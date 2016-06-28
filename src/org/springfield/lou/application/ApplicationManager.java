@@ -88,7 +88,7 @@ public class ApplicationManager extends Thread implements MargeObserver {
     }
     
     public void removeApplication(String id){
-    	if(this.getApplication(id)!=null)this.externalInterfaces.remove(this.getApplication(id).getExternalInterfaceId());
+  //  	if(this.getApplication(id)!=null)this.externalInterfaces.remove(this.getApplication(id).getExternalInterfaceId());
     	this.runningapps.remove(id);
    // 	update();
     }    

@@ -686,6 +686,7 @@ public class Screen {
 		}
 		
 		// so lets see if we have a referid on this that overrides it ?
+		/*
 		String referid = app.getReferid(target);
 		if (referid!=null) {
 			// so create new filename based on it ? (example : /websiteserviceone/defaultoutput);
@@ -703,7 +704,9 @@ public class Screen {
 					}
 				}
 			}
+			
 		}
+		*/
 
 		
 		

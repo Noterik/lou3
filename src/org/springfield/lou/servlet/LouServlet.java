@@ -357,15 +357,7 @@ public class LouServlet extends HttpServlet {
 			return;
 		}
 		
-		String gaintest = request.getParameter("type");
-		
-		if (gaintest!=null && gaintest.equals("gain")) {
-			System.out.println("GAINDATA="+data);
-			app.externalGainEvent(request, data);
-			return;
-		}
-		
-		
+
 		
 		if (data.indexOf("stop(")==0) {
 			//System.out.println("RECIEVED STOP FROP CLIENT");

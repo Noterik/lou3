@@ -47,7 +47,6 @@ import org.springfield.lou.screen.ScreenGroup;
 import org.springfield.lou.screen.ScreenManager;
 import org.springfield.lou.user.User;
 import org.springfield.lou.user.UserManager;
-import org.springfield.lou.util.NodeObserver;
 import org.springfield.mojo.interfaces.ServiceInterface;
 import org.springfield.mojo.interfaces.ServiceManager;
 
@@ -82,12 +81,9 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     protected boolean running = true;
     protected int fakeconnectionlost = 0;
     protected int fakeconnectionlostcount = 5;
-    protected String location_scope = "browserid";
-    protected Map<String, NodeObserver> observingNodes;
+//    protected String location_scope = "browserid";
     protected SmithersModel model;
-	protected Map<String, String> referids = new HashMap<String, String>();
-	protected Map<String, String> referidscss = new HashMap<String, String>();
-	protected Map<String, String> actionlists = new HashMap<String, String>();
+
     protected Map<String, String> callbackmethods = new HashMap<String, String>();
     protected Map<String, Object> callbackobjects = new HashMap<String, Object>();
     private Map<String, ArrayList<PathBindObject>> pathbindobjects = new HashMap<String, ArrayList<PathBindObject>>();
@@ -96,7 +92,6 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     
     public Html5Application(String id, String remoteReciever) {
     	this.timeoutcheck = false;
-    	this.observingNodes = new HashMap<String, NodeObserver>();
 		this.id = id;
 		int pos = id.indexOf("/html5application/");
 		if (pos!=-1) {
@@ -117,17 +112,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		this.usermanager = new UserManager();
 		t = new Thread(this);
         t.start();
-        /*
-        try{
-        RemoteProxy proxy = new RemoteProxy("remoteproxy", remoteReciever);
-		proxy.setApplication(this);
-		this.componentmanager.addComponent(proxy);
-        }catch(Exception e){
-        	e.printStackTrace();
-        }
-        */
-        
-        // load action lists and call the init !
+
         model = new SmithersModel(this);
     }
     
@@ -149,14 +134,6 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     
 	public Html5Application(String id) {
 		this(id, "video");
-	}
-	
-	public String getLocationScope() {
-		return location_scope;
-	}
-	
-	public void setLocationScope(String ns) {
-		location_scope = ns;
 	}
 	
 	public void setId(String i) {
@@ -206,50 +183,10 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		Long newid = new Date().getTime();
 		screencounter++;
 		Screen screen = new Screen(this,caps,id+"/1/screen/"+newid);
-	//	System.out.println("NEW SCREEN="+this+" "+this.getAppname()+" "+this.getId()+" "+screencounter);
-
 		screen.setParameters(p); // this can also be used to set location ?
-	//	System.out.println("CAP IP="+caps.getCapability("ipnumber"));
-	//	System.out.println("BROWSER ID="+caps.getCapability("smt_browserid"));
-		
-		// we need to add the location to this screen based on app settings
-		if (location_scope.equals("browserid")) {
-			System.out.println("get new screen browser id");
-			/*
-			String loc = caps.getCapability("smt_browserid");
-			if (loc!=null)  {
-				//Location nloc = new Location(loc, screen);
-				Location nloc = new Location(loc);
-				LocationManager.put(nloc);
-				screen.setLocation(nloc);
-			}
-			*/
-		} else if (location_scope.equals("ipnumber")) {
-			/*
-			String loc = caps.getCapability("ipnumber");
-			if (loc!=null)  {
-				//Location nloc = new Location(loc, screen); // problemdaniel
-				Location nloc = new Location(loc); // problemdaniel
-				LocationManager.put(nloc);
-				screen.setLocation(nloc);
-			}
-			*/
-		} else if (location_scope.equals("screen")) {
-			/*
-			String loc = screen.getId();
-			//System.out.println("SCREEN LOC ID="+loc);
-			if (loc!=null)  {
-				//Location nloc = new Location(loc, screen);
-				Location nloc = new Location(loc);
 
-				LocationManager.put(nloc);
-				screen.setLocation(nloc);
-			}
-			*/
-		}
 		this.screenmanager.put(screen);
 		this.onNewScreen(screen);
-	//	ApplicationManager.update();
 		return screen;
 	}
 	
@@ -260,20 +197,6 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	public ScreenManager getScreenManager(){
 		return this.screenmanager;
 	}
-	
-	/*
-	public void executeActionlist(String name) {
-		if (actionlistmanager.executeList(null, name)) {
-			
-		} else {
-			// call class directly, to simulate a callServer
-		}
-	}
-	
-	public void executeActionlist(Screen s,String name) {
-		return;
-	}
-	*/
 	
 	public UserManager getUserManager(){
 		return this.usermanager;
@@ -315,9 +238,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	}
 	
 	public void timeoutCheckup() {
-		//System.out.println("timeoutCheckup()");
 		Set<String> keys = this.screenmanager.getScreens().keySet();
-		//System.out.println("timeoutCheckup() "+keys.size()+" "+this.getFullId()+" this="+this);
 		ArrayList<String> wantremove = new ArrayList<String>();
 		Iterator<String> it = keys.iterator();
 		while(it.hasNext()){
@@ -328,18 +249,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 				if (username!=null) {
 					this.onLogoutUser(screen,username);
 				}
-				//System.out.println("SIZE="+this.getScreenManager().getScreens().size());
-			   // it.remove(); // avoids a ConcurrentModificationException
-				//System.out.println("SIZE2="+this.getScreenManager().getScreens().size());
-			  //  this.removeScreen(next,username);
 				wantremove.add(next+","+username);
-			    //it.remove();
-				//System.out.println("SIZE3="+this.getScreenManager().getScreens().size());
-				//if(this.screenmanager.size()==0){
-				//	this.screencounter = 1;
-				//}
-			} else {
-				//System.out.println("Screen ok "+screen.getId());
 			}
 		}
 		for (int i=0;i<wantremove.size();i++) {
@@ -390,36 +300,6 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		}
 	}
 	
-	/*
-	public void setContentOnScope(Screen scopescreen,String div,String content) {
-		Set<String> keys = this.screenmanager.getScreens().keySet();
-		Iterator<String> it = keys.iterator();
-		while(it.hasNext()){
-			String next = it.next();
-			Screen s = this.screenmanager.get(next);
-			
-			// we need to send this only to our location scope
-			Location loc =s.getLocation();
-			Location scopeloc = scopescreen.getLocation();
-			if (loc!=null && scopeloc!=null) {
-				String locid = loc.getId(); 
-				String slocid = scopeloc.getId(); 
-				if (locid.equals(slocid)) {
-					s.setContent(div,content);
-				}
-			} else {
-				System.out.println("LOCATION IS NULL SHOULD NOT HAPPEN !");
-				s.setContent(div,content);
-			//}
-		}
-	}
-	*/
-	
-	public int getExternalInterfaceId(){
-		return this.externalInterfaceId;
-	}
-	
-	
 	public void putData(String data) {
 		int pos = data.indexOf("put(");
 		if (pos!=-1) {
@@ -443,17 +323,6 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 					// get the correct screen in this case the sender
 					ts.put(from,content);
 				} else {
-					// check if we are a component 
-					/*
-					ComponentInterface comp = this.componentmanager.getComponent(target);	
-					if (comp!=null) {
-						//System.out.println("FOUND COMPONENENT = "+comp.getId());
-						comp.put(from,content);
-				
-					if (target.equals("../*")) {
-						// do we send it all screens attached ?
-						setContentAllScreens(from,content);
-					*/
 				    if (target.indexOf("../")==0){
 						// ok so not all screens but a screen !
 						String ns = target.substring(3);
@@ -469,23 +338,8 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	
 	
 	public void loadStyleSheet(Screen s,String sname) {
-    	String refercss = getReferidCSS(sname);
-    	if (refercss==null) {
-    		s.loadStyleSheet(getApplicationCSS(sname) , this);
-    	} else {
-        	if (refercss.startsWith("/")) {
-    				String refappname = refercss.substring(1);
-    				int pos = refappname.indexOf("/");
-    				String refcss = refappname.substring(pos+1);
-    				refappname = refappname.substring(0,pos);
-    				s.loadStyleSheetRefer(getApplicationCSSRefer(refcss,refappname),refappname);
-        	}
-    		
-    	}
-		//s.loadStyleSheet(sname, this);
+		s.loadStyleSheet(getApplicationCSS(sname) , this);
 	}
-	
-	// example loadStyleSheet(s,"trafficcontroller",appname);
 	
 	public void loadStyleSheet(Screen s,String dstyle,String sname) {
 		String fs = getDeviceCSS(dstyle);
@@ -501,53 +355,6 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 			s.loadStyleSheet(sname , this);
 		}
 	}
-
-	/*
-	public void loadContent(Screen s, String div,String comp) {
-		s.loadContent(div,comp,true, this);
-		// default also load the script attached
-		s.loadComponentScript(div,componentmanager.getComponentJS(comp), this, comp);
-	
-		Iterator<String> it = this.componentmanager.getComponent(comp).getProperties().keySet().iterator();	
-		while(it.hasNext()){
-			String property = (String) it.next();
-			String msg = "setdata(" + property + "," + this.componentmanager.getComponents().get(comp).getProperties().get(property) + ")";
-			s.putMsg(comp, "", msg);
-			System.out.println("SENDING INIT PROPERTIES!!! MSG::: "+ msg + "target:: " + comp);
-		}
-	}
-	*/
-	
-	/*
-	public void addContent(Screen s, String div,String comp) {
-		s.loadContent(div,comp,false, this);
-		// default also load the script attached
-		s.loadScript(div,componentmanager.getComponentJS(comp), this);
-	}
-	*/
-	
-	/*
-	public void addReferid(String div,String referid) {
-		// adds a referid for a external app to a local div name
-		referids.put(div, referid);
-	}
-	*/
-	
-	public String getReferid(String ctype) {
-		return referids.get(ctype);
-	}
-	
-	public void addReferidCSS(String local,String refercss) {
-		referidscss.put(local, refercss);
-	}
-	
-	
-	public String getReferidCSS(String css) {
-		return referidscss.get(css);
-	}
-
-
-
 	
 	
 	public void put(String from,String content) {
@@ -697,11 +504,13 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     }
 
     
+    
     public String getDeviceCSS(String dstyle) {
     	// weird for now.
     	String path = "apps/"+appname+"/css/"+dstyle+".css";
     	return path;
     }
+    
     
     public int getScreenCount() {
     	return screenmanager.getScreens().size();
@@ -713,16 +522,6 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     
     public int getScreenIdCounter() {
     	return screencounter-1;
-    }
-    
-    
-    public void subscribe(String node, FSXMLStrainer strainer){ // old daniel?
-    //	System.out.println("Html5Application.subscribe(" + node + ", " + strainer + ")");
-    	this.observingNodes.put(node, new NodeObserver(node, strainer));
-    }
-    
-    public void unsubscribe(String node){
-    	this.observingNodes.remove(node);
     }
     
     
@@ -849,19 +648,6 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     	return name;
     }
     
-    public Boolean externalGainEvent(HttpServletRequest request,String data) {
-    	System.out.println("Error: Incoming gain event on : "+id+" not handled by app");
-    	//System.out.println("DATA="+data);
-    	return false;
-    }
-    
-    public Html5MultiElement getMultiElement(String groupname,String s) {	
-    	return new Html5MultiElement(this, groupname, s);
-    }
-    
-    public Html5MultiElement getMultiElement(String s) {	
-    	return new Html5MultiElement(this,s);
-    }
     
     public SmithersModel getModel() {
     	return model;

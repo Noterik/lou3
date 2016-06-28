@@ -40,7 +40,7 @@ import org.springfield.fs.*;
  * @package org.springfield.lou.application
  *
  */
-public interface Html5ApplicationInterface extends QueryMultiInterface {
+public interface Html5ApplicationInterface {
 	public void setId(String id);
 	public String getId();
 	public String getAppname();
@@ -52,16 +52,10 @@ public interface Html5ApplicationInterface extends QueryMultiInterface {
 	public void log(String msg);
 	public void log(Screen s,String msg);
 	public void log(Screen s,String msg,int level);	
-	public void setLocationScope(String scope);
-	public String getReferid(String ctype);
-//	public void executeActionlist(Screen s,String name);
-//	public void executeActionlist(String name);
-//	public void addReferid(String div,String referid);
+	//public String getReferid(String ctype);
 	public void setContent(String div,String content);
-	//public void setContentOnScope(Screen s,String div,String content);
 	public void setHtmlPath(String p);
 	public void loadStyleSheet(Screen s,String sname);
-	//public void loadContent(Screen s, String comp);
 	public Screen getScreen(String id);
 	public Screen getNewScreen(Capabilities caps,Map<String,String[]> params);
 	public void putData(String msg);
@@ -76,14 +70,11 @@ public interface Html5ApplicationInterface extends QueryMultiInterface {
 	public int getScreenCount();
 	public int getUserCount();
 	public int getScreenIdCounter();
-	public int getExternalInterfaceId();
-	public void subscribe(String node, FSXMLStrainer strainer);
-	public void unsubscribe(String node);
+//	public int getExternalInterfaceId();
 	public FsNode getNode(String path);
 	public String getFavicon();
 	public SmithersModel getModel();
 	public String getMetaHeaders(HttpServletRequest request);
-	public Boolean externalGainEvent(HttpServletRequest request,String data);
 	public void setSessionRecovery(boolean s);
 	public boolean getSessionRecovery();
 	public ArrayList<String> getRecoveryList(); 
