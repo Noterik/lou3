@@ -26,8 +26,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springfield.lou.application.components.ComponentInterface;
-import org.springfield.lou.application.components.ComponentManager;
 import org.springfield.lou.controllers.Html5Controller;
 import org.springfield.lou.model.SmithersModel;
 import org.springfield.lou.screen.*;
@@ -56,23 +54,19 @@ public interface Html5ApplicationInterface extends QueryMultiInterface {
 	public void log(Screen s,String msg,int level);	
 	public void setLocationScope(String scope);
 	public String getReferid(String ctype);
-	public void executeActionlist(Screen s,String name);
-	public void executeActionlist(String name);
-	public void addReferid(String div,String referid);
+//	public void executeActionlist(Screen s,String name);
+//	public void executeActionlist(String name);
+//	public void addReferid(String div,String referid);
 	public void setContent(String div,String content);
-	public void setContentOnScope(Screen s,String div,String content);
+	//public void setContentOnScope(Screen s,String div,String content);
 	public void setHtmlPath(String p);
 	public void loadStyleSheet(Screen s,String sname);
-	public void loadContent(Screen s, String comp);
+	//public void loadContent(Screen s, String comp);
 	public Screen getScreen(String id);
 	public Screen getNewScreen(Capabilities caps,Map<String,String[]> params);
 	public void putData(String msg);
 	public void put(String from,String content);
 	public void putOnScreen(Screen s,String from, String content);
-	public ComponentManager getComponentManager();
-	public void addComponent(ComponentInterface comp);
-	public void addComponentToScreen(ComponentInterface comp, Screen screen);
-	public void removeComponentFromScreen(String component, Screen sc);
 	public void removeScreen(String id,String username);
 	public ScreenManager getScreenManager();
 	public String getLibPaths();

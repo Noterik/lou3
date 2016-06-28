@@ -35,14 +35,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.springfield.lou.application.components.ComponentInterface;
-import org.springfield.lou.application.components.ComponentManager;
-import org.springfield.lou.application.components.types.proxy.RemoteProxy;
 import org.springfield.lou.controllers.Html5Controller;
 import org.springfield.fs.*;
 import org.springfield.lou.homer.LazyHomer;
-import org.springfield.lou.location.Location;
-import org.springfield.lou.location.LocationManager;
 import org.springfield.lou.model.SmithersModel;
 import org.springfield.lou.screen.BindManager;
 import org.springfield.lou.screen.Capabilities;
@@ -76,9 +71,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	protected int screencounter;
 	protected Boolean timeoutcheck;
     protected ScreenManager screenmanager;
-    protected ComponentManager componentmanager;
     protected UserManager usermanager;
-    protected ActionListManager actionlistmanager;
     protected Thread t;
     protected String appname = "";
     protected int externalInterfaceId;
@@ -116,7 +109,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		}
 		this.screencounter = 1;
 		this.screenmanager = new ScreenManager();
-		this.componentmanager = new ComponentManager();
+
 		this.bindmanager = new BindManager(this);
 		this.externalInterfaceId = ApplicationManager.instance().getEternalInterfaceNumber();
 		ApplicationManager.instance().addExternalInterface(externalInterfaceId, this);
@@ -124,6 +117,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		this.usermanager = new UserManager();
 		t = new Thread(this);
         t.start();
+        /*
         try{
         RemoteProxy proxy = new RemoteProxy("remoteproxy", remoteReciever);
 		proxy.setApplication(this);
@@ -131,6 +125,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
         }catch(Exception e){
         	e.printStackTrace();
         }
+        */
         
         // load action lists and call the init !
         model = new SmithersModel(this);
@@ -200,7 +195,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	
 	public void setHtmlPath(String p) {
 		htmlpath = p;
-		this.actionlistmanager = new ActionListManager(this);
+	//	this.actionlistmanager = new ActionListManager(this);
 	}
 	
 	public void setCallback(String name,String m,Class c) {
@@ -219,6 +214,8 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		
 		// we need to add the location to this screen based on app settings
 		if (location_scope.equals("browserid")) {
+			System.out.println("get new screen browser id");
+			/*
 			String loc = caps.getCapability("smt_browserid");
 			if (loc!=null)  {
 				//Location nloc = new Location(loc, screen);
@@ -226,7 +223,9 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 				LocationManager.put(nloc);
 				screen.setLocation(nloc);
 			}
+			*/
 		} else if (location_scope.equals("ipnumber")) {
+			/*
 			String loc = caps.getCapability("ipnumber");
 			if (loc!=null)  {
 				//Location nloc = new Location(loc, screen); // problemdaniel
@@ -234,7 +233,9 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 				LocationManager.put(nloc);
 				screen.setLocation(nloc);
 			}
+			*/
 		} else if (location_scope.equals("screen")) {
+			/*
 			String loc = screen.getId();
 			//System.out.println("SCREEN LOC ID="+loc);
 			if (loc!=null)  {
@@ -244,10 +245,11 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 				LocationManager.put(nloc);
 				screen.setLocation(nloc);
 			}
+			*/
 		}
 		this.screenmanager.put(screen);
 		this.onNewScreen(screen);
-		ApplicationManager.update();
+	//	ApplicationManager.update();
 		return screen;
 	}
 	
@@ -259,6 +261,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		return this.screenmanager;
 	}
 	
+	/*
 	public void executeActionlist(String name) {
 		if (actionlistmanager.executeList(null, name)) {
 			
@@ -270,6 +273,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	public void executeActionlist(Screen s,String name) {
 		return;
 	}
+	*/
 	
 	public UserManager getUserManager(){
 		return this.usermanager;
@@ -386,6 +390,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		}
 	}
 	
+	/*
 	public void setContentOnScope(Screen scopescreen,String div,String content) {
 		Set<String> keys = this.screenmanager.getScreens().keySet();
 		Iterator<String> it = keys.iterator();
@@ -405,13 +410,15 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 			} else {
 				System.out.println("LOCATION IS NULL SHOULD NOT HAPPEN !");
 				s.setContent(div,content);
-			}
+			//}
 		}
 	}
+	*/
 	
 	public int getExternalInterfaceId(){
 		return this.externalInterfaceId;
 	}
+	
 	
 	public void putData(String data) {
 		int pos = data.indexOf("put(");
@@ -437,14 +444,17 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 					ts.put(from,content);
 				} else {
 					// check if we are a component 
+					/*
 					ComponentInterface comp = this.componentmanager.getComponent(target);	
 					if (comp!=null) {
 						//System.out.println("FOUND COMPONENENT = "+comp.getId());
 						comp.put(from,content);
-					} else if (target.equals("../*")) {
+				
+					if (target.equals("../*")) {
 						// do we send it all screens attached ?
 						setContentAllScreens(from,content);
-					} else if (target.indexOf("../")==0){
+					*/
+				    if (target.indexOf("../")==0){
 						// ok so not all screens but a screen !
 						String ns = target.substring(3);
 						String cs = from.substring(0,from.lastIndexOf("/"));
@@ -456,6 +466,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 			}
 		}
  	}
+	
 	
 	public void loadStyleSheet(Screen s,String sname) {
     	String refercss = getReferidCSS(sname);
@@ -491,6 +502,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		}
 	}
 
+	/*
 	public void loadContent(Screen s, String div,String comp) {
 		s.loadContent(div,comp,true, this);
 		// default also load the script attached
@@ -504,17 +516,22 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 			System.out.println("SENDING INIT PROPERTIES!!! MSG::: "+ msg + "target:: " + comp);
 		}
 	}
+	*/
 	
+	/*
 	public void addContent(Screen s, String div,String comp) {
 		s.loadContent(div,comp,false, this);
 		// default also load the script attached
 		s.loadScript(div,componentmanager.getComponentJS(comp), this);
 	}
+	*/
 	
+	/*
 	public void addReferid(String div,String referid) {
 		// adds a referid for a external app to a local div name
 		referids.put(div, referid);
 	}
+	*/
 	
 	public String getReferid(String ctype) {
 		return referids.get(ctype);
@@ -529,50 +546,32 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		return referidscss.get(css);
 	}
 
-	
-	public void loadContent(Screen s, String comp) {
-		s.loadContent(comp, comp,true, this);
-		s.loadComponentScript(comp, componentmanager.getComponentJS(comp), this, comp);
-		//s.loadScript(comp, componentmanager.getComponentGestures(comp),this);
-		
-		Iterator<String> it = this.componentmanager.getComponent(comp).getProperties().keySet().iterator();	
-		while(it.hasNext()){
-			String property = (String) it.next();
-			String msg = "setdata(" + property + "," + this.componentmanager.getComponents().get(comp).getProperties().get(property) + ")";
-			s.putMsg(comp, "", msg);
-			//System.out.println("SENDING INIT PROPERTIES!!! MSG::: "+ msg + "target:: " + comp);
-		}
-	}
+
 
 	
-	public void setContentAllScreens(String from,String content) {
-		Set<String> keys = this.screenmanager.getScreens().keySet();
-		Iterator<String> it = keys.iterator();
-		while(it.hasNext()){
-			String next = it.next();
-			Screen s = this.screenmanager.get(next);
-			s.put(from,content);
-		}
-	}
 	
 	public void put(String from,String content) {
 		System.out.println("Application put should be overridden");
 	}
 	
 	public void putOnScreen(Screen s,String from,String content) {
-		
+		//System.out.println("PUT ON SCREEN CALLED");
 		// old commands can we integrate them in actions ???
 		String component = content.substring(content.indexOf("(")+1, content.indexOf(")"));
 		if(content.indexOf("load(")==0)	{
+			System.out.println("LOAD CALLED!!");
+			/*
 			String[] parts = component.split(",");
 			if (parts.length==1) { 
-				loadContent(s, component);
+			//	loadContent(s, component);
 			} else {
 				loadContent(s, parts[0],parts[1]);
 			}
+			*/
 		} else if(content.indexOf("add(")==0) {
-			String[] parts = component.split(",");
-			addContent(s, parts[0],parts[1]);
+			System.out.println("ADD PUT CALLED");
+		//	String[] parts = component.split(",");
+	//		addContent(s, parts[0],parts[1]);
 		} else if(content.indexOf("remove(")==0) {
 			removeContent(s, component);
 		} else if(content.indexOf("event(")==0) {
@@ -591,116 +590,34 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 			eddieLog(s,component);
 		}
 		// call the actionlists attached !
-        executeActionlist(s,content);
+      //  executeActionlist(s,content);
 	}
 	
 	public void removeContent(Screen s, String comp){
 		s.removeContent(comp, this);	
-	
 	}
 	
-	public void removeContentAllScreens(String comp){
-		Set<String> keys = this.screenmanager.getScreens().keySet();
-		Iterator<String> it = keys.iterator();
-		while(it.hasNext()){
-			String next = it.next();
-			Screen s = this.screenmanager.get(next);
-			s.removeContent(comp, this);	
-		}
-	}
-	
-	public void removeContentAllScreensWithRole(String role,String comp){
-		Set<String> keys = this.screenmanager.getScreens().keySet();
-		Iterator<String> it = keys.iterator();
-		while(it.hasNext()){
-			String next = it.next();
-			Screen s = this.screenmanager.get(next);
-			if (s.getRole().equals(role)) {
-				s.removeContent(comp, this);	
-			}
-		}
-	}
-	
-	public void loadContentAllScreensWithRole(String role,String comp) {
-		Set<String> keys = this.screenmanager.getScreens().keySet();
-		Iterator<String> it = keys.iterator();
-		while(it.hasNext()){
-			String next = it.next();
-			Screen s = this.screenmanager.get(next);
-			if (s.getRole().equals(role)) {
-				loadContent(s,comp);	
-			}
-		}
-	}
-	
-	public void setContentAllScreensWithRole(String role,String div,String content) {
-		Set<String> keys = this.screenmanager.getScreens().keySet();
-		Iterator<String> it = keys.iterator();
-		while(it.hasNext()){
-			String next = it.next();
-			Screen s = this.screenmanager.get(next);
-			if (s.getRole().equals(role)) {
-				s.setContent(div,content);
-			}
-		}
-	}
-	
-	public void addComponentToScreen(ComponentInterface comp, Screen sc){
-		this.componentmanager.addComponent(comp);
-		comp.getScreenManager().put(sc);
-		sc.getComponentManager().addComponent(comp);	
-	}
-	
-	public void addComponent(ComponentInterface comp) {
-		this.componentmanager.addComponent(comp);	
-	}
-	
-	public void removeComponentFromScreen(String comp, Screen sc){
-		try{
-			sc.getComponentManager().removeComponent(comp);
-		}catch(Exception e){
-			//e.printStackTrace();
-		}
-		try{
-			this.componentmanager.getComponent(comp).getScreenManager().remove(sc.getId());
-		}catch(Exception e){
-			//e.printStackTrace();
-		}
-		
-		try{
-			Iterator<String> it = this.screenmanager.getScreens().keySet().iterator();	
-			while (it.hasNext()){
-				Screen s = this.screenmanager.get(it.next());
-				//if a screen still has this component don't remove it
-				//from the application component manager
-				if(s.getComponentManager().getComponents().containsKey(comp)) return;
-			}
-			
-			this.componentmanager.removeComponent(this.componentmanager.getComponent(comp).getId());
-		}catch(Exception e){
-			//e.printStackTrace();
-		}
-		
-	}
 	
 	public void removeScreen(String id,String username){
 		Screen screen = this.screenmanager.get(id);
 //		String username =null;
 		if (screen!=null) {
 			username = screen.getUserName();
-			Location nloc = screen.getLocation();
-			if (nloc!=null) {
-				LocationManager.remove(nloc.getId());
-				System.out.println("location remove = "+nloc.getId()+" "+LocationManager.size());
-			}
+			//Location nloc = screen.getLocation();
+			//if (nloc!=null) {
+			//	LocationManager.remove(nloc.getId());
+			//	System.out.println("location remove = "+nloc.getId()+" "+LocationManager.size());
+			//}
 		}
 		ScreenManager.globalremove(id);
 		bindmanager.onPathRemove(screen);
 		
+		/*
 		Iterator<String> it = this.componentmanager.getComponents().keySet().iterator();
 		while(it.hasNext()){
 			this.componentmanager.getComponent((String)it.next()).getScreenManager().remove(id);
 		}
+		*/
 		onScreenTimeout(screen);
 		//if(this.screenmanager.size()==0){
 		//	this.screencounter = 1;
@@ -716,12 +633,9 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 					}
 			}
 		}
-		ApplicationManager.update();
+		//ApplicationManager.update();
 	}
 	
-	public ComponentManager getComponentManager(){
-		return this.componentmanager;
-	}
 	
 	public void onScreenTimeout(Screen s) {
 		//System.out.println("Screen timeout should be overridden by application");
@@ -729,13 +643,14 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	
 	public void onNewScreen(Screen s) {
 		//loadContent(s, "signal"); old code ?
+		/*
 		String extraactionlist = s.getParameter("actionlist");
-		//System.out.println("EXTRALIST="+extraactionlist);
 		if (extraactionlist!=null) {
 			executeActionlist(s,extraactionlist);
 		} else {
 			executeActionlist(s,"newscreen");
 		}
+		*/
 	}
 	
 	public void onLogoutUser(Screen s,String name) {
@@ -743,7 +658,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		if (u!=null) { // should check if still on other screen !!!
 			usermanager.removeUser(u);
 		}
-		ApplicationManager.update();	
+	//	ApplicationManager.update();	
 	}
 	
 	public void onNewUser(Screen s,String id) {
@@ -755,15 +670,15 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		} else {
 			u.addScreen(s);
 		}
-		ApplicationManager.update();
+		//ApplicationManager.update();
 		//System.out.println("NewUser APP="+appname);
-		if (!appname.equals("dashboard")) executeActionlist(s,"newuser");
+	//	if (!appname.equals("dashboard")) executeActionlist(s,"newuser");
 	}
 	
 	
 	
 	public void onLoginFail(Screen s,String id) {
-		executeActionlist(s,"login/loginfail");
+	//	executeActionlist(s,"login/loginfail");
 	}
 	
     public String getApplicationCSS(String name) {

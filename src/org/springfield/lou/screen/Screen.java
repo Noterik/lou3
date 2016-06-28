@@ -34,13 +34,8 @@ import org.json.simple.JSONObject;
 import org.springfield.fs.Fs;
 import org.springfield.fs.FsNode;
 import org.springfield.lou.application.*;
-import org.springfield.lou.application.components.BasicComponent;
-import org.springfield.lou.application.components.ComponentInterface;
-import org.springfield.lou.application.components.ComponentManager;
-import org.springfield.lou.application.components.types.AvailableappsComponent;
 import org.springfield.lou.controllers.Html5Controller;
 import org.springfield.lou.homer.LazyHomer;
-import org.springfield.lou.location.Location;
 import org.springfield.lou.tools.JavascriptInjector;
 import org.springfield.mojo.interfaces.ServiceInterface;
 import org.springfield.mojo.interfaces.ServiceManager;
@@ -64,8 +59,6 @@ public class Screen {
 	private String language = null;
 	private String data = null;
 	private long lastseen = -1;
-	private ComponentManager cm;
-	private Location location;
 	private String username = null;
 	private Map<String, String[]> params;
 	private Map<String, Object> properties;
@@ -127,7 +120,7 @@ public class Screen {
 		} else {
 			System.out.println("APP STARTED IN ROOT NOT AS A USER needs to be in /user/[name]/ "+a.getFullId());
 		}
-		this.cm = new ComponentManager();
+		//this.cm = new ComponentManager();
 		setSeen();
 	}
 	
@@ -256,13 +249,6 @@ public class Screen {
 		return this.id;
 	}
 	
-	public void setLocation(Location loc) {
-		location = loc;
-	}
-	
-	public Location getLocation() {
-		return location;
-	}
 	
 	public String getShortId() {
 		return this.shortid;
@@ -381,7 +367,6 @@ public class Screen {
 		    this.notify();
 		}
 		
-		app.removeComponentFromScreen(t, this);
 	}
 		
 	/**
@@ -413,9 +398,6 @@ public class Screen {
 		}
 	}
 	
-	public ComponentManager getComponentManager(){
-		return this.cm;
-	}
 	
 	public void loadStyleSheet(String style,Boolean allowcache) {
 		if (allowcache && csscache.contains(style)) {
@@ -902,6 +884,7 @@ public class Screen {
 	}
 	
 	
+	/*
 	public void loadContent(String target,String ctype,Boolean overload, Html5ApplicationInterface app) {
 		// lets find out what is the active version for this app
 		String templatepath = app.getComponentManager().getComponentPath(ctype);
@@ -983,34 +966,8 @@ public class Screen {
 				//System.out.println("Can't read template file for: "+ target);
 		}
 		
-		
-		// should it be component or target ? Daniel, changed it
-		// ok lets turn  it into a component if needed
-		ComponentInterface comp = app.getComponentManager().getComponent(ctype);
-		if (comp!=null) {
-			// we already have it so i guess its multiscreen component nice :)
-			//register this component to the screen and the screen to the component
-			comp.getScreenManager().put(this);
-			this.cm.addComponent(comp);
-			
-		} else {
-			// start a component based on the name (fixed now)
-			try {
-				String classname = "org.springfield.lou.application.components.types.";
-			    classname += ctype.substring(0,1).toUpperCase();
-			    classname += ctype.substring(1) + "Component";
-				Object o = Class.forName(classname).newInstance();
-				comp = (ComponentInterface)o;
-
-			} catch(Exception e) {
-				// lets assume its a basic component then
-				comp = new BasicComponent();
-			}
-			comp.setId(ctype);
-			comp.setApplication(app);
-			app.addComponentToScreen(comp, this);
-		}
 	}
+	*/
 	
 	public void setGroup(String name) {
 		ScreenGroup sg = app.getScreenManager().getScreenGroup(name);

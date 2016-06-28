@@ -26,7 +26,6 @@ import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import org.springfield.lou.application.remoteregister.RemoteServlet;
 
 /**
  * LazyLou handles the remote controlm
@@ -175,8 +174,8 @@ class LazyLou extends Thread
         	System.out.println(buttonClicked);
         	
         	String body = "<fsxml><message id=\"1\"><properties><msg>buttonClicked("+buttonClicked+")</msg></properties></message></fsxml>";
-        	//TODO: the IP address should be configurable
-        	RemoteServlet.handle(body,"buttonClicked("+buttonClicked+")","192.168.1.30");
+      //  	//TODO: the IP address should be configurable
+       // 	RemoteServlet.handle(body,"buttonClicked("+buttonClicked+")","192.168.1.30");
         }
         
         for(int i=0;i<signalValues.size();i++) System.out.print(signalValues.get(i) + " ");

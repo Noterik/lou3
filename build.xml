@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<project name="lou2" default="deploy-war">
+<project name="lou3" default="deploy-war">
 	<!-- maak env variabele-->
 	<property environment="env" />
 	<property name="src.dir" value="src"/>

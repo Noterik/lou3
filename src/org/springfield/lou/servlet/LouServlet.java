@@ -352,6 +352,7 @@ public class LouServlet extends HttpServlet {
 		}
 		
 		if (data.indexOf("put(")==0) {
+		//	System.out.println("DO PUT WAS CALLED");
 			app.putData(data);
 			return;
 		}
@@ -446,8 +447,8 @@ public class LouServlet extends HttpServlet {
 					screen.setParameters(params);
 					
 					// see if we need to override the location
-					String ploc = screen.getParameter("location");
-					if (ploc!=null) screen.getLocation().setId(ploc);
+					//String ploc = screen.getParameter("location");
+					//if (ploc!=null) screen.getLocation().setId(ploc);
 					response.setContentType("text/xml; charset=UTF-8");
 					OutputStream out = response.getOutputStream();
 					out.write(XMLHelper.createScreenIdFSXML(screen.getId(),true).getBytes());

@@ -1,9 +1,0 @@
-package org.springfield.lou.json;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-@Retention(RetentionPolicy.RUNTIME)
-public @interface JSONField {
-	String field() default "";
-}

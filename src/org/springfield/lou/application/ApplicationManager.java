@@ -37,8 +37,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.springfield.lou.application.components.types.OpenappsComponent;
-import org.springfield.lou.application.types.DashboardApplication;
 import org.springfield.fs.*;
 import org.springfield.lou.homer.LazyHomer;
 import org.springfield.marge.Marge;
@@ -60,7 +58,6 @@ public class ApplicationManager extends Thread implements MargeObserver {
 	private static Map<String, Html5ApplicationInterface> runningapps = new HashMap<String, Html5ApplicationInterface>();
 	private static Map<String, Html5AvailableApplication> availableapps = null;
 	private static ApplicationManager instance;
-	private static OpenappsComponent oac;
 	private static boolean running = false;
 	private static Map<Integer, Html5ApplicationInterface> externalInterfaces = new HashMap<Integer, Html5ApplicationInterface>();
 	private static Map<String, Html5ApplicationInterface> router = new HashMap<String, Html5ApplicationInterface>();
@@ -87,13 +84,13 @@ public class ApplicationManager extends Thread implements MargeObserver {
     	// for now its just one app not static/instance based yet
     	//System.out.println("ADDAPPLICATION="+app.getFullId()+" ID="+app.getId());
     	runningapps.put(app.getId(),app);
-    	update();
+    	//update();
     }
     
     public void removeApplication(String id){
     	if(this.getApplication(id)!=null)this.externalInterfaces.remove(this.getApplication(id).getExternalInterfaceId());
     	this.runningapps.remove(id);
-    	update();
+   // 	update();
     }    
     
     public int getEternalInterfaceNumber(){
@@ -195,7 +192,7 @@ public class ApplicationManager extends Thread implements MargeObserver {
 			Html5ApplicationInterface newapp = (Html5ApplicationInterface)o;
 			newapp.setHtmlPath("/springfield/lou/apps/"+newapp.getAppname()+"/"+version+"/");
 			// execute the first command list
-			newapp.executeActionlist("init");
+			//newapp.executeActionlist("init");
     		System.out.println("NEW APP="+newapp+" version="+version+" D="+LazyHomer.inDeveloperMode());
     		return newapp;
     	} catch(Exception e) {
@@ -245,13 +242,17 @@ public class ApplicationManager extends Thread implements MargeObserver {
     	return availableapps;
     }    
     
+    /*
     public static void setOpenappCallback(OpenappsComponent c) {
     	oac = c;
     }
+    */
     
+    /*
     public static void update() {
     	if (oac!=null) oac.update();
     }
+    */
     
     public static void startLogger(String url) {
     		logcollection =  new FSList(url);
@@ -288,7 +289,7 @@ public class ApplicationManager extends Thread implements MargeObserver {
     		String url = logcollection.getPath();
     		if (app.getId().equals(url)) {
     			logcollection.addNode(n);
-    			if (oac!=null) oac.logChange(logcollection);
+    		//	if (oac!=null) oac.logChange(logcollection);
     		}
     }
     
@@ -437,11 +438,13 @@ public class ApplicationManager extends Thread implements MargeObserver {
 		    	    	 }
 		    	     }
 
+		    	     /*
 		    	     Html5ApplicationInterface app = getApplication("/domain/webtv/html5application/dashboard");
     				 if (app!=null) {
     					DashboardApplication dapp = (DashboardApplication)app;
     					dapp.newApplicationFound(appname);
     				 }
+    				 */
     				 
     				 // lets tell set the available variable to tell the others we have it.
     				 System.out.println("DANIEL CHECK 1");
@@ -758,7 +761,7 @@ public class ApplicationManager extends Thread implements MargeObserver {
 									// lets scan for triggers !
 									String scanpath="/springfield/lou/apps/"+vapp.getId()+"/"+pv.getId()+"/actionlists/";
 									//System.out.println("ACTIONLIST PRESCANNER="+scanpath);
-									if (!LazyHomer.inDeveloperMode()) ActionListManager.readActionListsDirForUrlTriggers(scanpath);
+								//	if (!LazyHomer.inDeveloperMode()) ActionListManager.readActionListsDirForUrlTriggers(scanpath);
 								}
 							}
 							//System.out.println("N5.2");
@@ -767,7 +770,7 @@ public class ApplicationManager extends Thread implements MargeObserver {
 								if (dv!=null) {
 									dv.loadDevelopmentState(true);
 									String scanpath="/springfield/lou/apps/"+vapp.getId()+"/"+dv.getId()+"/actionlists/";
-									if (LazyHomer.inDeveloperMode()) ActionListManager.readActionListsDirForUrlTriggers(scanpath);
+								//	if (LazyHomer.inDeveloperMode()) ActionListManager.readActionListsDirForUrlTriggers(scanpath);
 								}
 							}
 							
@@ -938,8 +941,8 @@ public class ApplicationManager extends Thread implements MargeObserver {
 			    	        	loadAvailableApps();
 					    	     Html5ApplicationInterface app = getApplication("/domain/webtv/html5application/dashboard");
 			    				 if (app!=null) {
-			    					DashboardApplication dapp = (DashboardApplication)app;
-			    					dapp.newApplicationFound(appname);
+			    				//	DashboardApplication dapp = (DashboardApplication)app;
+			    				//	dapp.newApplicationFound(appname);
 			    				 }
 			    				 
 			    					ArrayList<String> keys = new ArrayList<String>(runningapps.keySet());
