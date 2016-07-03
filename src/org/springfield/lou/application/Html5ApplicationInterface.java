@@ -27,7 +27,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springfield.lou.controllers.Html5Controller;
-import org.springfield.lou.model.SmithersModel;
+import org.springfield.lou.model.AppInstanceModel;
+import org.springfield.lou.model.AppModel;
+import org.springfield.lou.model.Model;
 import org.springfield.lou.screen.*;
 import org.springfield.fs.*;
 
@@ -70,10 +72,12 @@ public interface Html5ApplicationInterface {
 	public int getScreenCount();
 	public int getUserCount();
 	public int getScreenIdCounter();
+	public AppModel getAppModel();
+	public AppInstanceModel getAppInstanceModel();
 //	public int getExternalInterfaceId();
 	public FsNode getNode(String path);
 	public String getFavicon();
-	public SmithersModel getModel();
+//	public Model getModel();
 	public String getMetaHeaders(HttpServletRequest request);
 	public void setSessionRecovery(boolean s);
 	public boolean getSessionRecovery();

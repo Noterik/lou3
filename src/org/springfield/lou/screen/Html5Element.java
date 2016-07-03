@@ -15,7 +15,7 @@ import org.springfield.fs.FSList;
 import org.springfield.fs.FsNode;
 import org.springfield.lou.application.Html5ApplicationInterface;
 import org.springfield.lou.controllers.Html5Controller;
-import org.springfield.lou.model.SmithersModel;
+import org.springfield.lou.model.Model;
 
 public class Html5Element {
 	private String selector;
@@ -143,9 +143,9 @@ public class Html5Element {
 	}
 	
 	public boolean parsehtml(JSONObject json) {
-		SmithersModel model = screen.getApplication().getModel();
+		//Model model = screen.getApplication().getModel();
 		//System.out.println("SELECTOR="+selector);
-		FsNode node = model.getNode("/app/view/"+selector);
+		FsNode node = screen.getModel().getNode("/app/view/"+selector);
 		if (node!=null) {
 			String template = node.getProperty("template");
 			// extend for the real path
@@ -192,9 +192,9 @@ public class Html5Element {
 	
 	public boolean loadScript(Html5Controller c) {
 		controller = c;
-		SmithersModel model = screen.getApplication().getModel();
+		//Model model = screen.getApplication().getModel();
 		//System.out.println("SELECTOR="+selector);
-		FsNode node = model.getNode("/app/view/"+selector+"/controller/"+controller.getControllerName());
+		FsNode node = screen.getModel().getNode("/app/view/"+selector+"/controller/"+controller.getControllerName());
 		if (node!=null) {
 			String scriptname = node.getProperty("javascript");
 			if (scriptname==null || scriptname.equals("")) {
@@ -274,7 +274,7 @@ public class Html5Element {
 	public boolean on(String eventtype,Html5Controller c) {
 		controller = c;
 		controller.setScreen(screen);
-		controller.setModel(screen.getApplication().getModel());
+		controller.setModel(screen.getModel());
 		controller.attach(selector,eventtype);
 		return true;
 	}
@@ -282,7 +282,7 @@ public class Html5Element {
 	public boolean html(Html5Controller c) {
 		controller = c;
 		controller.setScreen(screen);
-		controller.setModel(screen.getApplication().getModel());
+		controller.setModel(screen.getModel());
 		controller.attach(selector);
 		return true;
 	}
@@ -290,7 +290,7 @@ public class Html5Element {
 	public boolean attach(Html5Controller c) {
 		controller = c;
 		controller.setScreen(screen);
-		controller.setModel(screen.getApplication().getModel());
+		controller.setModel(screen.getModel());
 		controller.attach(selector);
 		return true;
 	}
@@ -312,22 +312,22 @@ public class Html5Element {
 	}
 
 	public void setViewProperty(String name,String value) {
-		SmithersModel m = screen.getApplication().getModel();
-		FsNode view  = m.getNode("/app/view/"+selector);
+		//Model m = screen.getApplication().getModel();
+		FsNode view  = screen.getModel().getNode("/app/view/"+selector);
 		if (view==null) {
 			view = new FsNode("view",selector);
-			m.putNode("/app",view);
+			screen.getModel().putNode("/app",view);
 		}
 		view.setProperty(name,value);
 	}
 	
 	public void setControllerProperty(String controllername,String name,String value) {
-		SmithersModel m = screen.getApplication().getModel();
-		FsNode controller  = m.getNode("/app/view/"+selector+"/controller/"+controllername);
+		//Model m = screen.getApplication().getModel();
+		FsNode controller  = screen.getModel().getNode("/app/view/"+selector+"/controller/"+controllername);
 		
 		if (controller==null) {
 			controller = new FsNode("controller",controllername);
-			m.putNode("/app/view/"+selector,controller);
+			screen.getModel().putNode("/app/view/"+selector,controller);
 		}
 		controller.setProperty(name,value);
 	}

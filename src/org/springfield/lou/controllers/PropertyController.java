@@ -4,7 +4,7 @@ import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
 import org.springfield.fs.Fs;
 import org.springfield.fs.FsNode;
-import org.springfield.lou.model.SmithersModel;
+import org.springfield.lou.model.Model;
 import org.springfield.lou.screen.Screen;
 
 public class PropertyController extends Html5Controller {
@@ -53,7 +53,8 @@ public class PropertyController extends Html5Controller {
     public void setProperty(Screen s,JSONObject data) {
     	if (selector!=null) { // protect against no attach done
     		String value = (String)data.get(selector.substring(1)+".value");
-    		model.setProperty(nodepath,field,value);
+    		//model.setProperty(nodepath,field,value);
+    		model.setProperty(nodepath+"/"+field,value);
     	}
     }
 	

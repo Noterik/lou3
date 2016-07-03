@@ -36,6 +36,7 @@ import org.springfield.fs.FsNode;
 import org.springfield.lou.application.*;
 import org.springfield.lou.controllers.Html5Controller;
 import org.springfield.lou.homer.LazyHomer;
+import org.springfield.lou.model.Model;
 import org.springfield.lou.tools.JavascriptInjector;
 import org.springfield.mojo.interfaces.ServiceInterface;
 import org.springfield.mojo.interfaces.ServiceManager;
@@ -69,6 +70,7 @@ public class Screen {
   //  protected Map<String, Object> callbackobjects = new HashMap<String, Object>();
     private Map<String, HashMap<String,PathBindObject>> pathbindobjects = new HashMap<String, HashMap<String,PathBindObject>>();
     protected Map<String, ArrayList<String>> bindoverrides = new HashMap<String, ArrayList<String>>();
+    private Model model;
     
     protected Map<String, ArrayList<PropertyBindObject>> propertybindobjects = new HashMap<String, ArrayList<PropertyBindObject>>();
 	
@@ -84,6 +86,7 @@ public class Screen {
 		this.shortid=id.substring(pos);
 		this.app = a;
 		this.properties = new HashMap<String, Object>();
+	    model = new Model(this);
 		
 		// so some session recovery, only allow sessions per user !!!
 		if (a.getSessionRecovery()) {
@@ -112,8 +115,9 @@ public class Screen {
 					String name =  iter.next();
 					String value = n2.getProperty(name);
 					if (value!=null) {
-						System.out.println("RECOVERY SET="+name+" value="+value);
-						setProperty(name, value); // put it back for now just String work !
+						System.out.println("RECOVERY SET="+name+" value="+value+"!!");
+						model.setProperty("/screen/"+name, value); // put it back for now just String work !
+						
 					}
 				}
 			}
@@ -122,6 +126,10 @@ public class Screen {
 		}
 		//this.cm = new ComponentManager();
 		setSeen();
+	}
+	
+	public Model getModel() {
+		return model;
 	}
 	
 	public void event(String from,String key,JSONObject data) {
@@ -198,6 +206,7 @@ public class Screen {
 		return params;
 	}
 	
+	/*
 	public void setProperty(String key, Object value){
 		properties.put(key, value);
 		// ok lets check if we also need to store it in the session object in smithers
@@ -228,10 +237,14 @@ public class Screen {
 		
 	
 	}
+
+	
 	
 	public Object getProperty(String key){
 		return properties.get(key);
 	}
+	*/
+	
 	
 	public void setSeen() {
 		lastseen = new Date().getTime();	
@@ -822,6 +835,7 @@ public class Screen {
 		app.log(this,msg,level);
 	}
 	
+	/*
 	public void setProperties(String content) {
 		String[] cmd=content.split(",");
 		for (int i=0;i<cmd.length;i++) {
@@ -829,6 +843,7 @@ public class Screen {
 			setProperty(param[0],param[1]);
 		}
 	}
+	*/
 	
 	public void bindOverride(String selector,ArrayList<String> overrides) {
 		bindoverrides.put(selector, overrides);

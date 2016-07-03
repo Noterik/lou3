@@ -38,7 +38,9 @@ import org.json.simple.parser.JSONParser;
 import org.springfield.lou.controllers.Html5Controller;
 import org.springfield.fs.*;
 import org.springfield.lou.homer.LazyHomer;
-import org.springfield.lou.model.SmithersModel;
+import org.springfield.lou.model.AppInstanceModel;
+import org.springfield.lou.model.AppModel;
+import org.springfield.lou.model.Model;
 import org.springfield.lou.screen.BindManager;
 import org.springfield.lou.screen.Capabilities;
 import org.springfield.lou.screen.Html5Element;
@@ -73,22 +75,20 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     protected UserManager usermanager;
     protected Thread t;
     protected String appname = "";
-    protected int externalInterfaceId;
-    protected String remoteReciever = "video";
-    protected boolean paired = false;
     protected boolean sessionrecovery = false;
 	protected ArrayList<String> recoverylist  = new ArrayList<String>();
     protected boolean running = true;
     protected int fakeconnectionlost = 0;
     protected int fakeconnectionlostcount = 5;
 //    protected String location_scope = "browserid";
-    protected SmithersModel model;
+    protected AppInstanceModel appinstancemodel;
 
     protected Map<String, String> callbackmethods = new HashMap<String, String>();
     protected Map<String, Object> callbackobjects = new HashMap<String, Object>();
     private Map<String, ArrayList<PathBindObject>> pathbindobjects = new HashMap<String, ArrayList<PathBindObject>>();
 	private Map<String, Object> properties = new HashMap<String, Object>();
 	private BindManager bindmanager;
+	private static AppModel appmodel;
     
     public Html5Application(String id, String remoteReciever) {
     	this.timeoutcheck = false;
@@ -106,14 +106,21 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		this.screenmanager = new ScreenManager();
 
 		this.bindmanager = new BindManager(this);
-		this.externalInterfaceId = ApplicationManager.instance().getEternalInterfaceNumber();
-		ApplicationManager.instance().addExternalInterface(externalInterfaceId, this);
 		//System.out.println("external id: " + externalInterfaceId);
 		this.usermanager = new UserManager();
 		t = new Thread(this);
         t.start();
 
-        model = new SmithersModel(this);
+       if (appmodel==null) appmodel = new AppModel(this); // create the memory for all instances of this app
+       appinstancemodel = new AppInstanceModel(this); // create the memory for this app
+    }
+    
+    public AppModel getAppModel() {
+    	return appmodel;
+    }
+    
+    public AppInstanceModel getAppInstanceModel() {
+    	return appinstancemodel;
     }
     
     public void addToRecoveryList(String name) {
@@ -148,10 +155,6 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		return appname;
 	}
 	
-	public void setPaired(Boolean status){
-		this.paired = status;
-	}
-	
 	public String getDomain() {
 		String result = id.substring(id.indexOf("/domain/")+8);
 		result = result.substring(0,result.indexOf('/'));
@@ -172,7 +175,6 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	
 	public void setHtmlPath(String p) {
 		htmlpath = p;
-	//	this.actionlistmanager = new ActionListManager(this);
 	}
 	
 	public void setCallback(String name,String m,Class c) {
@@ -362,23 +364,11 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	}
 	
 	public void putOnScreen(Screen s,String from,String content) {
-		//System.out.println("PUT ON SCREEN CALLED");
-		// old commands can we integrate them in actions ???
 		String component = content.substring(content.indexOf("(")+1, content.indexOf(")"));
 		if(content.indexOf("load(")==0)	{
 			System.out.println("LOAD CALLED!!");
-			/*
-			String[] parts = component.split(",");
-			if (parts.length==1) { 
-			//	loadContent(s, component);
-			} else {
-				loadContent(s, parts[0],parts[1]);
-			}
-			*/
 		} else if(content.indexOf("add(")==0) {
 			System.out.println("ADD PUT CALLED");
-		//	String[] parts = component.split(",");
-	//		addContent(s, parts[0],parts[1]);
 		} else if(content.indexOf("remove(")==0) {
 			removeContent(s, component);
 		} else if(content.indexOf("event(")==0) {
@@ -396,8 +386,6 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 			String[] parts = component.split(",");
 			eddieLog(s,component);
 		}
-		// call the actionlists attached !
-      //  executeActionlist(s,content);
 	}
 	
 	public void removeContent(Screen s, String comp){
@@ -407,28 +395,13 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	
 	public void removeScreen(String id,String username){
 		Screen screen = this.screenmanager.get(id);
-//		String username =null;
 		if (screen!=null) {
 			username = screen.getUserName();
-			//Location nloc = screen.getLocation();
-			//if (nloc!=null) {
-			//	LocationManager.remove(nloc.getId());
-			//	System.out.println("location remove = "+nloc.getId()+" "+LocationManager.size());
-			//}
 		}
 		ScreenManager.globalremove(id);
 		bindmanager.onPathRemove(screen);
 		
-		/*
-		Iterator<String> it = this.componentmanager.getComponents().keySet().iterator();
-		while(it.hasNext()){
-			this.componentmanager.getComponent((String)it.next()).getScreenManager().remove(id);
-		}
-		*/
 		onScreenTimeout(screen);
-		//if(this.screenmanager.size()==0){
-		//	this.screencounter = 1;
-		//}
 
 		if (username!=null) {
 			User u = usermanager.getUser(username);
@@ -440,24 +413,13 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 					}
 			}
 		}
-		//ApplicationManager.update();
 	}
 	
 	
 	public void onScreenTimeout(Screen s) {
-		//System.out.println("Screen timeout should be overridden by application");
 	}
 	
 	public void onNewScreen(Screen s) {
-		//loadContent(s, "signal"); old code ?
-		/*
-		String extraactionlist = s.getParameter("actionlist");
-		if (extraactionlist!=null) {
-			executeActionlist(s,extraactionlist);
-		} else {
-			executeActionlist(s,"newscreen");
-		}
-		*/
 	}
 	
 	public void onLogoutUser(Screen s,String name) {
@@ -465,7 +427,6 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		if (u!=null) { // should check if still on other screen !!!
 			usermanager.removeUser(u);
 		}
-	//	ApplicationManager.update();	
 	}
 	
 	public void onNewUser(Screen s,String id) {
@@ -477,20 +438,14 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		} else {
 			u.addScreen(s);
 		}
-		//ApplicationManager.update();
-		//System.out.println("NewUser APP="+appname);
-	//	if (!appname.equals("dashboard")) executeActionlist(s,"newuser");
 	}
 	
 	
 	
 	public void onLoginFail(Screen s,String id) {
-	//	executeActionlist(s,"login/loginfail");
 	}
 	
     public String getApplicationCSS(String name) {
-    	// weird for now.
-    	//System.out.println("CSS NAME="+name);
     	String path = "apps/"+appname+"/css/"+name+".css";
     	return path;
      }
@@ -649,9 +604,11 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     }
     
     
-    public SmithersModel getModel() {
+    /*
+    public Model getModel() {
     	return model;
     }
+    */
     
     public Html5Controller createController(String name) {
     	System.out.println("PLACE createController node in your app");

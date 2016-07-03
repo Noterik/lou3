@@ -8,7 +8,7 @@ import org.json.simple.JSONObject;
 import org.springfield.marge.*;
 import org.springfield.fs.Fs;
 import org.springfield.fs.FsNode;
-import org.springfield.lou.model.SmithersModel;
+import org.springfield.lou.model.Model;
 import org.springfield.lou.screen.Screen;
 
 public class Html5Controller implements MargeObserver {
@@ -17,7 +17,7 @@ public class Html5Controller implements MargeObserver {
 	public String selector;
 	public String defaultscript = null;
 	public String defaulttemplate = null;
-	public SmithersModel model;
+	public Model model;
 	
 	private  ArrayList<String> overridelist = new ArrayList<String>();
 	
@@ -33,7 +33,7 @@ public class Html5Controller implements MargeObserver {
 		return selector;	
 	}
 	
-	public void setModel(SmithersModel m) {
+	public void setModel(Model m) {
 		model = m;
 	}
 	

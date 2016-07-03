@@ -3,7 +3,9 @@ package org.springfield.lou.model;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -18,18 +20,46 @@ import org.springfield.lou.application.Html5ApplicationInterface;
 import org.springfield.lou.controllers.FsListController;
 import org.springfield.lou.controllers.Html5Controller;
 import org.springfield.lou.homer.LazyHomer;
+import org.springfield.lou.screen.Screen;
 import org.springfield.marge.*;
 
-public class SmithersModel {
+public class AppInstanceModel  {
 	
 	private Html5Application app;
 	
-	public SmithersModel(Html5Application a) {
+	private Map<String, String> screenproperties = new HashMap<String,String>();
+	
+	public AppInstanceModel(Html5Application a) {
 		app = a;
 		// create our master node in mojo
 		FSListManager.put("/app"+app.getId().substring(7), new FSList());
 		loadAppConfig();		
 	}
+	
+	
+	public boolean setProperty(String path,String value) {
+		System.out.println("model -> setProperty("+path+","+value+") "+this);
+		if (path.startsWith("/screen/")) return setScreenProperty(path.substring(8),value);
+		return true;
+	}
+	
+	public String getProperty(String path) {
+		System.out.println("model -> getProperty("+path+")"+this);
+		if (path.startsWith("/screen/")) return getScreenProperty(path.substring(8));
+		return null;
+	}
+	
+	private String getScreenProperty(String path) {
+		System.out.println("model -> getScreenProperty("+path+")");
+		return screenproperties.get(path);
+	}
+	
+	private boolean setScreenProperty(String path,String value) {
+		System.out.println("model -> setScreenProperty("+path+","+value+")");
+		screenproperties.put(path,value);
+		return true;
+	}
+	
 	
 	
 	public boolean setProperty(String nodepath,String propertyname,String value) {

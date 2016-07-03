@@ -18,8 +18,11 @@ public class ScreenController extends Html5Controller {
 		data.put("language",screen.getLanguageCode());
 		data.put("id",screen.getId());
 		data.put("hostname",LazyHomer.getExternalIpNumber());
-		if (screen.getProperty("jumper")!=null) data.put("jumper",screen.getProperty("jumper"));
-		data.put("username",screen.getProperty("username"));
+			
+		//if (screen.getProperty("jumper")!=null) data.put("jumper",screen.getProperty("jumper"));
+		if (model.getProperty("/screen/jumper")!=null) data.put("jumper",model.getProperty("/screen/jumper"));
+
+		data.put("username",model.getProperty("/screen/username"));
 		data.put("screengroups",screen.getGroups().toString());
 		String sg="";
 		for (String s: screen.getGroups()) {  
