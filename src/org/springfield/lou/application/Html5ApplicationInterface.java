@@ -85,7 +85,7 @@ public interface Html5ApplicationInterface {
 	public void addToRecoveryList(String name);
 	public void setCallback(String name,String k,Object o);
 	public Html5Controller createController(String name);
- 	public void onPathUpdate(String paths,String methodname,Html5Controller callbackobject);
+ 	//public void onPathUpdate(String paths,String methodname,Html5Controller callbackobject);
  	public void removeEvents(Object obj);
- 	public void setProperty(String path,String value);
+ 	//public void setProperty(String path,String value);
 }

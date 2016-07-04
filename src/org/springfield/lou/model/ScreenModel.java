@@ -3,6 +3,7 @@ package org.springfield.lou.model;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -25,22 +26,32 @@ import org.springfield.marge.*;
 
 public class ScreenModel  {
 	
-	private Html5Application app;
+	private Html5ApplicationInterface app;
 	
 	private Map<String, String> screenproperties = new HashMap<String,String>();
+	private Screen screen;
 	
 	public ScreenModel(Html5ApplicationInterface a,Screen s) {
+		screen = s;
+		app = a;
 	}
 	
 	
 	public boolean setProperty(String path,String value) {
-		System.out.println("model -> setProperty("+path+","+value+") "+this);
+		//System.out.println("screen model -> setProperty("+path+","+value+") "+this);
 		screenproperties.put(path, value);
+		// ok lets check if we also need to store it in the session object in smithers
+		ArrayList<String> list = app.getRecoveryList();
+		System.out.println("RECOVERY LIST="+list);
+		if (list.contains(path)) {
+			// ok we need to store this for now just works for Strings
+			Fs.setProperty(screen.getRecoveryId(), path, value.toString());
+		}
 		return true;
 	}
 	
 	public String getProperty(String path) {
-		System.out.println("screen model -> getProperty("+path+")"+this);
+		//System.out.println("screen model -> getProperty("+path+")"+this);
 		return screenproperties.get(path);
 	}
 	

@@ -1,4 +1,4 @@
-package org.springfield.lou.screen;
+package org.springfield.lou.model;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -13,6 +13,8 @@ import org.springfield.fs.FsNode;
 import org.springfield.lou.application.Html5Application;
 import org.springfield.lou.application.PathBindObject;
 import org.springfield.lou.controllers.Html5Controller;
+import org.springfield.lou.screen.BindEvent;
+import org.springfield.lou.screen.Screen;
 
 public class BindManager {
     private Map<String, ArrayList<PathBindObject>> pathbindobjects = new HashMap<String, ArrayList<PathBindObject>>();
@@ -20,12 +22,13 @@ public class BindManager {
 	protected Stack<BindEvent> eventqueue  = new Stack<BindEvent>();
 	private BindThread normalthread;
     
-    public BindManager(Html5Application a) {
-    	this.app = a;
+    public BindManager() {
     	normalthread = new BindThread("normal",this);
     }
     
  	public void onPathUpdate(String paths,String methodname,Html5Controller callbackobject) {
+ 		//return;
+ 		
  		try {
 		Method method = callbackobject.getClass().getMethod(methodname,String.class,FsNode.class);
 
@@ -46,8 +49,10 @@ public class BindManager {
 		}
 
 		} catch(Exception e) {
+			e.printStackTrace();
  			return;
  		}
+ 	
  	}
  	
  	public synchronized void onPathRemove(Screen s) {
@@ -83,19 +88,21 @@ public class BindManager {
     	int counter = 0;
     	long starttime = new Date().getTime();
     	String[] parts = path.split("/"); 
-    	String key = parts[1];
-    	String nodeid = parts[2];
-    	String propertyname = parts[3];
+    	String key = parts[1]+"/"+parts[2];
+    	String nodeid = parts[3];
+    	String propertyname = parts[4];
    	
     	FsNode node = new FsNode(key,nodeid);
     	node.setProperty(propertyname, value);
    	
     	key = "/"+key+"/";
 		ArrayList<PathBindObject> binds = pathbindobjects.get(key);
+		//System.out.println("BINDS="+binds+" K="+key+" A="+this);
 		if (binds!=null) {
 			for (int i=0;i<binds.size();i++) {
 				PathBindObject bind  = binds.get(i);
-				try {
+				try {		
+					//System.out.println("BIND CALL="+bind.method+" "+bind.obj);
 					bind.methodcall.invoke(bind.obj,key,node);
 					counter++;
 				} catch(Exception e) {

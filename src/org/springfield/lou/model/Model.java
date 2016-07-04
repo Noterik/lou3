@@ -32,6 +32,7 @@ public class Model {
 	private static DomainModel dmodel;
 	private AppModel amodel;
 	private ScreenModel smodel;
+	private static BindManager bindmanager;
 	
 	public Model(Screen s) {
 		Html5ApplicationInterface app = s.getApplication();
@@ -39,18 +40,35 @@ public class Model {
 		imodel = app.getAppInstanceModel(); // answers the /instance/ calls
 		amodel = app.getAppModel(); // answers the /app/ calls
 		if (dmodel==null) dmodel = new DomainModel(); // answers the /domain/ calls
+		if (bindmanager==null) bindmanager = new BindManager();
+		
+	}
+	
+ 	public void onPathUpdate(String paths,String methodname,Html5Controller callbackobject) {
+ 		System.out.println("onPathUpdate "+paths+" "+methodname+" "+callbackobject);
+ 		bindmanager.onPathUpdate(paths, methodname, callbackobject);
 	}
 	
 	
 	public boolean setProperty(String path,String value) {
 		System.out.println("model -> setProperty("+path+","+value+") "+this);
-		if (path.startsWith("/screen/")) return smodel.setProperty(path.substring(8),value);
+		if (path.startsWith("/screen/"))  {
+			smodel.setProperty(path.substring(8),value);
+	   	 	//bindmanager.setProperty(path, value); // signal the others
+	   	 	return true;
+		} else 
+		if (path.startsWith("/app/")) {
+			amodel.setProperty(path.substring(5),value);
+	   	 	bindmanager.setProperty(path, value); // signal the others
+	   	 	return true;
+		}
 		return true;
 	}
 	
 	public String getProperty(String path) {
 		System.out.println("model -> getProperty("+path+")"+this);
 		if (path.startsWith("/screen/")) return smodel.getProperty(path.substring(8));
+		if (path.startsWith("/app/")) return amodel.getProperty(path.substring(5));
 		return null;
 	}
 	

@@ -40,8 +40,8 @@ import org.springfield.fs.*;
 import org.springfield.lou.homer.LazyHomer;
 import org.springfield.lou.model.AppInstanceModel;
 import org.springfield.lou.model.AppModel;
+import org.springfield.lou.model.BindManager;
 import org.springfield.lou.model.Model;
-import org.springfield.lou.screen.BindManager;
 import org.springfield.lou.screen.Capabilities;
 import org.springfield.lou.screen.Html5Element;
 import org.springfield.lou.screen.Screen;
@@ -87,7 +87,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     protected Map<String, Object> callbackobjects = new HashMap<String, Object>();
     private Map<String, ArrayList<PathBindObject>> pathbindobjects = new HashMap<String, ArrayList<PathBindObject>>();
 	private Map<String, Object> properties = new HashMap<String, Object>();
-	private BindManager bindmanager;
+	//private BindManager bindmanager;
 	private static AppModel appmodel;
     
     public Html5Application(String id, String remoteReciever) {
@@ -105,7 +105,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		this.screencounter = 1;
 		this.screenmanager = new ScreenManager();
 
-		this.bindmanager = new BindManager(this);
+		//this.bindmanager = new BindManager(this);
 		//System.out.println("external id: " + externalInterfaceId);
 		this.usermanager = new UserManager();
 		t = new Thread(this);
@@ -399,7 +399,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 			username = screen.getUserName();
 		}
 		ScreenManager.globalremove(id);
-		bindmanager.onPathRemove(screen);
+	//	bindmanager.onPathRemove(screen); problem for lou3 need fix
 		
 		onScreenTimeout(screen);
 
@@ -615,10 +615,13 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     	return null;
     }
     
+    /*
  	public void onPathUpdate(String paths,String methodname,Html5Controller callbackobject) {
  		bindmanager.onPathUpdate(paths, methodname, callbackobject);
 	}
+	*/
  	
+ 	/*
     public void setProperty(String path,String value) {
 		long starttime = new Date().getTime();
    	 	properties.put(path,value);
@@ -627,10 +630,13 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		long endtime = new Date().getTime();
 		//System.out.println("SET APP PROPERTY TIME="+(endtime-starttime)+" P="+path+" V="+value);			
     }
+    */
     
+ 	/*
     public Object getProperty(String path) {
 		return properties.get(path);
     }
+    */
     
     public void removeEvents(Object obj) {
     	// remove all event callbacks this objects has

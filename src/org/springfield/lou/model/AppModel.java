@@ -27,7 +27,7 @@ public class AppModel  {
 	
 	private Html5Application app;
 	
-	private Map<String, String> screenproperties = new HashMap<String,String>();
+	private Map<String, String> properties = new HashMap<String,String>();
 	
 	public AppModel(Html5Application a) {
 		app = a;
@@ -38,13 +38,14 @@ public class AppModel  {
 	
 	
 	public boolean setProperty(String path,String value) {
-		System.out.println("app model -> setProperty("+path+","+value+") "+this);
+		//System.out.println("app model -> setProperty("+path+","+value+") "+this);
+		properties.put(path, value);
 		return true;
 	}
 	
 	public String getProperty(String path) {
-		System.out.println("app model -> getProperty("+path+")"+this);
-		return null;
+		//System.out.println("app model -> getProperty("+path+")"+this);
+		return properties.get(path);
 	}
 	
 	
@@ -92,14 +93,11 @@ public class AppModel  {
 			pos = listurl.lastIndexOf("/");
 			String name = listurl.substring(pos+1);
 			listurl = listurl.substring(0, pos);
-			System.out.println("LISTURL="+listurl);
 			FSList list = FSListManager.get(listurl);
-			System.out.println("LISTURL2="+list);
 			if (list!=null) {
 				for(Iterator<FsNode> iter = list.getNodes().iterator() ; iter.hasNext(); ) {
 					FsNode n = (FsNode)iter.next();	
 					if (n.getId().equals(id) && n.getName().equals(name)) {
-						System.out.println("AMODEL getNode returning "+n);
 						return n;
 					}
 				}

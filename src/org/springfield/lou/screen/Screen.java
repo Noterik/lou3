@@ -183,6 +183,10 @@ public class Screen {
 		}
 		*/
 	}
+	
+	public String getRecoveryId() {
+		return recoveryid;
+	}
 
 	
 	public void setParameters(Map<String,String[]> p) {

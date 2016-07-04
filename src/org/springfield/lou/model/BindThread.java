@@ -1,4 +1,5 @@
-package org.springfield.lou.screen;
+package org.springfield.lou.model;
+
 
 public class BindThread extends Thread {
 	private boolean running = false;
