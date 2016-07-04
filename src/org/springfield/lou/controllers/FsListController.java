@@ -94,6 +94,7 @@ public class FsListController extends Html5Controller {
     }
 	
     public void itemselected(Screen s,JSONObject data) {
+    	System.out.println("ITEM SELECTED="+data+" ACTIONMENU="+actionmenu);
     	String type = (String)data.get("eventtype"); // ugly hack needs to be fixed
     	if (type.equals("itemadd")) {
     		itemadd(s,data);
@@ -116,11 +117,12 @@ public class FsListController extends Html5Controller {
 			FsNode cnode = model.getNode("/app/view/"+selector+"_actionmenu/controller/FsActionMenuController");
 			screen.get(selector+"_"+lastitem+"_actionmenu").setControllerProperty("FsActionMenuController","nodepath", cnode.getProperty("nodepath"));
 			screen.get(selector+"_"+lastitem+"_actionmenu").setControllerProperty("FsActionMenuController","mouseovercss", cnode.getProperty("mouseovercss"));
-
+	       	System.out.println("WHHHEEEE3");
 			screen.get(selector+"_"+lastitem).append("div class=\"actionmenu\"",selector.substring(1)+"_"+lastitem+"_actionmenu",new FsActionMenuController());
 	       	//screen.get(selector+"_"+lastitem+"_actionmenu").attach(new FsActionMenuController()); 
 	       	screen.get(selector+"_"+lastitem+"_actionmenu").show();
 	       	screen.bind(selector+"_"+lastitem+"_actionmenu","actionselected","actionselected", this);
+	       	System.out.println("WHHHEEEE4");
 		} else {
 			sendEvent(data);
 		}

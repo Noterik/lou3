@@ -65,7 +65,12 @@ public class Model {
 	}
 	
 	public void putNode(String uri,FsNode node) {
-		
+		System.out.println("AMODE PUTNODE="+amodel);
+		if (uri.startsWith("/app/")) { 
+			amodel.putNode(uri,node);
+		} else if (uri.startsWith("/domain/")) { 
+			System.out.println("PUTNODE NOT DONE YET FOR DOMAIN");
+		}
 	}
 	
 	public void observeNode(MargeObserver o,String url) {

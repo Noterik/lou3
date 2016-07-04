@@ -84,9 +84,6 @@ public class AppModel  {
 	
 	
 	public FsNode getNode(String uri) {
-		if (uri.startsWith("/domain/")) {
-			//return Fs.getNode(uri);
-		} else if (uri.startsWith("/app/")) {
 			// memory app
 			String listurl = "/app"+app.getId().substring(7)+uri.substring(4);
 			int pos = listurl.lastIndexOf("/");
@@ -95,7 +92,9 @@ public class AppModel  {
 			pos = listurl.lastIndexOf("/");
 			String name = listurl.substring(pos+1);
 			listurl = listurl.substring(0, pos);
+			System.out.println("LISTURL="+listurl);
 			FSList list = FSListManager.get(listurl);
+			System.out.println("LISTURL2="+list);
 			if (list!=null) {
 				for(Iterator<FsNode> iter = list.getNodes().iterator() ; iter.hasNext(); ) {
 					FsNode n = (FsNode)iter.next();	
@@ -105,7 +104,6 @@ public class AppModel  {
 					}
 				}
 			}
-		}
 		return null;
 	}
 	
