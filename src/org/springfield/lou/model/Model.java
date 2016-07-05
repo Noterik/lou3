@@ -83,8 +83,8 @@ public class Model {
 	}
 	
 	public void putNode(String uri,FsNode node) {
-		System.out.println("AMODE PUTNODE="+amodel);
-		if (uri.startsWith("/app/")) { 
+		System.out.println("MODEL PUTNODE="+amodel+" URI="+uri+" N="+node.asXML());
+		if (uri.startsWith("/app/") || uri.equals("/app")) { 
 			amodel.putNode(uri,node);
 		} else if (uri.startsWith("/domain/")) { 
 			System.out.println("PUTNODE NOT DONE YET FOR DOMAIN");

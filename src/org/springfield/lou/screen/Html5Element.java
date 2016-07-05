@@ -144,10 +144,12 @@ public class Html5Element {
 	
 	public boolean parsehtml(JSONObject json) {
 		//Model model = screen.getApplication().getModel();
-		//System.out.println("SELECTOR="+selector);
+		System.out.println("SELECTOR="+selector);
 		FsNode node = screen.getModel().getNode("/app/view/"+selector);
+		System.out.println("NODE="+node);
 		if (node!=null) {
 			String template = node.getProperty("template");
+			System.out.println("TEMPLATE="+template);
 			// extend for the real path
 			String part = screen.getApplication().getAppname().substring(screen.getApplication().getAppname().lastIndexOf("/")+1);
 			
