@@ -76,7 +76,6 @@ public class BindManager {
  	
     public void setProperty(String path,String value) {
     	eventqueue.push(new BindEvent(path,value));
-    	System.out.println("SET PROPERTY BIND="+path+" "+value+" QS="+eventqueue.size()+" TR="+this);
     	if (eventqueue.size()>0) {
     		normalthread.check();
     	//	checkNormalQueue(); // direct delivery for testing.

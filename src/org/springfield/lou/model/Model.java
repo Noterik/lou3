@@ -61,6 +61,11 @@ public class Model {
 			amodel.setProperty(path.substring(5),value);
 	   	 	bindmanager.setProperty(path, value); // signal the others
 	   	 	return true;
+		} else
+		if (path.startsWith("/domain/")) {
+			dmodel.setProperty(path.substring(5),value);
+	   	 	//bindmanager.setProperty(path, value); // signal the others
+	   	 	return true;
 		}
 		return true;
 	}
@@ -73,7 +78,7 @@ public class Model {
 	}
 	
 	public FsNode getNode(String path) {
-		System.out.println("AMODE="+amodel);
+		//System.out.println("AMODE="+amodel);
 		if (path.startsWith("/app/")) { 
 			return amodel.getNode(path);
 		} else if (path.startsWith("/domain/")) { 
@@ -83,7 +88,6 @@ public class Model {
 	}
 	
 	public void putNode(String uri,FsNode node) {
-		System.out.println("MODEL PUTNODE="+amodel+" URI="+uri+" N="+node.asXML());
 		if (uri.startsWith("/app/") || uri.equals("/app")) { 
 			amodel.putNode(uri,node);
 		} else if (uri.startsWith("/domain/")) { 

@@ -57,24 +57,28 @@ public class AppModel  {
 	*/
 	
 	public void putNode(String uri,FsNode node) {
+		//System.out.println("AMODEL="+uri);
 		if (uri.equals("/app")) {
 			String listurl = "/app"+app.getId().substring(7);
+			System.out.println("ALISTURL="+listurl);
 			FSList list = FSListManager.get(listurl);
+			//System.out.println("LIST="+list);
 			if (list==null) {
+				
 				list = new FSList(listurl);
 				FSListManager.put(listurl, list);
 			}
 			list.addNode(node);
 		} else if (uri.startsWith("/app/")) {
 			String listurl = "/app"+app.getId().substring(7)+uri.substring(4);
-			System.out.println("LISTURL="+listurl);
+			//System.out.println("LISTURL="+listurl);
 			FSList list = FSListManager.get(listurl);
-			System.out.println("LIST="+list);
+			//System.out.println("LIST="+list);
 			if (list==null) {
 				list = new FSList(listurl);
 				FSListManager.put(listurl, list);
 			}
-			System.out.println("LIST ADD="+node.asXML());
+			//System.out.println("LIST ADD="+node.asXML());
 			list.addNode(node);
 			
 		}
