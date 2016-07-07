@@ -1,6 +1,11 @@
 var Eddie = function(options){
 
 	var self = {};
+	var callers = {};
+	var callvars = {};
+	var trackers = {};
+	var trackervalues = {};
+	var scripttypes = {};
 
 	var settings = {
 		lou_ip: "",
@@ -9,16 +14,18 @@ var Eddie = function(options){
 		fullapp: "",
 		postData: "<fsxml><screen><properties><screenId>-1</screenId></properties><capabilities id=\"1\"><properties>"+getCapabilities()+"</properties></capabilities></screen></fsxml>",
 		screenId: "",
+		timeoffset: -1,
 		active: true,
 		appparams: null,
 		worker_location: '/eddie/js/eddie_worker.js',
 		worker: null
-	}
+	};
 	$.extend(settings, options);
 
-	settings.lou_port = (window.location.port == "") ? '80' : window.location.port;
+	settings.lou_port = (window.location.port === "") ? '80' : window.location.port;
 
 	self.init = function(){
+		responsetime = new Date().getTime();
 		if(typeof(Worker) != "undefined"){
 			settings.worker = new Worker(settings.worker_location);
   		}else{
@@ -29,14 +36,108 @@ var Eddie = function(options){
 		register();
 		addGestureEvents();
 
-	}
+		interval = setInterval(function () {
+		nowdate = new Date().getTime();
+		delaydate = nowdate-responsetime;
+		if (delaydate>(30*1000)) {
+			clearInterval(interval);
+			window.location.href=window.location.href;
+		}
+            for (var data in trackers){
+   				var map = {};
+				var tid = data;
+				var tracks = trackers[data].split(",");
+				for(i = 0; i < tracks.length; i++){
+					var track = tracks[i];
+					var trackp = track.split('(');
+					if ($('#'+tid).length) {
+            			   	    switch(trackp[0]){
+            					case "vars":
+							var tname = trackp[1].substring(0,trackp[1].length-1);
+							var v = callvars[tid];
+							var oldvalue = trackervalues[tid+"/"+track];	
+							var newvalue = v[tname];
+							if (oldvalue!=newvalue) {
+                                                              trackervalues[tid+"/"+track] = newvalue;
+                                                              map[tname] = newvalue;
+                                                        }
+							break;
+            					case "screenXPerc":
+					    		var position = $('#'+tid).position();
+                                			var oldvalue = trackervalues[tid+"/"+track];
+                                			var newvalue = (position.left/window.innerWidth)*100;
+					    		if (oldvalue!=newvalue) {
+									trackervalues[tid+"/"+track] = newvalue;
+									map['screenXPerc'] = newvalue;
+					    		}
+            				    		break;
+            					case "screenYPerc":
+					    		position = $('#'+tid).position();
+                                			oldvalue = trackervalues[tid+"/"+track];
+                             				newvalue = (position.top/window.innerHeight)*100;
+					    		if (oldvalue!=newvalue) {
+									trackervalues[tid+"/"+track] = newvalue;
+									map['screenYPerc'] = newvalue;
+					    		}
+            						break;
+            					case "mousemove":
+                                			var send = trackervalues[tid+"/"+track+"_send"];
+							if (send === 'true') {
+								trackervalues[tid+"/"+track+"_send"] = 'false';
+								map['clientXY'] = trackervalues[tid+"/"+track];
+								map['width'] = $('#'+tid).width();
+								map['height'] = $('#'+tid).height();
+							}
+            						break;
+            					case "devicemotion":
+                                			var send = trackervalues["screen/devicemotion_send"];
+							if (send === 'true') {
+								trackervalues["screen/devicemotion_send"] = 'false';
+								map['alpha'] = trackervalues["screen/devicemotion_alpha"];
+								map['beta'] = trackervalues["screen/devicemotion_beta"];
+								map['gamma'] = trackervalues["screen/devicemotion_gamma"];
+							}
+            						break;
+            					case "location":
+							navigator.geolocation.getCurrentPosition(getPosition);
+					    		newvalue = trackervalues["screen/location"];
+                                			oldvalue = trackervalues["screen/location_old"];
+					    		if (oldvalue!=newvalue) {
+									trackervalues[tid+"/location_old"] = newvalue;
+									map["location"] = newvalue;
+									console.log("gps info="+newvalue);	
+					    		}
+            						break;
+            					case "currentTime":
+					    		newvalue = $('#'+tid)[0].currentTime;
+                                			oldvalue = trackervalues[tid+"/"+track];
+					    		if (oldvalue!=newvalue) {
+									trackervalues[tid+"/"+track] = newvalue;
+									map['currentTime'] = newvalue*1000;
+					    		}
+            						break;
+            					default:
+            						break;
+					     }
+				   	}
+				}
+                                var line = JSON.stringify(map);
+				if (line!="{}") {
+                                	self.putLou("","event("+tid+"/client,"+line+")");
+				}
+			}
+		}, 100);
+
+	};
 
 	self.destroy = function() {
+		/*
 		$.each(components, function(key, comp){
-			if(typeof comp.destroy == "function"){
+			if(typeof comp.destroy === "function"){
 				comp.destroy();
 			}
 		});
+		*/
 		var splits = settings.screenId.split('/');
 
 		self.putLou('notification','show(user ' + splits[splits.length - 1] + ' left session!)');
@@ -49,15 +150,20 @@ var Eddie = function(options){
 			'dataType': 'text',
 			'async': false
 		});
-	}
+	};
 
 	self.doRequest = function(args){
 		$.ajax(args);
-	}
+	};
+
+	self.sendEvent = function(targetid,eventtype,data){
+	    data['eventtype'] = eventtype;
+            self.putLou("","event("+targetid+"/client,"+JSON.stringify(data)+")");
+	};
 
 	self.getComponent = function(comp){
 		return components[comp];
-	}
+	};
 
 	self.listen = function(){
 		if(!settings.worker){
@@ -70,7 +176,7 @@ var Eddie = function(options){
 					}
 					request();
 				}
-			})
+			});
 			request();
 		}else{
 			settings.worker.postMessage(JSON.stringify({
@@ -80,26 +186,30 @@ var Eddie = function(options){
 					'lou_port': settings.lou_port,
 					'screenId': settings.screenId
 				}
-			}))
+			}));
 			settings.worker.onmessage = function(m){
 				parseResponse(m.data);
-			}
+			};
 		}
-	}
+	};
 
 	self.getScreenId = function(){
 		return settings.screenId;
-	}
+	};
 
 	self.log = function(msg) {
 		self.putLou("","log("+msg+",info)");
 		return false;
-	}
+	};
+
+	self.getVars = function(targetid) {
+		return callvars[targetid];
+	};
 
         self.log = function(msg,level) {
                 self.putLou("","log("+msg+","+level+")");
                 return false;
-        }
+        };
 
 	self.putLou = function(targetid, content, sync) {
 		var postData = "put(" + settings.screenId + "," + targetid + ")=" + content;
@@ -113,25 +223,28 @@ var Eddie = function(options){
 		});
 
 		return false;
-	}
+	};
 
 	self.makesound = function(sound) {
 		var audio = new Audio('/eddie/sounds/'+sound+'.mp3');
 		audio.play();
-	}
+	};
 
 	var register = function(){
 		var parseRegisterResponse = function(response){
 			settings.screenId = $(response).find('screenid').first().text();
+			var servertime = parseInt($(response).find('servertime').first().text());
+			settings.timeoffset = new Date().getTime() - servertime;
+			console.log("timedelay="+settings.timeoffset);
 			$(self).trigger('register-success');
-		}
+		};
 		self.doRequest({
 			'type': 'POST',
 			'url': 'http://' + settings.lou_ip +":"+ settings.lou_port + '/lou/LouServlet' + settings.fullapp+"?"+settings.appparams,
 			'data': settings.postData,
 			'success': parseRegisterResponse
-		})
-	}
+		});
+	};
 
 	var request = function(){
 		var putData = "<fsxml><screen><properties><screenId>" + settings.screenId + "</screenId></properties></screen></fsxml>";
@@ -144,12 +257,13 @@ var Eddie = function(options){
 			'dataType': 'text',
 			'contentType': 'text/plain',
 			'success': function(data){
-				$(self).trigger('request-success', data)
+				$(self).trigger('request-success', data);
 			}
 		});
-	}
+	};
 
 	var parseResponse = function(response){
+		responsetime = new Date().getTime();
 		var result = response;
 		if (result.indexOf("<screenid>appreset</screenid>")!=-1) {
 				alert('server reset');
@@ -161,62 +275,165 @@ var Eddie = function(options){
 			pos = result.indexOf(")");
 
             var targetid = result.substring(0,pos);
-
             switch(command){
             	case "set":
             		var content = result.substring(pos+2);
             		pos = content.indexOf("($end$)");
-            		if(pos!=-1)
-            			content = content.substring(0,pos);
+            		if(pos!=-1) {
+            				content = content.substring(0,pos);
+            			}
             			setDiv(targetid,content);
             		break;
-             	case "add":
-            		var content = result.substring(pos+2);
+            	case "val":
+            		content = result.substring(pos+2);
             		pos = content.indexOf("($end$)");
-            		if(pos!=-1)
+            		if(pos!=-1) {
             			content = content.substring(0,pos);
+            		}
+                    $('#'+targetid).val(content);
+            		break;
+            	case "html":
+            		content = result.substring(pos+2);
+            		pos = content.indexOf("($end$)");
+            		if(pos!=-1) {
+            				content = content.substring(0,pos);
+            			}
+                    	$('#'+targetid).html(content);
+            		break;
+                case "append":
+                        content = result.substring(pos+2);
+                        pos = content.indexOf("($end$)");
+                        if(pos!=-1) {
+                                        content = content.substring(0,pos);
+                                }
+                        $('#'+targetid).append(content);
+                        break;
+                case "parsehtml":
+                        content = result.substring(pos+2);
+                        pos = content.indexOf("($end$)");
+                        if(pos!=-1)
+                                 {
+                                 	content = content.substring(0,pos);
+                                 }
+				parseHtml(targetid,content);
+                        break;
+            	case "show":
+            		content = result.substring(pos+2);
+            		pos = content.indexOf("($end$)");
+            		if(pos!=-1) {
+            				content = content.substring(0,pos);
+            			}
+                    	$(targetid).show();
+            		break;
+                case "play":
+                        content = result.substring(pos+2);
+                        pos = content.indexOf("($end$)");
+                        if(pos!=-1) {
+                                content = content.substring(0,pos);
+                               }
+			$("#"+targetid)[0].play();
+                        break;
+                case "pause":
+                        content = result.substring(pos+2);
+                        pos = content.indexOf("($end$)");
+                        if(pos!=-1) {
+                                content = content.substring(0,pos);
+                               }
+			$("#"+targetid)[0].pause();
+                        break;
+            	case "hide":
+            		content = result.substring(pos+2);
+            		pos = content.indexOf("($end$)");
+            		if(pos!=-1) {
+            				content = content.substring(0,pos);
+            			}
+                    	$(targetid).hide(content);
+            		break;
+            	case "draggable":
+            		content = result.substring(pos+2);
+            		pos = content.indexOf("($end$)");
+            		if(pos!=-1) {
+            				content = content.substring(0,pos);
+            			}
+                    	$(targetid).draggable();     	
+            		break;
+            	case "bind":
+            		content = result.substring(pos+2);
+            		pos = content.indexOf("($end$)");
+            		if(pos!=-1) { content = content.substring(0,pos); }
+                   	setBind(targetid,content);
+			break;
+            	case "template":
+            		content = result.substring(pos+2);
+            		pos = content.indexOf("($end$)");
+            		if(pos!=-1) { content = content.substring(0,pos); }
+                   	setTemplate(targetid,content);
+			break;
+            	case "syncvars":
+            		content = result.substring(pos+2);
+            		pos = content.indexOf("($end$)");
+            		if(pos!=-1) { content = content.substring(0,pos); }
+                   	setSyncvars(targetid,content);
+			break;
+            	case "update":
+            	 	content = result.substring(pos+2);
+            		pos = content.indexOf("($end$)");
+            		if(pos!=-1) { content = content.substring(0,pos); }
+                   	doUpdate(targetid,content);
+			break;
+             	case "add":
+            	    content = result.substring(pos+2);
+            		pos = content.indexOf("($end$)");
+            		if(pos!=-1) {
+            				content = content.substring(0,pos);
+            			}
             			addToDiv(targetid,content);
             		break;
             	case "put":
-            		var content = result.substring(pos+2);
+            		content = result.substring(pos+2);
             		pos = content.indexOf("($end$)");
-            		if(pos!=-1)
-            			content = content.substring(0,pos);
+            		if(pos!=-1) {
+            				content = content.substring(0,pos);
+            			}
 						putMsg(targetid,content);
 					break;
 				case "remove":
 					remove(targetid);
 					break;
 				case "setcss":
-					var content = result.substring(pos+2);
+					content = result.substring(pos+2);
 					pos = content.indexOf("($end$)");
-					if (pos!=-1) content = content.substring(0,pos);
+					if (pos!=-1) { content = content.substring(0,pos); }
                     	setCSS(content);
                     break;
                 case "setstyle":
-					var content = result.substring(pos+2);
+					content = result.substring(pos+2);
 					pos = content.indexOf("($end$)");
-					if (pos!=-1)
-						content = content.substring(0,pos);
+					if (pos!=-1) {
+							content = content.substring(0,pos);
+						}
                     	setStyle(content);
                     break;
             	case "setscript":
-            		var content = result.substring(pos+2);
+            		content = result.substring(pos+2);
 					pos = content.indexOf("($end$)");
-					if (pos!=-1)
-						content = content.substring(0,pos);
+					if (pos!=-1) {
+							content = content.substring(0,pos);
+						}
                 	setScript(targetid,content);
                 	break;
                 case "removestyle":
-            		var content = result.substring(result.substring(result.indexOf("("))+1, result.indexOf(")"));
+            		content = result.substring(result.substring(result.indexOf("("))+1, result.indexOf(")"));
 					removeStyle(content);
                 	break;
                 case "sdiv":
-                        var content = result.substring(pos+2);
+                        content = result.substring(pos+2);
                         pos = content.indexOf("($end$)");
-                        if (pos!=-1) content = content.substring(0,pos);
+                        if (pos!=-1) { content = content.substring(0,pos); }
                         setDivProperty(targetid,content);
-                        break
+                        break;
+               default:
+                		break;
             }
 
             // lets check if there are move messages
@@ -228,14 +445,14 @@ var Eddie = function(options){
 				pos = -1;
 			}
 		}
-	}
+	};
 
 	function remove(args){
 		var splits = args.split(",");
 		var targetid = splits[0];
 		var leaveDiv = splits[1];
 
-		if(leaveDiv == "false"){
+		if(leaveDiv === "false"){
 			removeDiv(targetid);
 		}else{
 			emptyDiv(targetid);
@@ -247,14 +464,14 @@ var Eddie = function(options){
 
 	function removeDiv(targetid) {
 		var div = document.getElementById(targetid);
-		if (div!=null) {
+		if (div!==null) {
 			div.parentNode.removeChild(div);
 		}
-	};
+	}
 
 	function emptyDiv(targetid){
 		var div = document.getElementById(targetid);
-		if(div!=null){
+		if(div!==null){
 			div.innerHTML = "";
 		}
 	}
@@ -272,7 +489,7 @@ var Eddie = function(options){
 
 		try{
 			var pos = new_content.indexOf("(");
-			if (pos!=-1) {
+			if (pos!==-1) {
 				var command = new_content.substring(0,pos);
 				var args = new_content.substring(pos+1,new_content.length-1);
 				new_content = {
@@ -294,7 +511,7 @@ var Eddie = function(options){
 		}else{
 			window[targetid+"_putMsg"](content);
 		}
-	};
+	}
 
 	function setCSS(filename) {
 	  var fileref=document.createElement("link");
@@ -314,8 +531,8 @@ var Eddie = function(options){
 			var head = document.getElementsByTagName('head')[0],
 			    style = document.getElementsByTagName('style'),
 			    sstyle = $("style#"+stylename);
-			    content = content.substring(content.indexOf(",")+1)
-			if(sstyle.length==0){
+			    content = content.substring(content.indexOf(",")+1);
+			if(sstyle.length===0){
 				sstyle = document.createElement("style");
 				sstyle.type = 'text/css';
 				sstyle.setAttribute("id", stylename);
@@ -340,17 +557,39 @@ var Eddie = function(options){
 	}
 
 	function setScript(targetid, scriptbody) {
-		var script   = document.createElement("script");
-		script.type  = "text/javascript";
-		script.text  = scriptbody;
-		script.id = 'script_' + targetid;
-		document.body.appendChild(script);
+		// ugly code to map object and create a dataspace for it
+		var oname = scriptbody.substring(0,100);
+		var pname = oname.split(' ');
+		if (pname.length>2) {
+			try { // fails if not var name format in js file and thats ok
+				if (scripttypes[pname[1]]===undefined) {
+					var script   = document.createElement("script");
+					script.type  = "text/javascript";
+					script.text  = scriptbody;
+					script.id = 'script_' + targetid;
+					document.body.appendChild(script);
+					scripttypes[pname[1]] = targetid;
+				}
+				var obj = eval(pname[1]);
+				//callvars.set(targetid.substring(1),new Map().set("targetid",targetid.substring(1)));
+				callvars[targetid.substring(1)]={"targetid":targetid.substring(1)};
+				callers[targetid.substring(1)]=obj;
+			} catch(err) {
+				console.log(err);
+			}
+		} else {
+			script   = document.createElement("script");
+			script.type  = "text/javascript";
+			script.text  = scriptbody;
+			script.id = 'script_' + targetid;
+			document.body.appendChild(script);
+		}	
 	}
 
 
 	function setDivProperty(targetid,content) {
                 var div = document.getElementById(targetid);
-                if (div!=null) {
+                if (div!==null) {
 			var commands = content.split(",");
 			for(i = 0; i < commands.length; i++){
 				var command = commands[i];
@@ -359,7 +598,7 @@ var Eddie = function(options){
             			switch(command){
                			case "draggable":
 					if (eventtargets.length>1) {
-						var data = eval('(' + content.substring(10)+ ')')
+						var data = eval('(' + content.substring(10)+ ')');
                     				$('#'+targetid).draggable(data);
 					} else {
                     				$('#'+targetid).draggable();
@@ -382,7 +621,7 @@ var Eddie = function(options){
 								var edata = targetid+".value="+this.value;
 								self.putLou("",targetid+"/"+data.etarget+"("+edata+")");
 							} else {
-								var edata = "clientX="+event.clientX+",clientY="+event.clientY;
+								edata = "clientX="+event.clientX+",clientY="+event.clientY;
 								edata += ",screenX="+event.screenX+",screenY="+event.screenY;
 
 								var draggedElement = jQuery(event.srcElement);
@@ -409,15 +648,172 @@ var Eddie = function(options){
 						});
 					}
 					break;
+					default:
+					break;
 				}
 			}
 		}
 	}
 
+	function parseHtml(targetid,data) {
+           var pdata =  JSON.parse(data);
+           var parsed = Mustache.render(pdata.template,pdata);
+           $('#'+targetid).html(parsed);
+	}
+
+        function setTemplate(targetid,content) {
+           	var data =  JSON.parse(content);
+		callvars[targetid]={"template":data.template};
+	}
+
+        function doUpdate(targetid,content) {
+           	var data =  JSON.parse(content);
+		data['targetid'] = targetid;
+		callers[targetid].update(callvars[targetid],data);
+	}
+
+
+        function setSyncvars(targetid,content) {
+           	var data =  JSON.parse(content);
+		var vars = callvars[targetid];
+		for (var key in data) {
+			//vars.set(key, data[key]);
+			vars[key]=data[key];
+		}
+	}
+
+	function setBind(targetid,content) {
+                var div = document.getElementById(targetid);
+ 		if (content.indexOf('keypress')===0) {
+                	$(document).keyup(function(e) {
+                        map = {};
+                        map["targetid"] = targetid;
+                        map["which"] = event.which;
+		        self.putLou("","event("+targetid+"/keypress,"+JSON.stringify(map)+")");
+                	});
+		} else if (content.indexOf('track/')===0) {
+			trackers[targetid] = content.substring(6);
+			if (content.indexOf('track/devicemotion')===0) {
+				window.addEventListener('devicemotion',function(event) {
+				    var alpha = Math.round(event.rotationRate.alpha);
+				    var beta = Math.round(event.rotationRate.beta);
+				    var gamma = Math.round(event.rotationRate.gamma);
+				    if (Math.abs(alpha)>10 || Math.abs(beta)>10 || Math.abs(gamma)>10 ) {
+                                    	trackervalues["screen/devicemotion_alpha"] = alpha;
+                                    	trackervalues["screen/devicemotion_beta"] = beta;
+                                    	trackervalues["screen/devicemotion_gamma"] = gamma;
+                                    	trackervalues["screen/devicemotion_send"] = "true";
+				    }
+				});
+			} else if (content.indexOf('track/mousemove')===0) {
+				// tricky since we need to track it
+				$("#"+targetid).mousemove(function() {
+					// set these already in the tracker to be send	
+                                        var oldvalue = trackervalues[targetid+"/mousemove"];
+                                        var newvalue = event.clientX+','+event.clientY;
+                                        if (oldvalue!=newvalue) {
+                                             trackervalues[targetid+"/mousemove"] = newvalue;
+                                             trackervalues[targetid+"/mousemove_send"] = "true";
+					}
+				});	
+				$("#"+targetid).on('touchmove', function() {
+					// set these already in the tracker to be send	
+                                        var oldvalue = trackervalues[targetid+"/mousemove"];
+					var newvalue = '';
+					for (var i = 0; i < event.touches.length; i++) {
+                                          if (i===0) {
+						 newvalue += event.touches[i].clientX+','+event.touches[i].clientY;
+					   } else {
+						 newvalue += ','+event.touches[i].clientX+','+event.touches[i].clientY;
+					   }
+					}
+                                        if (oldvalue!=newvalue) {
+                                             trackervalues[targetid+"/mousemove"] = newvalue;
+                                             trackervalues[targetid+"/mousemove_send"] = "true";
+					}
+					event.preventDefault();
+				});	
+			}	
+                } else if (div!==null) {
+                            var eventtargets = content.split(":");
+                                        for(j = 0; j < eventtargets.length; j++){
+						var padding = eventtargets[j].split(",");
+                                                $("#"+targetid).bind(padding[0], {etarget: eventtargets[j]}, function(event) {
+                                                        var data = event.data;
+							sendBasicEvent(targetid,this,data,event);
+                                                });
+                                        }
+		}
+
+	}
+
+        function sendBasicEvent(targetid,obj,data,event) {
+		if (obj.tagName==="INPUT") {
+		      var map = {};
+                      map[targetid+".value"]=obj.value;
+		      self.putLou("","event("+targetid+"/"+data.etarget+","+JSON.stringify(map)+")");
+                } else {
+			var padding = data.etarget.split(",");
+		      	map = {};
+                        //map[targetid+".value"]=obj.value;
+			map["targetid"] = targetid;
+			map["clientX"] = event.clientX;
+			map["clientY"] = event.clientY;
+			map["screenX"] = event.screenX;
+			map["screenY"] = event.screenY;
+	
+			if (padding.length>1) {
+        			for (var i = 1; i < padding.length; i++) {
+                			var name = padding[i];
+					var p = $("#"+name);
+					var nt=$('input[name='+name+']:checked').val();
+					if (nt!==undefined) {
+    						map[name] = nt;
+                			} else if (p.prop("tagName")==="INPUT") {
+    						map[name] = $("#"+name).val();
+					} else {
+    						map[name] = $("#"+name).val();
+					}
+				}
+			}
+
+			var draggedElement = jQuery(event.srcElement);
+			var dragOffset = draggedElement.offset();
+			if (dragOffset !== undefined) {
+				var elementOffsetLeft = dragOffset.left;
+				var elementOffsetTop = dragOffset.top;
+				map["elementOffsetTop"] = elementOffsetTop;
+                        	map["elementOffsetLeft"] = elementOffsetLeft;
+			}		
+	
+			var dragPosition = draggedElement.position();
+			if (dragPosition !== undefined) {
+				var elementPositionLeft = dragPosition.left;
+				var elementPositionTop = dragPosition.top;
+				map["elementPositionTop"] = elementPositionTop;
+                        	map["elementPositionLeft"] = elementPositionLeft;
+			}	
+			
+			if (draggedElement[0] !== undefined) {
+				var elementWidth = draggedElement[0].clientWidth;
+				var elementHeight = draggedElement[0].clientHeight;
+				map["elementWidth"] = elementWidth;
+				map["elementHeight"] = elementHeight;
+			}
+		        self.putLou("","event("+targetid+"/"+padding[0]+","+JSON.stringify(map)+")");
+		}
+	}
+
+	function simpleKeys (original) {
+  		return Object.keys(original).reduce(function (obj, key) {
+    			obj[key] = typeof original[key] === 'object' ? '{ ... }' : original[key];
+    			return obj;
+  		}, {});
+	}	
+
 	function setDiv(targetid,content) {
-		// console.log("setting target: "+targetid);
 		var div = document.getElementById(targetid);
-		if (div!=null) {
+		if (div!==null) {
 	       	    $('#'+targetid).html(content);
 		} else {
 	  	    div = document.createElement('div');
@@ -426,17 +822,17 @@ var Eddie = function(options){
 	            document.getElementById("screen").appendChild(div);
 		}
 
-	};
+	}
 
 	function addToDiv(targetid,content) {
 		var div = document.getElementById(targetid);
-		if (div!=null) {
+		if (div!==null) {
 
 	       	    ne = document.createElement('div');
 	            ne.innerHTML = content;
 	            div.appendChild(ne);
 		}
-	};
+	}
 
 	function getCapabilities() {
 		var body="";
@@ -449,9 +845,10 @@ var Eddie = function(options){
 		body +="<screenwidth>"+window.innerWidth+"</screenwidth>";
 		body +="<screenheight>"+window.innerHeight+"</screenheight>";
 		body +="<orientation>"+window.orientation+"</orientation>";
+		body +="<documenturl>"+location.hostname+"</documenturl>";
 
 		var browserid = readCookie("smt_browserid");
-		if (browserid==null) {
+		if (browserid===null) {
 			var date = ""+new Date().getTime();
 			createCookie("smt_browserid",date,365);
 		}
@@ -462,10 +859,10 @@ var Eddie = function(options){
 		s = s.substring(s.indexOf("/domain/")+8);
 		s = s.substring(0,s.indexOf("?"));
 		s = s.replace(/\//g,"_");
-		console.log(s);
+		s = ""; // ignore sessions per app for now
 		var sessionid = readCookie("smt_"+s+"_sessionid");
-		if (sessionid==null) {
-			var date = ""+new Date().getTime();
+		if (sessionid===null) {
+			date = ""+new Date().getTime();
 			createCookie("smt_"+s+"_sessionid",date,365);
 		}
 		sessionid = readCookie("smt_"+s+"_sessionid");
@@ -490,11 +887,19 @@ var Eddie = function(options){
     	var ca = document.cookie.split(';');
     	for (var i = 0; i < ca.length; i++) {
         	var c = ca[i];
-        	while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-        	if (c.indexOf(nameEQ) === 0) return unescape(c.substring(nameEQ.length, c.length));
+        	while (c.charAt(0) === ' ') {
+        	 	c = c.substring(1, c.length); 
+        	}
+        	if (c.indexOf(nameEQ) === 0) { 
+        			return unescape(c.substring(nameEQ.length, c.length));
+        	}
     	}
     	return null;
 	}
+
+function getPosition(position) {
+    trackervalues["screen/location"]=""+position.coords.latitude+","+position.coords.longitude;
+}
 
 function eraseCookie(name) {
     createCookie(name, "", -1);
@@ -506,4 +911,4 @@ function eraseCookie(name) {
 	}
 
 	return self;
-}
+};

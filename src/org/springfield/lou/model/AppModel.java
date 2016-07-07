@@ -57,7 +57,7 @@ public class AppModel  {
 	*/
 	
 	public void putNode(String uri,FsNode node) {
-		//System.out.println("AMODEL="+uri);
+		//System.out.println("AMODEL PUT="+uri);
 		if (uri.equals("/app")) {
 			String listurl = "/app"+app.getId().substring(7);
 			System.out.println("ALISTURL="+listurl);
@@ -93,6 +93,7 @@ public class AppModel  {
 	
 	public FsNode getNode(String uri) {
 			// memory app
+		//System.out.println("AMODEL GET="+uri);
 			String listurl = "/app"+app.getId().substring(7)+uri.substring(4);
 			int pos = listurl.lastIndexOf("/");
 			String id = listurl.substring(pos+1);
