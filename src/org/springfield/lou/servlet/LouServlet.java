@@ -229,8 +229,7 @@ public class LouServlet extends HttpServlet {
 			body+=app.getMetaHeaders(request);
 			body+="<script type=\"text/javascript\">if (!window.console) window.console = {};if (!window.console.log) window.console.log = function () { };</script>";
 			body+="<script language=\"javascript\" type=\"text/javascript\">var LouSettings = {\"lou_ip\": \"" + LazyHomer.getExternalIpNumber() + "\", \"lou_port\": \"" + LazyHomer.getBartPort() + "\", \"user\": \"" + user + "\", \"app\": \"" + nameapp + "\", \"fullapp\": \"" + fullappname + "\", \"appparams\": \"" + params + "\"}</script>\n";
-			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/jquery-1.8.0.js\"></script>\n";
-			
+			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/jquery-2.2.4.min.js\"></script>\n";
 			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/jquery.xdomainrequest.min.js\"></script>\n";
 			String libs = getLibPaths(nameapp);
 			if (libs!=null) {
