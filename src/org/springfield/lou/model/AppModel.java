@@ -15,6 +15,7 @@ import org.springfield.fs.FSList;
 import org.springfield.fs.FSListManager;
 import org.springfield.fs.Fs;
 import org.springfield.fs.FsNode;
+import org.springfield.fs.FsPropertySet;
 import org.springfield.lou.application.Html5Application;
 import org.springfield.lou.application.Html5ApplicationInterface;
 import org.springfield.lou.controllers.FsListController;
@@ -46,6 +47,15 @@ public class AppModel  {
 	public String getProperty(String path) {
 		//System.out.println("app model -> getProperty("+path+")"+this);
 		return properties.get(path);
+	}
+	
+	public boolean setProperties(String path,FsPropertySet set) {
+		for(Iterator<String> iter = set.getKeys() ; iter.hasNext(); ) {
+			String key = (String)iter.next();
+			String value = set.getProperty(key);
+			properties.put(path+"/"+key, value);
+		}
+		return true;
 	}
 	
 	

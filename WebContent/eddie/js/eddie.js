@@ -300,6 +300,14 @@ var Eddie = function(options){
             			}
                     	$('#'+targetid).html(content);
             		break;
+            	case "location":
+            		content = result.substring(pos+2);
+            		pos = content.indexOf("($end$)");
+            		if(pos!=-1) {
+            				content = content.substring(0,pos);
+            			}
+                    	window.location.href = content;
+            		break;
                 case "append":
                         content = result.substring(pos+2);
                         pos = content.indexOf("($end$)");

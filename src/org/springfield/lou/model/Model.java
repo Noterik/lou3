@@ -15,6 +15,7 @@ import org.springfield.fs.FSList;
 import org.springfield.fs.FSListManager;
 import org.springfield.fs.Fs;
 import org.springfield.fs.FsNode;
+import org.springfield.fs.FsPropertySet;
 import org.springfield.lou.application.Html5Application;
 import org.springfield.lou.application.Html5ApplicationInterface;
 import org.springfield.lou.controllers.FsListController;
@@ -33,6 +34,19 @@ public class Model {
 	private AppModel amodel;
 	private ScreenModel smodel;
 	private static BindManager bindmanager;
+	private static ModelEventManager eventmanager;
+	
+	/* screen/
+ 	domain/
+	app/
+	
+	model.onPropertyInsert 
+	model.onPropertyUpdate
+	model.onPropertyDelete
+	model.onNodeInsert
+	model.onNodeUpdate
+	model.onNodeDelete
+	*/
 	
 	public Model(Screen s) {
 		Html5ApplicationInterface app = s.getApplication();
@@ -41,6 +55,7 @@ public class Model {
 		amodel = app.getAppModel(); // answers the /app/ calls
 		if (dmodel==null) dmodel = new DomainModel(); // answers the /domain/ calls
 		if (bindmanager==null) bindmanager = new BindManager();
+		if (eventmanager==null) eventmanager = new ModelEventManager();
 		
 	}
 	
@@ -48,7 +63,27 @@ public class Model {
  		System.out.println("onPathUpdate "+paths+" "+methodname+" "+callbackobject);
  		bindmanager.onPathUpdate(paths, methodname, callbackobject);
 	}
+ 	
+ 	public void onPropertyUpdate(String path,String methodname,Html5Controller callbackobject) {
+		if (path.startsWith("/app/")) {
+			eventmanager.onPropertyUpdate(path,methodname,callbackobject);
+		}
+ 	}
+ 	
+ 	public void onPropertiesUpdate(String path,String methodname,Html5Controller callbackobject) {
+		if (path.startsWith("/app/")) {
+			eventmanager.onPropertiesUpdate(path,methodname,callbackobject);
+		}
+ 	}
 	
+	public boolean setProperties(String path,FsPropertySet properties) {
+		if (path.startsWith("/app/")) {
+			amodel.setProperties(path.substring(5),properties);
+	   	 	eventmanager.setProperties(path, properties); // signal the others new code
+	   	 	return true;
+		}
+		return false;
+	}
 	
 	public boolean setProperty(String path,String value) {
 		System.out.println("model -> setProperty("+path+","+value+") "+this);
@@ -59,7 +94,8 @@ public class Model {
 		} else 
 		if (path.startsWith("/app/")) {
 			amodel.setProperty(path.substring(5),value);
-	   	 	bindmanager.setProperty(path, value); // signal the others
+	   	 	bindmanager.setProperty(path, value); // signal the others old code
+	   	 	eventmanager.setProperty(path, value); // signal the others new code
 	   	 	return true;
 		} else
 		if (path.startsWith("/domain/")) {
@@ -67,7 +103,7 @@ public class Model {
 	   	 	//bindmanager.setProperty(path, value); // signal the others
 	   	 	return true;
 		}
-		return true;
+		return false;
 	}
 	
 	public String getProperty(String path) {

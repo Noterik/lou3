@@ -96,16 +96,16 @@ public class BindManager {
    	
     	key = "/"+key+"/";
 		ArrayList<PathBindObject> binds = pathbindobjects.get(key);
-		//System.out.println("BINDS="+binds+" K="+key+" A="+this);
+		System.out.println("BINDS="+binds+" K="+key+" A="+this);
 		if (binds!=null) {
 			for (int i=0;i<binds.size();i++) {
 				PathBindObject bind  = binds.get(i);
 				try {		
-					//System.out.println("BIND CALL="+bind.method+" "+bind.obj);
+					System.out.println("BIND CALL="+bind.method+" "+bind.obj);
 					bind.methodcall.invoke(bind.obj,key,node);
 					counter++;
 				} catch(Exception e) {
-					e.printStackTrace();
+					//e.printStackTrace();
 				}
 			}
 		}	 

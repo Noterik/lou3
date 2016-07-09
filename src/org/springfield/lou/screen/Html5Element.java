@@ -60,6 +60,11 @@ public class Html5Element {
 		return true;
 	}
 	
+	public boolean location(String url) {
+		screen.send("location("+selector.substring(1)+")="+url);
+		return true;
+	}
+	
 	public boolean play() {
 		screen.send("play("+selector.substring(1)+")");
 		return true;
