@@ -138,6 +138,7 @@ public class AppModel  {
 		String part = app.getAppname().substring(app.getAppname().lastIndexOf("/")+1);
 		String filename = basepath+File.separator+"apps"+File.separator+part+File.separator+"components"+File.separator+"app.xml";
 		File file = new File(filename);
+		System.out.println("LOADING APP VARS FROM="+filename+" into "+this);
 		if (file.exists()) {
 			try {
 				BufferedReader br = new BufferedReader(new FileReader(filename));

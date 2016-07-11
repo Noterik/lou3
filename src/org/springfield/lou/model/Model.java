@@ -67,6 +67,8 @@ public class Model {
  	public void onPropertyUpdate(String path,String methodname,Html5Controller callbackobject) {
 		if (path.startsWith("/app/")) {
 			eventmanager.onPropertyUpdate(path,methodname,callbackobject);
+		} else if (path.startsWith("/domain/")) {
+			eventmanager.onPropertyUpdate(path,methodname,callbackobject);
 		}
  	}
  	
@@ -97,10 +99,10 @@ public class Model {
 	   	 	bindmanager.setProperty(path, value); // signal the others old code
 	   	 	eventmanager.setProperty(path, value); // signal the others new code
 	   	 	return true;
-		} else
+		} else                
 		if (path.startsWith("/domain/")) {
-			dmodel.setProperty(path.substring(5),value);
-	   	 	//bindmanager.setProperty(path, value); // signal the others
+			dmodel.setProperty(path.substring(8),value);
+	   	 	eventmanager.setProperty(path, value); // signal the others new code
 	   	 	return true;
 		}
 		return false;

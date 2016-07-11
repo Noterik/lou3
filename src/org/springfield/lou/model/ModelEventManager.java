@@ -21,7 +21,6 @@ public class ModelEventManager {
     private Map<String, ArrayList<ModelBindObject>> propertybinds = new HashMap<String, ArrayList<ModelBindObject>>();
     private Map<String, ArrayList<ModelBindObject>> propertiesbinds = new HashMap<String, ArrayList<ModelBindObject>>();
 
-    private Html5Application app;
 	protected Stack<ModelBindEvent> eventqueue  = new Stack<ModelBindEvent>();
 	private ModelEventThread normalthread;
     
@@ -112,8 +111,8 @@ public class ModelEventManager {
     public void deliverProperty(String path,String value) {
     	String[] parts = path.split("/"); 
     	String key = parts[1]+"/"+parts[2];
-    	String nodeid = parts[3];
-    	String propertyname = parts[4];
+    	String nodeid = parts[parts.length-2];
+    	String propertyname = parts[parts.length-1];
    	
     	FsNode node = new FsNode(key,nodeid);
     	node.setProperty(propertyname, value);

@@ -88,7 +88,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     private Map<String, ArrayList<PathBindObject>> pathbindobjects = new HashMap<String, ArrayList<PathBindObject>>();
 	private Map<String, Object> properties = new HashMap<String, Object>();
 	//private BindManager bindmanager;
-	private static AppModel appmodel;
+	private  AppModel appmodel; // i think this is wrong should be per url no?
     
     public Html5Application(String id, String remoteReciever) {
     	this.timeoutcheck = false;
