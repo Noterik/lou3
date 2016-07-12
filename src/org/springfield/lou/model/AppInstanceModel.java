@@ -38,24 +38,24 @@ public class AppInstanceModel  {
 	
 	
 	public boolean setProperty(String path,String value) {
-		System.out.println("model -> setProperty("+path+","+value+") "+this);
+		//System.out.println("model -> setProperty("+path+","+value+") "+this);
 		if (path.startsWith("/screen/")) return setScreenProperty(path.substring(8),value);
 		return true;
 	}
 	
 	public String getProperty(String path) {
-		System.out.println("model -> getProperty("+path+")"+this);
+		//System.out.println("model -> getProperty("+path+")"+this);
 		if (path.startsWith("/screen/")) return getScreenProperty(path.substring(8));
 		return null;
 	}
 	
 	private String getScreenProperty(String path) {
-		System.out.println("model -> getScreenProperty("+path+")");
+		//System.out.println("model -> getScreenProperty("+path+")");
 		return screenproperties.get(path);
 	}
 	
 	private boolean setScreenProperty(String path,String value) {
-		System.out.println("model -> setScreenProperty("+path+","+value+")");
+		//System.out.println("model -> setScreenProperty("+path+","+value+")");
 		screenproperties.put(path,value);
 		return true;
 	}

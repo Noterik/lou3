@@ -75,6 +75,21 @@ public class Html5Element {
 		return true;
 	}
 	
+	public boolean volume(float level) {
+		screen.send("volume("+selector.substring(1)+")="+level);
+		return true;
+	}
+	
+	public boolean autoplay(boolean state) {
+		screen.send("autoplay("+selector.substring(1)+")="+state);
+		return true;
+	}
+	
+	public boolean loop(boolean state) {
+		screen.send("loop("+selector.substring(1)+")="+state);
+		return true;
+	}
+	
 	
 	
 	
@@ -272,6 +287,10 @@ public class Html5Element {
 	
 	public void track(String vars,String callbackmethod,Object callbackobject) {
 		screen.bind(selector,"track/"+vars,callbackmethod,callbackobject);
+	}
+	
+	public void trackAndStore(String vars,String path) {
+		screen.bind(selector,"track/"+vars,path,null);
 	}
 	
 	public boolean on(String eventtype,Html5Controller c) {

@@ -133,7 +133,9 @@ public class Screen {
 	}
 	
 	public void event(String from,String key,JSONObject data) {
+		//System.out.println("EVENT="+data+" KEY="+key);
 		HashMap<String,PathBindObject> binds = pathbindobjects.get(key);
+		//System.out.println("BB="+binds);
 		
 		Set<String> keys = binds.keySet();
 		Iterator<String> it = keys.iterator();
@@ -142,46 +144,48 @@ public class Screen {
 			PathBindObject bind = binds.get(next);
 			String methodname = bind.method;
 			// now find back the object on the screen based on its screenid and selector
-			Screen s=this.getApplication().getScreenManager().get(bind.screenid);
-			if (s!=null) {
-				Html5Element el = s.get(bind.selector);
-				if (el!=null) {
-					Object object = el.getController();
-					//System.out.println("methodname="+methodname+" object="+object+" selector="+bind.selector);
-					try {
-						Method method = object.getClass().getMethod(methodname,Screen.class,JSONObject.class);
-						//Method method = object.getClass().getMethod(methodname,String.class,FsNode.class);
-						if (method!=null) {	
-							//method.invoke(object,key,node);
-							Screen fs = app.getScreen(from);
-							method.invoke(object,fs,data);
-						} else {
-							System.out.println("MISSING METHOD IN APP ="+method);
+			if (bind.screenid==null) { // must be a bindAndStore call
+				mapAndStore(methodname,data);
+			} else {
+				Screen s=this.getApplication().getScreenManager().get(bind.screenid);
+				if (s!=null) {
+					Html5Element el = s.get(bind.selector);
+					if (el!=null) {
+						Object object = el.getController();
+						//System.out.println("methodname="+methodname+" object="+object+" selector="+bind.selector);
+						try {
+							Method method = object.getClass().getMethod(methodname,Screen.class,JSONObject.class);
+							if (method!=null) {	
+								Screen fs = app.getScreen(from);
+								method.invoke(object,fs,data);
+							} else {
+								System.out.println("MISSING METHOD IN APP ="+method);
+							}
+						} catch(Exception e) {
+							e.printStackTrace();
 						}
-					} catch(Exception e) {
-						e.printStackTrace();
 					}
 				}
 			}
 		}	 
-
-		/*
-		String methodname = callbackmethods.get(lookup);
-		if (methodname!=null) {
-			Object caller = callbackobjects.get(lookup);
-			try {
-				Method method = caller.getClass().getMethod(methodname,Screen.class,JSONObject.class);
-				if (method!=null) {
-					Screen s = app.getScreen(from);
-					method.invoke(caller,s,data);
-				} else {
-					System.out.println("MISSING METHOD IN APP ="+method);
-				}
-			} catch(Exception e) {
-				e.printStackTrace();
+	}
+	
+	private void mapAndStore(String path,JSONObject data) {
+		//System.out.println("DATA="+data.toJSONString()+" s="+data.size());
+		if (data.size()==1) {
+			for (Object key : data.keySet()) {
+				Object value = data.get(key);
+				model.setProperty(path+"/"+key,""+value);
+				break; // we only have one
 			}
+		} else {
+			for (Object key : data.keySet()) {
+				Object value = data.get(key);
+				model.setProperty(path+"/"+key,""+value);
+				break; // we only have one
+			}	
 		}
-		*/
+		
 	}
 	
 	public String getRecoveryId() {
@@ -329,7 +333,7 @@ public class Screen {
 		int pos = p.indexOf("bind:");
 		if (pos!=-1) {
 			String  name = t+"/"+p.substring(pos+5);
-			System.out.println("OSETDIV="+o);
+		//	System.out.println("OSETDIV="+o);
 			app.setCallback(name,m,o);
 			setDiv(t,p);
 		}
@@ -888,10 +892,17 @@ public class Screen {
 		
 		if (eventtype.startsWith("track/")) eventtype = "client";
 
-		String screenid = ((Html5Controller)callbackobject).getScreenId();
-		String targetid = ((Html5Controller)callbackobject).getSelector();
+		String mid = methodname;
+		String screenid = null;
+		String targetid = null;
+		if (callbackobject!=null) {
+			screenid = ((Html5Controller)callbackobject).getScreenId();
+			targetid = ((Html5Controller)callbackobject).getSelector();
 	   // System.out.println("BIND = "+screenid+" "+targetid+" "+methodname);
-		String mid = screenid+"/"+targetid+"/"+methodname;
+			mid = screenid+"/"+targetid+"/"+methodname;
+		}
+		
+		
 		HashMap<String,PathBindObject> list = pathbindobjects.get(selector.substring(1)+"/"+eventtype);
 		if (list!=null) {
 			// find the screen id and targetid
@@ -1008,7 +1019,7 @@ public class Screen {
 	
 	public boolean isMember(String name) {
 		ScreenGroup sg = app.getScreenManager().getScreenGroup(name);
-		System.out.println("SCR="+sg+" SG="+name);
+		//System.out.println("SCR="+sg+" SG="+name);
 		if (sg!=null) {
 			if (sg.isMember(this)) return true;
 		}

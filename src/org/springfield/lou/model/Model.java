@@ -60,7 +60,7 @@ public class Model {
 	}
 	
  	public void onPathUpdate(String paths,String methodname,Html5Controller callbackobject) {
- 		System.out.println("onPathUpdate "+paths+" "+methodname+" "+callbackobject);
+ 		//System.out.println("onPathUpdate "+paths+" "+methodname+" "+callbackobject);
  		bindmanager.onPathUpdate(paths, methodname, callbackobject);
 	}
  	
@@ -88,7 +88,7 @@ public class Model {
 	}
 	
 	public boolean setProperty(String path,String value) {
-		System.out.println("model -> setProperty("+path+","+value+") "+this);
+		//System.out.println("model -> setProperty("+path+","+value+") "+this);
 		if (path.startsWith("/screen/"))  {
 			smodel.setProperty(path.substring(8),value);
 	   	 	//bindmanager.setProperty(path, value); // signal the others
@@ -109,7 +109,7 @@ public class Model {
 	}
 	
 	public String getProperty(String path) {
-		System.out.println("model -> getProperty("+path+")"+this);
+		//System.out.println("model -> getProperty("+path+")"+this);
 		if (path.startsWith("/screen/")) return smodel.getProperty(path.substring(8));
 		if (path.startsWith("/app/")) return amodel.getProperty(path.substring(5));
 		return null;

@@ -339,16 +339,40 @@ var Eddie = function(options){
                         if(pos!=-1) {
                                 content = content.substring(0,pos);
                                }
-			$("#"+targetid)[0].play();
+						$("#"+targetid)[0].play();
                         break;
                 case "pause":
                         content = result.substring(pos+2);
                         pos = content.indexOf("($end$)");
                         if(pos!=-1) {
                                 content = content.substring(0,pos);
-                               }
-			$("#"+targetid)[0].pause();
+                        }
+						$("#"+targetid)[0].pause();
                         break;
+                case "autoplay":
+            		content = result.substring(pos+2);
+            		pos = content.indexOf("($end$)");
+            		if(pos!=-1) {
+            				content = content.substring(0,pos);
+            			}
+                    	$("#"+targetid)[0].autoplay=content;
+            		break;
+                case "volume":
+            		content = result.substring(pos+2);
+            		pos = content.indexOf("($end$)");
+            		if(pos!=-1) {
+            				content = content.substring(0,pos);
+            			}
+                    	$("#"+targetid)[0].volume=content;
+            		break;
+                case "loop":
+            		content = result.substring(pos+2);
+            		pos = content.indexOf("($end$)");
+            		if(pos!=-1) {
+            				content = content.substring(0,pos);
+            			}
+                    	$("#"+targetid)[0].loop=content;
+            		break;
             	case "hide":
             		content = result.substring(pos+2);
             		pos = content.indexOf("($end$)");
@@ -699,6 +723,17 @@ var Eddie = function(options){
                         map["which"] = event.which;
 		        self.putLou("","event("+targetid+"/keypress,"+JSON.stringify(map)+")");
                 	});
+        } else if (content.indexOf('play')===0 || content.indexOf('pause')===0 || content.indexOf('ended')===0 || content.indexOf('error')===0) {
+               	$("#"+targetid).on(content, function() {	
+               	    var map = {};
+               	     map["targetid"] = targetid;
+               	     map["currentTime"] = $("#"+targetid)[0].currentTime*1000;
+               	     map["playbackRate"] = $("#"+targetid)[0].playbackRate;
+               	     map["buffered"] = $("#"+targetid)[0].buffered;
+               	     map["autoplay"] = $("#"+targetid)[0].autoplay;
+               	     map["loop"] = $("#"+targetid)[0].loop;
+               		self.putLou("","event("+targetid+"/"+content+","+JSON.stringify(map)+")");
+               	});
 		} else if (content.indexOf('track/')===0) {
 			trackers[targetid] = content.substring(6);
 			if (content.indexOf('track/devicemotion')===0) {
