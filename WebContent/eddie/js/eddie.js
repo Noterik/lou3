@@ -717,11 +717,34 @@ var Eddie = function(options){
 	function setBind(targetid,content) {
                 var div = document.getElementById(targetid);
  		if (content.indexOf('keypress')===0) {
+                	$(document).keydown(function(e) {
+                    	if (event.which==9) {
+                      	  e.preventDefault();
+							e.stopPropagation();
+						}
+
+                	});
                 	$(document).keyup(function(e) {
                         map = {};
                         map["targetid"] = targetid;
                         map["which"] = event.which;
-		        self.putLou("","event("+targetid+"/keypress,"+JSON.stringify(map)+")");
+                        
+                        var padding = content.split(",");
+                        if (padding.length>1) {
+        				for (var i = 1; i < padding.length; i++) {
+                			var name = padding[i];
+							var p = $("#"+name);
+							var nt=$('input[name='+name+']:checked').val();
+							if (nt!==undefined) {
+    							map[name] = nt;
+                			} else if (p.prop("tagName")==="INPUT") {
+    							map[name] = $("#"+name).val();
+							} else {
+    							map[name] = $("#"+name).val();
+							}
+						}
+					}
+		        		self.putLou("","event("+targetid+"/keypress,"+JSON.stringify(map)+")");
                 	});
         } else if (content.indexOf('play')===0 || content.indexOf('pause')===0 || content.indexOf('ended')===0 || content.indexOf('error')===0) {
                	$("#"+targetid).on(content, function() {	

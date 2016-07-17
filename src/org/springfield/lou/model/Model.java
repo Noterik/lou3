@@ -67,6 +67,8 @@ public class Model {
  	public void onPropertyUpdate(String path,String methodname,Html5Controller callbackobject) {
 		if (path.startsWith("/app/")) {
 			eventmanager.onPropertyUpdate(path,methodname,callbackobject);
+		} else if (path.startsWith("/screen/")) {
+			eventmanager.onPropertyUpdate(path,methodname,callbackobject);
 		} else if (path.startsWith("/domain/")) {
 			eventmanager.onPropertyUpdate(path,methodname,callbackobject);
 		}
@@ -92,6 +94,7 @@ public class Model {
 		if (path.startsWith("/screen/"))  {
 			smodel.setProperty(path.substring(8),value);
 	   	 	//bindmanager.setProperty(path, value); // signal the others
+	   	 	eventmanager.setProperty(path, value); // signal the others new code
 	   	 	return true;
 		} else 
 		if (path.startsWith("/app/")) {

@@ -80,6 +80,7 @@ public class Html5Element {
 		return true;
 	}
 	
+	
 	public boolean autoplay(boolean state) {
 		screen.send("autoplay("+selector.substring(1)+")="+state);
 		return true;
