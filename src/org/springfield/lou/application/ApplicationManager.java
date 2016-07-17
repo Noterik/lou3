@@ -236,8 +236,49 @@ public class ApplicationManager extends Thread implements MargeObserver {
     	return runningapps;
     }
     
-    public Map<String, Html5AvailableApplication> getAvailableApplications(){
-    	
+    public FSList getOpenApplicationsList() {
+    	FSList results = new FSList(); 
+		Set<String> keys = ApplicationManager.instance().getApplications().keySet();
+		Iterator<String> it = keys.iterator();
+		while(it.hasNext()){
+			String next = (String) it.next();
+			Html5ApplicationInterface app = ApplicationManager.instance().getApplication(next);
+			FsNode  node = new FsNode("applications",app.getId());
+			node.setProperty("id",""+app.getId());
+			node.setProperty("screencount",""+app.getScreenCount());
+			node.setProperty("screenidcount",""+app.getScreenIdCounter());
+			node.setProperty("usercount",""+app.getUserCount());
+			results.addNode(node);
+		}
+    	return results;
+    }
+    
+    public FSList getAvailableApplicationsList() {
+    	if (availableapps==null) loadAvailableApps();
+    	FSList results = new FSList(); 
+		Set<String> keys = availableapps.keySet();
+		Iterator<String> it = keys.iterator();
+		while(it.hasNext()){
+			String next = (String) it.next();
+			Html5AvailableApplication vapp = ApplicationManager.instance().getAvailableApplication(next);
+			FsNode  node = new FsNode("applications",vapp.getId());
+			node.setProperty("id",""+vapp.getId());
+			node.setProperty("versioncount",""+vapp.getVersionsCount());
+			node.setProperty("productionversion",""+vapp.getVersionsCount());
+			String pv= vapp.getProductionVersion();
+			String dv= vapp.getDevelopmentVersion();
+			if (pv==null) pv ="";
+			if (dv==null) dv ="";
+			node.setProperty("productionversion",pv+"("+vapp.getProductionVersionCount()+")");
+			node.setProperty("developmentversion",dv+" ("+vapp.getDevelopmentVersionCount()+")");
+			node.setProperty("status",vapp.getStatus());
+			results.addNode(node);
+			
+		}
+    	return results;
+    }
+    
+    public Map<String, Html5AvailableApplication> getAvailableApplications(){    	
     	if (availableapps==null) loadAvailableApps();
     	return availableapps;
     }    
