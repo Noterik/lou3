@@ -715,7 +715,7 @@ var Eddie = function(options){
 	}
 
 	function setBind(targetid,content) {
-                var div = document.getElementById(targetid);
+         var div = document.getElementById(targetid);
  		if (content.indexOf('keypress')===0) {
                 	$(document).keydown(function(e) {
                     	if (event.which==9) {
@@ -802,14 +802,24 @@ var Eddie = function(options){
 			}	
                 } else if (div!==null) {
                             var eventtargets = content.split(":");
-                                        for(j = 0; j < eventtargets.length; j++){
-						var padding = eventtargets[j].split(",");
+							for(j = 0; j < eventtargets.length; j++){
+												var padding = eventtargets[j].split(",");
                                                 $("#"+targetid).bind(padding[0], {etarget: eventtargets[j]}, function(event) {
                                                         var data = event.data;
-							sendBasicEvent(targetid,this,data,event);
+														sendBasicEvent(targetid,this,data,event);
                                                 });
-                                        }
-		}
+                            }
+				} else {
+					console.log("WHOOOOO68 = "+targetid);
+					        var eventtargets = content.split(":");
+							for(j = 0; j < eventtargets.length; j++){
+												var padding = eventtargets[j].split(",");
+                                                $("."+targetid).bind(padding[0], {etarget: eventtargets[j]}, function(event) {
+                                                        var data = event.data;
+														sendBasicEvent(targetid,this,data,event);
+                                                });
+                            }
+				}	
 
 	}
 
@@ -866,6 +876,7 @@ var Eddie = function(options){
 				map["elementWidth"] = elementWidth;
 				map["elementHeight"] = elementHeight;
 			}
+			map["id"] = event.target.id;
 		        self.putLou("","event("+targetid+"/"+padding[0]+","+JSON.stringify(map)+")");
 		}
 	}
