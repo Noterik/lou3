@@ -810,7 +810,6 @@ var Eddie = function(options){
                                                 });
                             }
 				} else {
-					console.log("WHOOOOO68 = "+targetid);
 					        var eventtargets = content.split(":");
 							for(j = 0; j < eventtargets.length; j++){
 												var padding = eventtargets[j].split(",");
@@ -823,12 +822,18 @@ var Eddie = function(options){
 
 	}
 
-        function sendBasicEvent(targetid,obj,data,event) {
+    function sendBasicEvent(targetid,obj,data,event) {
+        console.log("DATA="+obj.tagName);
 		if (obj.tagName==="INPUT") {
 		      var map = {};
-                      map[targetid+".value"]=obj.value;
+              map[targetid+".value"]=obj.value;
 		      self.putLou("","event("+targetid+"/"+data.etarget+","+JSON.stringify(map)+")");
-                } else {
+		} else if (obj.tagName==="SELECT") {
+			  var map = {};
+              map["value"]=obj.value;
+              map["id"] = event.target.id;
+		      self.putLou("","event("+targetid+"/"+data.etarget+","+JSON.stringify(map)+")");
+        } else {
 			var padding = data.etarget.split(",");
 		      	map = {};
                         //map[targetid+".value"]=obj.value;
