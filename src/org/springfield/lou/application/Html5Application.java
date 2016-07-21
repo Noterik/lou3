@@ -400,6 +400,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		}
 		ScreenManager.globalremove(id);
 	//	bindmanager.onPathRemove(screen); problem for lou3 need fix
+		screen.getModel().getEventManager().removeScreenBinds(screen.getId());
 		
 		onScreenTimeout(screen);
 

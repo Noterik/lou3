@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -26,6 +27,40 @@ public class ModelEventManager {
     
     public ModelEventManager() {
     	normalthread = new ModelEventThread("normal",this);
+    }
+    
+    public int getTotalBindsCount() {
+    	return getPropertyBindsCount()+getPropertiesBindsCount();
+    }
+    
+    public int getPropertyBindsCount() {
+    	int count = 0;
+    	Iterator<String> it = propertybinds.keySet().iterator();
+    	while(it.hasNext()){
+    		String key = it.next();
+    		List<ModelBindObject> l = (List)propertybinds.get(key);
+    		count+=l.size();
+    	}
+    	return count;
+    }
+    
+    public int getPropertiesBindsCount() {
+    	int count = 0;
+    	Iterator<String> it = propertiesbinds.keySet().iterator();
+    	while(it.hasNext()){
+    		String key = it.next();
+    		List<ModelBindObject> l = (List)propertiesbinds.get(key);
+    		count+=l.size();
+    	}
+    	return count;
+    }
+    
+    public Map<String, ArrayList<ModelBindObject>> getPropertiesBinds() {
+    	return propertiesbinds;
+    }
+    
+    public Map<String, ArrayList<ModelBindObject>> getPropertyBinds() {
+    	return propertybinds;
     }
     
     public void onPropertyUpdate(String path,String methodname,Html5Controller callbackobject) {
@@ -69,28 +104,42 @@ public class ModelEventManager {
  		}
 
     }
-
     
-    /*
- 	public synchronized void onPathRemove(Screen s) {
- 		if (s==null) return;
- 		String screenid = s.getId();
- 		//System.out.println("BIND REMOVE SCREEN S="+s+" id="+screenid);
-		Iterator<String> it = pathbindobjects.keySet().iterator();
-		while(it.hasNext()){
-			String key = it.next();
-			ArrayList<PathBindObject> binds = pathbindobjects.get(key);
-			for (int i=binds.size()-1;i>=0;i--) {
-				PathBindObject bind  = binds.get(i);
+    public void removeScreenBinds(String screenid) {
+    	System.out.println("SCREEN REMOVE ="+screenid);
+    	removePropertyScreenBinds(screenid);
+    	removePropertiesScreenBinds(screenid);
+    }
+
+    public synchronized void removePropertyScreenBinds(String screenid) {
+    	Iterator<String> it = propertybinds.keySet().iterator();
+    	while(it.hasNext()){
+    		String key = it.next();
+    		List<ModelBindObject> l = (List)propertybinds.get(key);
+    		for (int i=l.size()-1;i>=0;i--) {
+				ModelBindObject bind  = l.get(i);
 				if (bind.screenid.equals(screenid)) {
-					binds.remove(i);
-					//System.out.println("REMOVE ON BIND "+key);
+					l.remove(i);
 				}
-			}
-			
-		}
- 	}
- 	*/
+    		}
+    		//if (l.size()==0) propertybinds.remove(key);
+    	}
+	}
+    
+    public synchronized void removePropertiesScreenBinds(String screenid) {
+    	Iterator<String> it = propertiesbinds.keySet().iterator();
+    	while(it.hasNext()){
+    		String key = it.next();
+    		List<ModelBindObject> l = (List)propertiesbinds.get(key);
+    		for (int i=l.size()-1;i>=0;i--) {
+				ModelBindObject bind  = l.get(i);
+				if (bind.screenid.equals(screenid)) {
+					l.remove(i);
+				}
+    		}
+    		//if (l.size()==0) propertiesbinds.remove(key);
+    	}
+	}
  	
     public void setProperty(String path,String value) {
     	eventqueue.push(new ModelBindEvent(ModelBindEvent.PROPERTY,path,value));

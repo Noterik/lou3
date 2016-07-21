@@ -59,6 +59,10 @@ public class Model {
 		
 	}
 	
+	public ModelEventManager getEventManager() {
+		return eventmanager;
+	}
+	
  	public void onPathUpdate(String paths,String methodname,Html5Controller callbackobject) {
  		//System.out.println("onPathUpdate "+paths+" "+methodname+" "+callbackobject);
  		bindmanager.onPathUpdate(paths, methodname, callbackobject);
