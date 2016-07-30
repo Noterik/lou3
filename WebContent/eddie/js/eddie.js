@@ -728,6 +728,7 @@ var Eddie = function(options){
                         map = {};
                         map["targetid"] = targetid;
                         map["which"] = event.which;
+                        map["id"] = event.target.id;
                         
                         var padding = content.split(",");
                         if (padding.length>1) {
@@ -827,6 +828,8 @@ var Eddie = function(options){
 		if (obj.tagName==="INPUT") {
 		      var map = {};
               map[targetid+".value"]=obj.value;
+              map["value"]=obj.value;
+              map["id"] = event.target.id;
 		      self.putLou("","event("+targetid+"/"+data.etarget+","+JSON.stringify(map)+")");
 		} else if (obj.tagName==="SELECT") {
 			  var map = {};

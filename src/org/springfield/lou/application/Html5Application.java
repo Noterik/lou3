@@ -396,11 +396,13 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	public void removeScreen(String id,String username){
 		Screen screen = this.screenmanager.get(id);
 		if (screen!=null) {
+			System.out.println("REQUEST SCREEN REMOVE ID="+id+"");
+			screen.getModel().getEventManager().removeScreenBinds(id);
 			username = screen.getUserName();
 		}
 		ScreenManager.globalremove(id);
 	//	bindmanager.onPathRemove(screen); problem for lou3 need fix
-		screen.getModel().getEventManager().removeScreenBinds(screen.getId());
+
 		
 		onScreenTimeout(screen);
 
