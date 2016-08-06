@@ -148,5 +148,18 @@ public class Model {
 		Marge.addObserver(url+"*", o);
 	}
 	
+	public boolean isMainNode(String path) {
+		return Fs.isMainNode(path);
+	}
+	
+	public boolean insertNode(FsNode node,String path) {
+		//System.out.println("AMODE="+amodel);
+		if (path.startsWith("/app/")) { 
+		} else if (path.startsWith("/domain/")) { 
+			return Fs.insertNode(node, path);
+		}
+		return false;
+	}
+	
 	
 }
