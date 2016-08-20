@@ -37,6 +37,7 @@ import org.springfield.lou.application.*;
 import org.springfield.lou.controllers.Html5Controller;
 import org.springfield.lou.homer.LazyHomer;
 import org.springfield.lou.model.Model;
+import org.springfield.lou.performance.PerformanceManager;
 import org.springfield.lou.tools.JavascriptInjector;
 import org.springfield.mojo.interfaces.ServiceInterface;
 import org.springfield.mojo.interfaces.ServiceManager;
@@ -916,91 +917,6 @@ public class Screen {
 		}
 	}
 	
-	
-	/*
-	public void loadContent(String target,String ctype,Boolean overload, Html5ApplicationInterface app) {
-		// lets find out what is the active version for this app
-		String templatepath = app.getComponentManager().getComponentPath(ctype);
-		
-		String basepath = "/springfield/tomcat/webapps/ROOT/eddie/";
-		if (LazyHomer.isWindows()) basepath = "C:\\springfield\\tomcat\\webapps\\ROOT\\eddie\\";
-		
-		String packagepath = app.getHtmlPath();
-		String filename = null;
-		if (packagepath!=null) {
-			filename = packagepath + "components"+File.separator+templatepath;
-		} else {
-			
-			filename = basepath+"domain"+File.separator+app.getDomain()+File.separator+"apps"+File.separator+app.getAppname()+File.separator+"components"+File.separator+templatepath;
-			File file = new File(filename);
-			if (!file.exists()) {
-				// ok so not in the domain/app/component (step 1)
-							
-				filename = basepath+"domain"+File.separator+app.getDomain()+File.separator+"components"+File.separator+templatepath;
-				file = new File(filename);
-				if (!file.exists()) {
-					// ok also not in domain/component
-	
-					filename = basepath+"apps"+File.separator+app.getAppname()+File.separator+"components"+File.separator+templatepath;
-					file = new File(filename);
-					if (!file.exists()) {
-						// ok also not in app/component
-	
-						// so its in component
-						filename = basepath+"components"+File.separator+templatepath;
-					}
-				}
-			}
-		}
-		
-		// the above part should be redone we don't support overriding like that anymore (daniel) ?
-		
-		// so lets see if we have a referid on this that overrides it ?
-		String referid = app.getReferid(ctype);
-		if (referid!=null) {
-			// so create new filename based on it ? (example : /websiteserviceone/defaultoutput);
-			if (referid.startsWith("/")) {
-				String refappname = referid.substring(1);
-				int pos = refappname.indexOf("/");
-				String refcname = refappname.substring(pos+1);
-				refappname = refappname.substring(0,pos);
-				Html5AvailableApplication refapp = ApplicationManager.instance().getAvailableApplication(refappname);
-				if (refapp!=null) {
-					if (LazyHomer.inDeveloperMode()) {
-						filename = "/springfield/lou/apps/"+refappname+File.separator+refapp.getDevelopmentVersion()+File.separator+"components"+File.separator+refcname+File.separator+refcname+".html";
-					} else {
-						filename = "/springfield/lou/apps/"+refappname+File.separator+refapp.getProductionVersion()+File.separator+"components"+File.separator+refcname+File.separator+refcname+".html";
-					}
-				}
-			}
-		}
-		
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(filename));
-			StringBuffer str = new StringBuffer();
-			String line = br.readLine();
-			while (line != null) {
-				str.append(line);
-				str.append("\n");
-				line = br.readLine();
-			 }
-			br.close();
-			String body = str.toString();
-			
-			// preprocess
-			body = body.replace("$cname","components."+ctype);
-			
-			if(overload) {
-				this.setContent(target, body);
-			} else {
-				this.addContent(target, body);
-			}
-		} catch (Exception e){
-				//System.out.println("Can't read template file for: "+ target);
-		}
-		
-	}
-	*/
 	
 	public void setGroup(String name) {
 		ScreenGroup sg = app.getScreenManager().getScreenGroup(name);

@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -43,6 +44,7 @@ import org.apache.log4j.Logger;
 import org.springfield.lou.application.ApplicationManager;
 import org.springfield.lou.application.Html5ApplicationInterface;
 import org.springfield.lou.homer.LazyHomer;
+import org.springfield.lou.performance.PerformanceManager;
 import org.springfield.lou.screen.Capabilities;
 import org.springfield.lou.screen.Screen;
 import org.springfield.lou.tools.XMLHelper;
@@ -409,12 +411,14 @@ public class LouServlet extends HttpServlet {
 						return;
 					}
 				}
+				long starttime = new Date().getTime();	
 
 				//System.out.println("data2="+msg);
 				out.write(msg.getBytes());
 				out.flush();
 				out.close();
-				
+				long endtime = new Date().getTime();	
+				PerformanceManager.addNetworkCallTime(endtime-starttime);
 			} else {
 				System.out.println("lost flow why ? screenId="+screenId+" "+app.getScreen(screenId));
 				if (!screenId.equals("-1")) {
