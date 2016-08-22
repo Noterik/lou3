@@ -71,6 +71,16 @@ public class ModelEventManager {
 			ArrayList<ModelBindObject> list = propertybinds.get(path);
 			if (list!=null) {
 				// find the screen id and targetid
+				System.out.println("LIST SIZE="+list.size());
+				// for it gets tricky do we allow same screen with same method to join 2 times ?
+				for (int i=list.size()-1;i>=0;i--) {
+					ModelBindObject co = list.get(i);
+					System.out.println("CHECK ="+co.method+" "+methodname);
+					if (co.screenid.equals(screenid) && co.method.equals(methodname)) {
+						System.out.println("SHOULD REPLACE INSTEAD OF INSERT REMOVE");
+						list.remove(i);
+					}
+				}
 				list.add(new ModelBindObject(methodname,screenid,targetid,callbackobject,method));
 			} else {
 				list = new ArrayList<ModelBindObject>();
