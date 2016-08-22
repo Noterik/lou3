@@ -31,6 +31,7 @@ public class Model {
 	private Map<String, String> screenproperties = new HashMap<String,String>();
 	private AppInstanceModel imodel;
 	private static DomainModel dmodel;
+	private static SharedModel sharedmodel = new SharedModel();
 	private AppModel amodel;
 	private ScreenModel smodel;
 	private static BindManager bindmanager;
@@ -81,12 +82,18 @@ public class Model {
  	public void onPropertiesUpdate(String path,String methodname,Html5Controller callbackobject) {
 		if (path.startsWith("/app/")) {
 			eventmanager.onPropertiesUpdate(path,methodname,callbackobject);
+		} else if (path.startsWith("/shared/")) {
+			eventmanager.onPropertiesUpdate(path,methodname,callbackobject);
 		}
  	}
 	
 	public boolean setProperties(String path,FsPropertySet properties) {
 		if (path.startsWith("/app/")) {
 			amodel.setProperties(path.substring(5),properties);
+	   	 	eventmanager.setProperties(path, properties); // signal the others new code
+	   	 	return true;
+		} else 	if (path.startsWith("/shared/")) {
+			sharedmodel.setProperties(path.substring(8),properties);
 	   	 	eventmanager.setProperties(path, properties); // signal the others new code
 	   	 	return true;
 		}
