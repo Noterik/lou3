@@ -164,6 +164,14 @@ public class Html5Element {
 		return true;
 	}
 	
+	public boolean render() {
+		return parsehtml(new JSONObject());
+	}
+	
+	public boolean render(JSONObject json) {
+		return parsehtml(json);
+	}
+	
 	public boolean parsehtml(JSONObject json) {
 		FsNode node = screen.getModel().getNode("/app/view/"+selector);
 		if (node!=null) {
@@ -198,7 +206,6 @@ public class Html5Element {
 				}
 				json.put("template", str.toString());
 				screen.send("parsehtml("+selector.substring(1)+")="+json);
-				//System.out.println("TEMPLATE ("+selector+") : parsehtml("+selector.substring(1)+")="+json);
 				return true;
 			} else {
 				html("NO TEMPLATE IN VIEW NODE "+selector+" DEFINED");
@@ -315,6 +322,14 @@ public class Html5Element {
 		controller = c;
 		controller.setScreen(screen);
 		controller.setModel(screen.getModel());
+		FsNode node = screen.getModel().getNode("/app/view/"+selector);
+		if (node!=null) {
+			String style = node.getProperty("style");
+			if (style!=null) {
+				System.out.println("STYLE="+style);
+				screen.loadStyleSheet(style);
+			}
+		}
 		controller.attach(selector);
 		return true;
 	}

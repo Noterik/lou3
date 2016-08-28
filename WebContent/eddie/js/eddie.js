@@ -776,22 +776,32 @@ var Eddie = function(options){
 				// tricky since we need to track it
 				$("#"+targetid).mousemove(function() {
 					// set these already in the tracker to be send	
-                                        var oldvalue = trackervalues[targetid+"/mousemove"];
-                                        var newvalue = event.clientX+','+event.clientY;
-                                        if (oldvalue!=newvalue) {
-                                             trackervalues[targetid+"/mousemove"] = newvalue;
-                                             trackervalues[targetid+"/mousemove_send"] = "true";
+                    var oldvalue = trackervalues[targetid+"/mousemove"];
+                    var width = $('#'+targetid).width();
+                    var height = $('#'+targetid).height();
+                    var xp = (event.clientX/width)*100;
+                    var yp = (event.clientY/height)*100;
+                    var newvalue = event.clientX+','+event.clientY+","+xp+","+yp;
+                    if (oldvalue!=newvalue) {
+                          trackervalues[targetid+"/mousemove"] = newvalue;
+                          trackervalues[targetid+"/mousemove_send"] = "true";
 					}
 				});	
 				$("#"+targetid).on('touchmove', function() {
 					// set these already in the tracker to be send	
                                         var oldvalue = trackervalues[targetid+"/mousemove"];
 					var newvalue = '';
+					var width = $('#'+targetid).width();
+                    var height = $('#'+targetid).height();
 					for (var i = 0; i < event.touches.length; i++) {
-                                          if (i===0) {
-						 newvalue += event.touches[i].clientX+','+event.touches[i].clientY;
+                        if (i===0) {
+                        var xp = (event.touches[i].clientX/width)*100;
+                    	var yp = (event.touches[i].clientY/height)*100;
+						 newvalue += event.touches[i].clientX+','+event.touches[i].clientY+','+xp+','+yp;
 					   } else {
-						 newvalue += ','+event.touches[i].clientX+','+event.touches[i].clientY;
+					     var xp = (event.touches[i].clientX/width)*100;
+                    	 var yp = (event.touches[i].clientY/height)*100;
+						 newvalue += ','+event.touches[i].clientX+','+event.touches[i].clientY+','+xp+','+yp;
 					   }
 					}
                                         if (oldvalue!=newvalue) {

@@ -51,8 +51,8 @@ public class SharedModel  {
 		int pos = sharedpath.indexOf("/");
 		String spacename = sharedpath.substring(0,pos);
 		String path = sharedpath.substring(pos+1);
-		System.out.println("SPACENAME="+spacename);
-		System.out.println("PATH="+path);
+		//System.out.println("SPACENAME="+spacename);
+		//System.out.println("PATH="+path);
 		/*
 		for(Iterator<String> iter = set.getKeys() ; iter.hasNext(); ) {
 			String key = (String)iter.next();

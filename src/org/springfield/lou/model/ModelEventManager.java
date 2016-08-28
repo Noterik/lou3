@@ -71,13 +71,13 @@ public class ModelEventManager {
 			ArrayList<ModelBindObject> list = propertybinds.get(path);
 			if (list!=null) {
 				// find the screen id and targetid
-				System.out.println("LIST SIZE="+list.size());
+				//System.out.println("LIST SIZE="+list.size());
 				// for it gets tricky do we allow same screen with same method to join 2 times ?
 				for (int i=list.size()-1;i>=0;i--) {
 					ModelBindObject co = list.get(i);
-					System.out.println("CHECK ="+co.method+" "+methodname);
+					//System.out.println("CHECK ="+co.method+" "+methodname);
 					if (co.screenid.equals(screenid) && co.method.equals(methodname)) {
-						System.out.println("SHOULD REPLACE INSTEAD OF INSERT REMOVE");
+						//System.out.println("SHOULD REPLACE INSTEAD OF INSERT REMOVE");
 						list.remove(i);
 					}
 				}
@@ -95,7 +95,8 @@ public class ModelEventManager {
     }
 
     public void onPropertiesUpdate(String path,String methodname,Html5Controller callbackobject) {
- 		try {
+		//System.out.println("WBIND = "+path);
+    	try {
  			Method method = callbackobject.getClass().getMethod(methodname,ModelEvent.class);
  			String screenid = callbackobject.getScreenId();
  			String targetid = callbackobject.getSelector();
@@ -116,7 +117,7 @@ public class ModelEventManager {
     }
     
     public void removeScreenBinds(String screenid) {
-    	System.out.println("SCREEN REMOVE ="+screenid);
+    	//System.out.println("SCREEN REMOVE ="+screenid);
     	removePropertyScreenBinds(screenid);
     	removePropertiesScreenBinds(screenid);
     }
@@ -194,7 +195,7 @@ public class ModelEventManager {
     }
     
     public void deliverProperties(String path,FsPropertySet set) {	
-		ArrayList<ModelBindObject> binds = propertiesbinds.get(path);
+		ArrayList<ModelBindObject> binds = propertiesbinds.get(path); // direct hit
 		if (binds!=null) {
 			for (int i=0;i<binds.size();i++) {
 				ModelBindObject bind  = binds.get(i);
@@ -207,7 +208,28 @@ public class ModelEventManager {
 					e.printStackTrace();
 				}
 			}
-		}	 
+		}
+		// this needs to be done smarter need to talk about this with Pieter (Daniel)
+		int pos = path.lastIndexOf("/");
+		if (pos!=-1) {
+			String spath = path.substring(0,pos)+"/*";
+			//System.out.println("STAR MAP="+path);
+			binds = propertiesbinds.get(spath);
+			if (binds!=null) {
+				for (int i=0;i<binds.size();i++) {
+					ModelBindObject bind  = binds.get(i);
+					try {		
+						ModelEvent event = new ModelEvent();
+						event.path = path;
+						event.target = set;
+						bind.methodcall.invoke(bind.obj,event);
+					} catch(Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		
     }
     
     public void checkNormalQueue() {
