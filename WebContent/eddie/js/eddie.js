@@ -834,7 +834,6 @@ var Eddie = function(options){
 	}
 
     function sendBasicEvent(targetid,obj,data,event) {
-        console.log("DATA="+obj.tagName);
 		if (obj.tagName==="INPUT") {
 		      var map = {};
               map[targetid+".value"]=obj.value;
@@ -855,6 +854,11 @@ var Eddie = function(options){
 			map["clientY"] = event.clientY;
 			map["screenX"] = event.screenX;
 			map["screenY"] = event.screenY;
+        	var xp = (event.clientX/window.innerWidth)*100;
+            var yp = (event.clientY/window.innerHeight)*100;
+            map["screenXp"] = xp;
+			map["screenYp"] = yp;
+			
 	
 			if (padding.length>1) {
         			for (var i = 1; i < padding.length; i++) {
