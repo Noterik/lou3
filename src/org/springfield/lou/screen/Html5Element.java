@@ -326,11 +326,19 @@ public class Html5Element {
 		if (node!=null) {
 			String style = node.getProperty("style");
 			if (style!=null) {
-				System.out.println("STYLE="+style);
 				screen.loadStyleSheet(style);
 			}
 		}
 		controller.attach(selector);
+		if (javascript==null) {
+			node = screen.getModel().getNode("/app/view/"+selector+"/controller/"+controller.getControllerName());
+			if (node!=null) {
+				String scriptname = node.getProperty("javascript");
+				if (scriptname!=null && !scriptname.equals("")) {
+					loadScript(c); 
+				}
+			}
+		}
 		return true;
 	}
 	
