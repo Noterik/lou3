@@ -55,7 +55,7 @@ var Eddie = function(options){
             					case "vars":
 							var tname = trackp[1].substring(0,trackp[1].length-1);
 							var v = callvars[tid];
-							var oldvalue = trackervalues[tid+"/"+track];	
+							var oldvalue = trackervalues[tid+"/"+track];
 							var newvalue = v[tname];
 							if (oldvalue!=newvalue) {
                                                               trackervalues[tid+"/"+track] = newvalue;
@@ -105,7 +105,7 @@ var Eddie = function(options){
 					    		if (oldvalue!=newvalue) {
 									trackervalues[tid+"/location_old"] = newvalue;
 									map["location"] = newvalue;
-									console.log("gps info="+newvalue);	
+									console.log("gps info="+newvalue);
 					    		}
             						break;
             					case "currentTime":
@@ -387,7 +387,7 @@ var Eddie = function(options){
             		if(pos!=-1) {
             				content = content.substring(0,pos);
             			}
-                    	$(targetid).draggable();     	
+                    	$(targetid).draggable();
             		break;
             	case "bind":
             		content = result.substring(pos+2);
@@ -615,7 +615,7 @@ var Eddie = function(options){
 			script.text  = scriptbody;
 			script.id = 'script_' + targetid;
 			document.body.appendChild(script);
-		}	
+		}
 	}
 
 
@@ -674,7 +674,7 @@ var Eddie = function(options){
 								edata += ",elementOffsetLeft=" + elementOffsetLeft;
 								edata += ",elementPositionTop=" + elementPositionTop;
 								edata += ",elementPositionLeft=" + elementPositionLeft;
-								
+
 								self.putLou("",targetid+"/"+data.etarget+"("+edata+")");
 							}
 						});
@@ -729,7 +729,7 @@ var Eddie = function(options){
                         map["targetid"] = targetid;
                         map["which"] = event.which;
                         map["id"] = event.target.id;
-                        
+
                         var padding = content.split(",");
                         if (padding.length>1) {
         				for (var i = 1; i < padding.length; i++) {
@@ -748,7 +748,7 @@ var Eddie = function(options){
 		        		self.putLou("","event("+targetid+"/keypress,"+JSON.stringify(map)+")");
                 	});
         } else if (content.indexOf('play')===0 || content.indexOf('pause')===0 || content.indexOf('ended')===0 || content.indexOf('error')===0) {
-               	$("#"+targetid).on(content, function() {	
+               	$("#"+targetid).on(content, function() {
                	    var map = {};
                	     map["targetid"] = targetid;
                	     map["currentTime"] = $("#"+targetid)[0].currentTime*1000;
@@ -775,47 +775,44 @@ var Eddie = function(options){
 			} else if (content.indexOf('track/mousemove')===0) {
 				// tricky since we need to track it
 				$("#"+targetid).mousemove(function() {
-					// set these already in the tracker to be send	
-                    var oldvalue = trackervalues[targetid+"/mousemove"];
-                    var width = $('#'+targetid).width();
-                    var height = $('#'+targetid).height();
-                    var xp = (event.clientX/width)*100;
-                    var yp = (event.clientY/height)*100;
-                    var newvalue = event.clientX+','+event.clientY+","+xp+","+yp;
-                    if (oldvalue!=newvalue) {
-                          trackervalues[targetid+"/mousemove"] = newvalue;
-                          trackervalues[targetid+"/mousemove_send"] = "true";
-					}
-				});	
-				$("#"+targetid).on('touchmove', function() {
-					// set these already in the tracker to be send	
+					// set these already in the tracker to be send
                                         var oldvalue = trackervalues[targetid+"/mousemove"];
-					var newvalue = '';
-					var width = $('#'+targetid).width();
-                    var height = $('#'+targetid).height();
-					for (var i = 0; i < event.touches.length; i++) {
-                        if (i===0) {
-                        var xp = (event.touches[i].clientX/width)*100;
-                    	var yp = (event.touches[i].clientY/height)*100;
-						 newvalue += event.touches[i].clientX+','+event.touches[i].clientY+','+xp+','+yp;
-					   } else {
-					     var xp = (event.touches[i].clientX/width)*100;
-                    	 var yp = (event.touches[i].clientY/height)*100;
-						 newvalue += ','+event.touches[i].clientX+','+event.touches[i].clientY+','+xp+','+yp;
-					   }
-					}
+                                        var newvalue = event.offsetX+','+event.offsetY;
                                         if (oldvalue!=newvalue) {
                                              trackervalues[targetid+"/mousemove"] = newvalue;
                                              trackervalues[targetid+"/mousemove_send"] = "true";
 					}
+				});
+				$("#"+targetid).on('touchmove', function() {
+					// set these already in the tracker to be send
+          var oldvalue = trackervalues[targetid+"/mousemove"];
+					var newvalue = '';
+
+					var boundingBox = this.getBoundingClientRect();
+
+					for (var i = 0; i < event.touches.length; i++) {
+						var touch = event.touches[i];
+						var top = touch.pageY - boundingBox.top;
+						var left = touch.pageX - boundingBox.left;
+            if (i===0) {
+							newvalue += left+','+top;
+					  } else {
+							newvalue += ','+left+','+top;
+					  }
+					}
+          if (oldvalue!=newvalue) {
+               trackervalues[targetid+"/mousemove"] = newvalue;
+               trackervalues[targetid+"/mousemove_send"] = "true";
+					}
 					event.preventDefault();
-				});	
-			}	
+				});
+			}
                 } else if (div!==null) {
                             var eventtargets = content.split(":");
 							for(j = 0; j < eventtargets.length; j++){
-												var padding = eventtargets[j].split(",");
-                                                $("#"+targetid).bind(padding[0], {etarget: eventtargets[j]}, function(event) {
+
+								var padding = eventtargets[j].split(",");
+                        $("#"+targetid).bind(padding[0], {etarget: eventtargets[j]}, function(event) {
                                                         var data = event.data;
 														sendBasicEvent(targetid,this,data,event);
                                                 });
@@ -829,11 +826,12 @@ var Eddie = function(options){
 														sendBasicEvent(targetid,this,data,event);
                                                 });
                             }
-				}	
+				}
 
 	}
 
     function sendBasicEvent(targetid,obj,data,event) {
+        console.log("DATA="+obj.tagName);
 		if (obj.tagName==="INPUT") {
 		      var map = {};
               map[targetid+".value"]=obj.value;
@@ -854,12 +852,7 @@ var Eddie = function(options){
 			map["clientY"] = event.clientY;
 			map["screenX"] = event.screenX;
 			map["screenY"] = event.screenY;
-        	var xp = (event.clientX/window.innerWidth)*100;
-            var yp = (event.clientY/window.innerHeight)*100;
-            map["screenXp"] = xp;
-			map["screenYp"] = yp;
-			
-	
+
 			if (padding.length>1) {
         			for (var i = 1; i < padding.length; i++) {
                 			var name = padding[i];
@@ -882,16 +875,16 @@ var Eddie = function(options){
 				var elementOffsetTop = dragOffset.top;
 				map["elementOffsetTop"] = elementOffsetTop;
                         	map["elementOffsetLeft"] = elementOffsetLeft;
-			}		
-	
+			}
+
 			var dragPosition = draggedElement.position();
 			if (dragPosition !== undefined) {
 				var elementPositionLeft = dragPosition.left;
 				var elementPositionTop = dragPosition.top;
 				map["elementPositionTop"] = elementPositionTop;
                         	map["elementPositionLeft"] = elementPositionLeft;
-			}	
-			
+			}
+
 			if (draggedElement[0] !== undefined) {
 				var elementWidth = draggedElement[0].clientWidth;
 				var elementHeight = draggedElement[0].clientHeight;
@@ -908,7 +901,7 @@ var Eddie = function(options){
     			obj[key] = typeof original[key] === 'object' ? '{ ... }' : original[key];
     			return obj;
   		}, {});
-	}	
+	}
 
 	function setDiv(targetid,content) {
 		var div = document.getElementById(targetid);
@@ -987,9 +980,9 @@ var Eddie = function(options){
     	for (var i = 0; i < ca.length; i++) {
         	var c = ca[i];
         	while (c.charAt(0) === ' ') {
-        	 	c = c.substring(1, c.length); 
+        	 	c = c.substring(1, c.length);
         	}
-        	if (c.indexOf(nameEQ) === 0) { 
+        	if (c.indexOf(nameEQ) === 0) {
         			return unescape(c.substring(nameEQ.length, c.length));
         	}
     	}
