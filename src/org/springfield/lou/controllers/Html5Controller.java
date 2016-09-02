@@ -25,6 +25,10 @@ public class Html5Controller implements MargeObserver {
 		
 	}
 	
+	public int getApplicationHashCode() {
+		return screen.getApplication().hashCode();
+	}
+	
 	public String getScreenId() {
 		return screen.getId();
 	}

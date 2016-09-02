@@ -60,7 +60,7 @@ public class Model {
 		
 	}
 	
-	public ModelEventManager getEventManager() {
+	public static ModelEventManager getEventManager() {
 		return eventmanager;
 	}
 	

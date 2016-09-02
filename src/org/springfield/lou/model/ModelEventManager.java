@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import org.restlet.Application;
 import org.springfield.fs.FsNode;
 import org.springfield.fs.FsPropertySet;
 import org.springfield.lou.application.Html5Application;
+import org.springfield.lou.application.Html5ApplicationInterface;
 import org.springfield.lou.application.PathBindObject;
 import org.springfield.lou.controllers.Html5Controller;
 import org.springfield.lou.screen.BindEvent;
@@ -81,10 +81,10 @@ public class ModelEventManager {
 						list.remove(i);
 					}
 				}
-				list.add(new ModelBindObject(methodname,screenid,targetid,callbackobject,method));
+				list.add(new ModelBindObject(methodname,screenid,callbackobject.getApplicationHashCode(),targetid,callbackobject,method));
 			} else {
 				list = new ArrayList<ModelBindObject>();
-				list.add(new ModelBindObject(methodname,screenid,targetid,callbackobject,method));
+				list.add(new ModelBindObject(methodname,screenid,callbackobject.getApplicationHashCode(),targetid,callbackobject,method));
 				propertybinds.put(path, list);
 			}
 		} catch(Exception e) {
@@ -103,24 +103,46 @@ public class ModelEventManager {
 			ArrayList<ModelBindObject> list = propertiesbinds.get(path);
 			if (list!=null) {
 				// find the screen id and targetid
-				list.add(new ModelBindObject(methodname,screenid,targetid,callbackobject,method));
+				list.add(new ModelBindObject(methodname,screenid,callbackobject.getApplicationHashCode(),targetid,callbackobject,method));
 			} else {
 				list = new ArrayList<ModelBindObject>();
-				list.add(new ModelBindObject(methodname,screenid,targetid,callbackobject,method));
+				list.add(new ModelBindObject(methodname,screenid,callbackobject.getApplicationHashCode(),targetid,callbackobject,method));
 				propertiesbinds.put(path, list);
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
  			return;
  		}
-
     }
+    
+    public void removeApplication(int applicationhashcode) {
+    	removePropertyApplicationBinds(applicationhashcode);
+    	removePropertiesApplicationBinds(applicationhashcode);
+    }
+    
     
     public void removeScreenBinds(String screenid) {
     	//System.out.println("SCREEN REMOVE ="+screenid);
     	removePropertyScreenBinds(screenid);
     	removePropertiesScreenBinds(screenid);
     }
+    
+    public synchronized void removePropertyApplicationBinds(int applicationhashcode) {
+    	Iterator<String> it = propertybinds.keySet().iterator();
+    	while(it.hasNext()){
+    		String key = it.next();
+    		List<ModelBindObject> l = (List)propertybinds.get(key);
+    		for (int i=l.size()-1;i>=0;i--) {
+				ModelBindObject bind  = l.get(i);
+				if (bind.applicationhashcode==applicationhashcode) {
+					System.out.println("REMOVE OF OLD APPLICATION BIND !");
+					l.remove(i);
+				}
+    		}
+    		//if (l.size()==0) propertybinds.remove(key);
+    	}
+	}
+
 
     public synchronized void removePropertyScreenBinds(String screenid) {
     	Iterator<String> it = propertybinds.keySet().iterator();
@@ -145,6 +167,21 @@ public class ModelEventManager {
     		for (int i=l.size()-1;i>=0;i--) {
 				ModelBindObject bind  = l.get(i);
 				if (bind.screenid.equals(screenid)) {
+					l.remove(i);
+				}
+    		}
+    		//if (l.size()==0) propertiesbinds.remove(key);
+    	}
+	}
+    
+    public synchronized void removePropertiesApplicationBinds(int applicationhashcode) {
+    	Iterator<String> it = propertiesbinds.keySet().iterator();
+    	while(it.hasNext()){
+    		String key = it.next();
+    		List<ModelBindObject> l = (List)propertiesbinds.get(key);
+    		for (int i=l.size()-1;i>=0;i--) {
+				ModelBindObject bind  = l.get(i);
+				if (bind.applicationhashcode==applicationhashcode) {
 					l.remove(i);
 				}
     		}

@@ -94,7 +94,6 @@ public class Screen {
 			String sid = caps.getCapability("smt_sessionid");
 
 			String appuser = a.getFullId();
-			System.out.println("A="+appuser+" "+sid);
 			pos = appuser.indexOf("/user/");
 			if (pos!=-1) {
 				appuser = appuser.substring(pos+6);

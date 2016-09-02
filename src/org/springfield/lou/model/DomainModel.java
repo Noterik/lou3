@@ -34,18 +34,16 @@ public class DomainModel  {
 	
 	
 	public boolean setProperty(String path,String value) {
-		System.out.println("domain model -> setProperty("+path+","+value+") "+this);
 		int pos=path.lastIndexOf("/");
     	String propertyname = path.substring(pos+1);
     	path = path.substring(0,pos);
-		System.out.println("domain model2 -> setProperty("+path+","+propertyname+") "+this);
 		Fs.setProperty("/domain/"+path,propertyname,value);
 
 		return true;
 	}
 	
 	public String getProperty(String path) {
-		System.out.println("domain model -> getProperty("+path+")"+this);
+		System.out.println("domain model -> getProperty("+path+")"+this+" NOT IMPLEMENTED");
 		return null;
 	}
 	

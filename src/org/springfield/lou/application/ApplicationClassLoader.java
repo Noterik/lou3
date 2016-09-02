@@ -61,7 +61,6 @@ public class ApplicationClassLoader extends SecureClassLoader {
 
 		while(pi.hasMoreElements()){
 			Permission p = pi.nextElement();
-			System.out.println("PERMC="+p.getName());
 		}
 		
 		
@@ -90,7 +89,6 @@ public class ApplicationClassLoader extends SecureClassLoader {
                 
         try {  
         	Class<?> r2 = findSystemClass(className);  
-            System.out.println("SC="+r2);
             return r2;
         } catch (Exception e) { }  
       
@@ -99,7 +97,6 @@ public class ApplicationClassLoader extends SecureClassLoader {
         	JarFile jar = new JarFile(jarFile);  
             // System.out.println("JARFILE="+jar+" "+jarFile);
             String filename = className.replace('.','/');
-            System.out.println("CLASSLOADED WANTS TO LOAD "+filename + ".class");
             JarEntry entry = jar.getJarEntry(filename + ".class");  
             // System.out.println("JARENTRY="+entry);
             InputStream is = jar.getInputStream(entry);  

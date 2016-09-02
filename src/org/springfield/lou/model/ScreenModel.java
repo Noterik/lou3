@@ -38,7 +38,7 @@ public class ScreenModel  {
 	
 	
 	public boolean setProperty(String path,String value) {
-		System.out.println("screen model -> setProperty("+path+","+value+") "+this);
+		//System.out.println("screen model -> setProperty("+path+","+value+") "+this);
 		screenproperties.put(path, value);
 		// ok lets check if we also need to store it in the session object in smithers
 		ArrayList<String> list = app.getRecoveryList();

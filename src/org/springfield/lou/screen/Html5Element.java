@@ -359,7 +359,6 @@ public class Html5Element {
 	}
 
 	public void setViewProperty(String name,String value) {
-		//Model m = screen.getApplication().getModel();
 		FsNode view  = screen.getModel().getNode("/app/view/"+selector);
 		if (view==null) {
 			view = new FsNode("view",selector);
@@ -369,7 +368,6 @@ public class Html5Element {
 	}
 	
 	public void setControllerProperty(String controllername,String name,String value) {
-		//Model m = screen.getApplication().getModel();
 		FsNode controller  = screen.getModel().getNode("/app/view/"+selector+"/controller/"+controllername);
 		
 		if (controller==null) {

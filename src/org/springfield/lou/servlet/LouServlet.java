@@ -406,7 +406,6 @@ public class LouServlet extends HttpServlet {
 					msg = screen.getMsg();
 					if (msg==null) {
 						// simulated a drop connection
-						System.out.println("DROP CONNECTION");
 						out.close();
 						return;
 					}

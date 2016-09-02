@@ -274,6 +274,9 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 			System.out.println("SHUTDOWN");
 			this.removeScreen(next,username);	
 		}
+		
+		Model.getEventManager().removeApplication(this.hashCode());
+		
 		ApplicationManager.instance().removeApplication(this.id);
 	}
 	
@@ -396,7 +399,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	public void removeScreen(String id,String username){
 		Screen screen = this.screenmanager.get(id);
 		if (screen!=null) {
-			System.out.println("REQUEST SCREEN REMOVE ID="+id+"");
+			//System.out.println("REQUEST SCREEN REMOVE ID="+id+"");
 			screen.getModel().getEventManager().removeScreenBinds(id);
 			username = screen.getUserName();
 		}
@@ -645,7 +648,6 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     	// remove all event callbacks this objects has
     	
     	// remove from path binds
-    	System.out.println("REMOVE PATH BINDS !!");
     }
 
 }
