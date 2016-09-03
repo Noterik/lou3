@@ -492,9 +492,8 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     	int level = LOG_INFO; // default to info
     	if (l.equals("warning")) { level = LOG_WARNING; }
     	else if (l.equals("error")) { level = LOG_ERROR; }
-    	FsNode n = new FsNode("log");	
   		SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss");
-  		n.setId(f.format(new Date()));
+    	FsNode n = new FsNode("log",f.format(new Date()));	
   		n.setProperty("level", loglevels[level-1]);
   		n.setProperty("source", "js");
   		n.setProperty("msg", parts[0]);
@@ -572,9 +571,8 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	}
     
     public void log(Screen s,String msg,int level) {
-    		FsNode n = new FsNode("log");	
     		SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss");
-    		n.setId(f.format(new Date()));
+    		FsNode n = new FsNode("log",f.format(new Date()));
     		n.setProperty("level", loglevels[level-1]);
     		n.setProperty("source", "java");
     		n.setProperty("msg", msg);

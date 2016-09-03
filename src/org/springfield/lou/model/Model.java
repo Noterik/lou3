@@ -101,20 +101,20 @@ public class Model {
 	}
 	
 	public boolean setProperty(String path,String value) {
-		//System.out.println("model -> setProperty("+path+","+value+") "+this);
 		if (path.startsWith("/screen/"))  {
 			smodel.setProperty(path.substring(8),value);
-	   	 	//bindmanager.setProperty(path, value); // signal the others
 	   	 	eventmanager.setProperty(path, value); // signal the others new code
 	   	 	return true;
-		} else 
-		if (path.startsWith("/app/")) {
+		} else if (path.startsWith("/shared/"))  {
+				sharedmodel.setProperty(path,value);
+		   	 	eventmanager.setProperty(path, value); // signal the others new code
+		   	 	return true;
+		} else if (path.startsWith("/app/")) {
 			amodel.setProperty(path.substring(5),value);
 	   	 	bindmanager.setProperty(path, value); // signal the others old code
 	   	 	eventmanager.setProperty(path, value); // signal the others new code
 	   	 	return true;
-		} else                
-		if (path.startsWith("/domain/")) {
+		} else if (path.startsWith("/domain/")) {
 			dmodel.setProperty(path.substring(8),value);
 	   	 	eventmanager.setProperty(path, value); // signal the others new code
 	   	 	return true;
@@ -123,16 +123,32 @@ public class Model {
 	}
 	
 	public String getProperty(String path) {
-		//System.out.println("model -> getProperty("+path+")"+this);
-		if (path.startsWith("/screen/")) return smodel.getProperty(path.substring(8));
-		if (path.startsWith("/app/")) return amodel.getProperty(path.substring(5));
+		System.out.println("model -> getProperty("+path+")"+this);
+		if (path.startsWith("/screen/")) {
+			return smodel.getProperty(path.substring(8));
+		} else  if (path.startsWith("/shared/")) {
+				return sharedmodel.getProperty(path);
+		} else if (path.startsWith("/app/")) {
+			return amodel.getProperty(path.substring(5));
+		}
+		return null;
+	}
+	
+	public FSList getList(String path) {
+		if (path.startsWith("/shared")) { 
+			return sharedmodel.getList(path);
+		} else if (path.startsWith("/domain/")) { 
+		//	return dmodel.getNode(path);
+		}
 		return null;
 	}
 	
 	public FsNode getNode(String path) {
-		//System.out.println("AMODE="+amodel);
+		System.out.println("MODEL="+path);
 		if (path.startsWith("/app/")) { 
 			return amodel.getNode(path);
+		} else if (path.startsWith("/shared/")) { 
+			return sharedmodel.getNode(path);
 		} else if (path.startsWith("/domain/")) { 
 			return dmodel.getNode(path);
 		}
@@ -142,6 +158,8 @@ public class Model {
 	public void putNode(String uri,FsNode node) {
 		if (uri.startsWith("/app/") || uri.equals("/app")) { 
 			amodel.putNode(uri,node);
+		} else if (uri.startsWith("/shared")) { 
+				sharedmodel.putNode(uri,node);
 		} else if (uri.startsWith("/domain/")) { 
 			System.out.println("PUTNODE NOT DONE YET FOR DOMAIN");
 		}
@@ -162,6 +180,8 @@ public class Model {
 	public boolean insertNode(FsNode node,String path) {
 		//System.out.println("AMODE="+amodel);
 		if (path.startsWith("/app/")) { 
+		} else if (path.startsWith("/shared/")) { 
+			return sharedmodel.putNode(path,node);
 		} else if (path.startsWith("/domain/")) { 
 			return Fs.insertNode(node, path);
 		}
