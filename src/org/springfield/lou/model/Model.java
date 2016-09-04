@@ -51,7 +51,8 @@ public class Model {
 	
 	public Model(Screen s) {
 		Html5ApplicationInterface app = s.getApplication();
-		smodel = new ScreenModel(app,s); // answers the /screen/ calls
+		//smodel = new ScreenModel(app,s); // answers the /screen/ calls
+		smodel = new ScreenModel(); // answers the /screen/ calls
 		imodel = app.getAppInstanceModel(); // answers the /instance/ calls
 		amodel = app.getAppModel(); // answers the /app/ calls
 		if (dmodel==null) dmodel = new DomainModel(); // answers the /domain/ calls
@@ -92,7 +93,7 @@ public class Model {
 	   	 	eventmanager.setProperties(path, properties); // signal the others new code
 	   	 	return true;
 		} else 	if (path.startsWith("/shared/")) {
-			sharedmodel.setProperties(path.substring(8),properties);
+			sharedmodel.setProperties(path,properties);
 	   	 	eventmanager.setProperties(path, properties); // signal the others new code
 	   	 	return true;
 		}
@@ -101,7 +102,8 @@ public class Model {
 	
 	public boolean setProperty(String path,String value) {
 		if (path.startsWith("/screen/"))  {
-			smodel.setProperty(path.substring(8),value);
+			//smodel.setProperty(path.substring(8),value);
+			smodel.setProperty(path,value);
 	   	 	eventmanager.setProperty(path, value); // signal the others new code
 	   	 	return true;
 		} else if (path.startsWith("/shared/"))  {
@@ -123,7 +125,8 @@ public class Model {
 	
 	public String getProperty(String path) {
 		if (path.startsWith("/screen/")) {
-			return smodel.getProperty(path.substring(8));
+			//return smodel.getProperty(path.substring(8));
+			return smodel.getProperty(path);
 		} else  if (path.startsWith("/shared/")) {
 				return sharedmodel.getProperty(path);
 		} else if (path.startsWith("/app/")) {

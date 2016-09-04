@@ -114,7 +114,7 @@ public class FsListController extends Html5Controller {
 			
 			screen.removeContent(selector.substring(1)+"_"+lastitem+"_actionmenu");
 			
-			FsNode cnode = model.getNode("/app/view/"+selector+"_actionmenu/controller/FsActionMenuController");
+			FsNode cnode = model.getNode("/app/component/view/"+selector+"_actionmenu/controller/FsActionMenuController");
 			screen.get(selector+"_"+lastitem+"_actionmenu").setControllerProperty("FsActionMenuController","nodepath", cnode.getProperty("nodepath"));
 			screen.get(selector+"_"+lastitem+"_actionmenu").setControllerProperty("FsActionMenuController","mouseovercss", cnode.getProperty("mouseovercss"));
 	       	System.out.println("WHHHEEEE3");

@@ -157,7 +157,7 @@ public class AppInstanceModel  {
 						Element view = (Element)child;
 						String viewid = view.attributeValue("id");	
 						FsNode viewnode = new FsNode("view",viewid);
-						putNode("/app",viewnode);
+						putNode("/app/component",viewnode);
 						
 						for(Iterator<Node> iter2 = view.nodeIterator(); iter2.hasNext();) {
 							Node child2 = (Node)iter2.next();
@@ -167,7 +167,7 @@ public class AppInstanceModel  {
 									Element controller = (Element)child2;
 									String controllerid = controller.attributeValue("id");	
 									FsNode controllernode = new FsNode("controller",controllerid);
-									putNode("/app/view/"+viewid,controllernode);
+									putNode("/app/component/view/"+viewid,controllernode);
 									for(Iterator<Node> iter3 = controller.nodeIterator(); iter3.hasNext();) {
 										Node child3 = (Node)iter3.next();
 										String id2 = child3.getName();

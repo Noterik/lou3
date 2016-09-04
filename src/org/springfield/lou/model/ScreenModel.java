@@ -24,8 +24,9 @@ import org.springfield.lou.homer.LazyHomer;
 import org.springfield.lou.screen.Screen;
 import org.springfield.marge.*;
 
-public class ScreenModel  {
+public class ScreenModel extends MemoryModel {
 	
+	/*
 	private Html5ApplicationInterface app;
 	
 	private Map<String, String> screenproperties = new HashMap<String,String>();
@@ -53,5 +54,6 @@ public class ScreenModel  {
 		//System.out.println("screen model -> getProperty("+path+")"+this);
 		return screenproperties.get(path);
 	}
+	*/
 	
 }
