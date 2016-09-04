@@ -65,7 +65,6 @@ public class Model {
 	}
 	
  	public void onPathUpdate(String paths,String methodname,Html5Controller callbackobject) {
- 		//System.out.println("onPathUpdate "+paths+" "+methodname+" "+callbackobject);
  		bindmanager.onPathUpdate(paths, methodname, callbackobject);
 	}
  	
@@ -123,7 +122,6 @@ public class Model {
 	}
 	
 	public String getProperty(String path) {
-		System.out.println("model -> getProperty("+path+")"+this);
 		if (path.startsWith("/screen/")) {
 			return smodel.getProperty(path.substring(8));
 		} else  if (path.startsWith("/shared/")) {
@@ -144,7 +142,6 @@ public class Model {
 	}
 	
 	public FsNode getNode(String path) {
-		System.out.println("MODEL="+path);
 		if (path.startsWith("/app/")) { 
 			return amodel.getNode(path);
 		} else if (path.startsWith("/shared/")) { 
@@ -178,7 +175,6 @@ public class Model {
 	}
 	
 	public boolean insertNode(FsNode node,String path) {
-		//System.out.println("AMODE="+amodel);
 		if (path.startsWith("/app/")) { 
 		} else if (path.startsWith("/shared/")) { 
 			return sharedmodel.putNode(path,node);

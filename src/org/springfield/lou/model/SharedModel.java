@@ -36,36 +36,26 @@ public class SharedModel  {
 	}
 	
 	public FSList getList(String path) {
-		System.out.println("SHARED GETLIST2="+path);
 		if (path.equals("/shared")) return root.getChildList();
 		String[] steps = path.substring(1).split("/");
 		int stepc = 0;
 		int stept = steps.length;
-		System.out.println("STEPC="+stepc+" STEPT="+stept);
 		FsNode current = root;
 		
 		FsNode snode = null;
 		while ((stepc+1)<stept) {
-			System.out.println("GET ON="+steps[stepc+1]);
 			snode = current.getChild(steps[stepc+1]);
-			System.out.println("GET RETURN="+snode);
 			if (snode==null) {
 				return null;
-			} else {
-				System.out.println("SNODE FOUND="+snode.asXML());
 			}
+
 			stepc=stepc+2;
 			current = snode;
-			System.out.println("STEPC="+stepc+" STEPT="+stept);
-			System.out.println("SNODE="+current.asXML());
-		//	return current.getChildList();
 		}
 		if (current!=null) {
 			if (stept==stepc) {
-				System.out.println("RESULT LIST="+current.getChildList());
 				return current.getChildList();
 			} else {
-				System.out.println("RETURN NAMES LIST="+steps[stepc]);
 				return current.getNamedChildList(steps[stepc]);
 			}
 		}
@@ -75,12 +65,10 @@ public class SharedModel  {
 
 	
 	public boolean setProperty(String path,String value) {
-		System.out.println("shared model -> setProperty("+path+","+value+") "+this);
 		int pos =  path.lastIndexOf("/");
 		if (pos!=-1) {
 			String nodepath = path.substring(0,pos);
 			String name = path.substring(pos+1);
-			System.out.println("shared model -> nodepath="+nodepath+" name="+name+") "+this);
 			FsNode node  = getNode(nodepath);
 			if (node!=null) {
 				node.setProperty(name, value);	
@@ -93,16 +81,13 @@ public class SharedModel  {
 	
 
 	public String getProperty(String path) {
-		System.out.println("shared model -> getProperty("+path+") "+this);
 		int pos =  path.lastIndexOf("/");
 		if (pos!=-1) {
 			String nodepath = path.substring(0,pos);
 			String name = path.substring(pos+1);
-			System.out.println("shared model -> nodepath="+nodepath+" name="+name+") "+this);
 			FsNode node  = getNode(nodepath);
 			if (node!=null) {
 				return node.getProperty(name);	
-
 			} 
 		}
 		return null;
@@ -128,26 +113,20 @@ public class SharedModel  {
 	
 	
 	public boolean putNode(String path,FsNode node) {
-		System.out.println("PUT NODE PATH="+path+" node="+node.asXML());
 		String[] steps = path.substring(1).split("/");
 		int stepc = 0;
 		int stept = steps.length;
 		FsNode current = root;
 		
 		while ((stepc+1)<stept) {
-		//	System.out.println("SNODE="+current.asXML()+" ID="+steps[stepc+1]);
 			FsNode snode = current.getChild(steps[stepc+1]);
 			if (snode==null) { // create the node in its path if needed ( like mkdirs() )
 				snode = new FsNode(steps[stepc],steps[stepc+1]);
-			//	System.out.println("MKDIRNODE="+snode.asXML());
 				current.addNode(snode);
 			} 
 			stepc=stepc+2;
 			current = snode;
-			//System.out.println("STEPC="+stepc+" STEPT="+stept);
-			//System.out.println("SNODE="+current.asXML());
 		}
-		System.out.println("ADDNODE="+node.asXML()+" TO NODE="+current.asXML());
 		current.addNode(node);
 		return true; // needs work
 	}
@@ -155,30 +134,20 @@ public class SharedModel  {
 
 	
 	public FsNode getNode(String path) {
-		System.out.println("SHARED GETNODE="+path);
 		String[] steps = path.substring(1).split("/");
 		int stepc = 0;
 		int stept = steps.length;
-		System.out.println("STEPC="+stepc+" STEPT="+stept);
 		FsNode current = root;
 		
 		FsNode snode = null;
 		while ((stepc+1)<stept) {
-			System.out.println("GET ON="+steps[stepc+1]);
 			snode = current.getChild(steps[stepc+1]);
-			System.out.println("GET RETURN="+snode);
 			if (snode==null) { // create the node in its path if needed ( like mkdirs() )
 				return null;
-			} else {
-				System.out.println("SNODE FOUND="+snode.asXML());
 			}
 			stepc=stepc+2;
 			current = snode;
-			System.out.println("STEPC="+stepc+" STEPT="+stept);
-			System.out.println("SNODE="+current.asXML());
-		//	return current.getChildList();
 		}
-		System.out.println("RESULT NODE="+current.asXML());
 		return current;
 	}
 	
