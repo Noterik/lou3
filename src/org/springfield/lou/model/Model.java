@@ -34,7 +34,6 @@ public class Model {
 	private static SharedModel sharedmodel = new SharedModel();
 	private AppModel amodel;
 	private ScreenModel smodel;
-	private static BindManager bindmanager;
 	private static ModelEventManager eventmanager;
 	
 	/* screen/
@@ -56,7 +55,6 @@ public class Model {
 		imodel = app.getAppInstanceModel(); // answers the /instance/ calls
 		amodel = app.getAppModel(); // answers the /app/ calls
 		if (dmodel==null) dmodel = new DomainModel(); // answers the /domain/ calls
-		if (bindmanager==null) bindmanager = new BindManager();
 		if (eventmanager==null) eventmanager = new ModelEventManager();
 		
 	}
@@ -65,26 +63,18 @@ public class Model {
 		return eventmanager;
 	}
 	
+	/*
  	public void onPathUpdate(String paths,String methodname,Html5Controller callbackobject) {
  		bindmanager.onPathUpdate(paths, methodname, callbackobject);
 	}
+	*/
  	
  	public void onPropertyUpdate(String path,String methodname,Html5Controller callbackobject) {
-		if (path.startsWith("/app/")) {
-			eventmanager.onPropertyUpdate(path,methodname,callbackobject);
-		} else if (path.startsWith("/screen/")) {
-			eventmanager.onPropertyUpdate(path,methodname,callbackobject);
-		} else if (path.startsWith("/domain/")) {
-			eventmanager.onPropertyUpdate(path,methodname,callbackobject);
-		}
+		eventmanager.onPropertyUpdate(path,methodname,callbackobject);
  	}
  	
  	public void onPropertiesUpdate(String path,String methodname,Html5Controller callbackobject) {
-		if (path.startsWith("/app/")) {
-			eventmanager.onPropertiesUpdate(path,methodname,callbackobject);
-		} else if (path.startsWith("/shared/")) {
-			eventmanager.onPropertiesUpdate(path,methodname,callbackobject);
-		}
+		eventmanager.onPropertyUpdate(path,methodname,callbackobject);
  	}
 	
 	public boolean setProperties(String path,FsPropertySet properties) {
@@ -92,6 +82,10 @@ public class Model {
 			amodel.setProperties(path.substring(5),properties);
 	   	 	eventmanager.setProperties(path, properties); // signal the others new code
 	   	 	return true;
+		} else if (path.startsWith("/screen/")) {
+				smodel.setProperties(path.substring(5),properties);
+		   	 	eventmanager.setProperties(path, properties); // signal the others new code
+		   	 	return true;
 		} else 	if (path.startsWith("/shared/")) {
 			sharedmodel.setProperties(path,properties);
 	   	 	eventmanager.setProperties(path, properties); // signal the others new code
@@ -112,7 +106,6 @@ public class Model {
 		   	 	return true;
 		} else if (path.startsWith("/app/")) {
 			amodel.setProperty(path.substring(5),value);
-	   	 	bindmanager.setProperty(path, value); // signal the others old code
 	   	 	eventmanager.setProperty(path, value); // signal the others new code
 	   	 	return true;
 		} else if (path.startsWith("/domain/")) {

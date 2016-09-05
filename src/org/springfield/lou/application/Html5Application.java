@@ -40,7 +40,6 @@ import org.springfield.fs.*;
 import org.springfield.lou.homer.LazyHomer;
 import org.springfield.lou.model.AppInstanceModel;
 import org.springfield.lou.model.AppModel;
-import org.springfield.lou.model.BindManager;
 import org.springfield.lou.model.Model;
 import org.springfield.lou.screen.Capabilities;
 import org.springfield.lou.screen.Html5Element;

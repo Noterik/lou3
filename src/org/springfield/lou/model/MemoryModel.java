@@ -67,7 +67,7 @@ public class MemoryModel  {
 			String nodepath = path.substring(0,pos);
 			String name = path.substring(pos+1);
 			FsNode node  = getNode(nodepath);
-			if (node!=null) {
+			if (node!=null && value!=null) {
 				node.setProperty(name, value);	
 				return true;
 			} 
