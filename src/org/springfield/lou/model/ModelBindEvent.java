@@ -4,6 +4,7 @@ public class ModelBindEvent {
 
 	public final static int PROPERTY = 1;
 	public final static int PROPERTIES = 2;
+	public final static int PATH = 3;
 	
 	public String path;
 	public int type;

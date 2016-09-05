@@ -607,39 +607,13 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     }
     
     
-    /*
-    public Model getModel() {
-    	return model;
-    }
-    */
     
     public Html5Controller createController(String name) {
     	System.out.println("PLACE createController node in your app");
     	return null;
     }
     
-    /*
- 	public void onPathUpdate(String paths,String methodname,Html5Controller callbackobject) {
- 		bindmanager.onPathUpdate(paths, methodname, callbackobject);
-	}
-	*/
- 	
- 	/*
-    public void setProperty(String path,String value) {
-		long starttime = new Date().getTime();
-   	 	properties.put(path,value);
-   	 	bindmanager.setProperty(path, value); // signal the others
-   	 	
-		long endtime = new Date().getTime();
-		//System.out.println("SET APP PROPERTY TIME="+(endtime-starttime)+" P="+path+" V="+value);			
-    }
-    */
-    
- 	/*
-    public Object getProperty(String path) {
-		return properties.get(path);
-    }
-    */
+
     
     public void removeEvents(Object obj) {
     	// remove all event callbacks this objects has

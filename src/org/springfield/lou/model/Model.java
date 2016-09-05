@@ -63,11 +63,11 @@ public class Model {
 		return eventmanager;
 	}
 	
-	/*
- 	public void onPathUpdate(String paths,String methodname,Html5Controller callbackobject) {
- 		bindmanager.onPathUpdate(paths, methodname, callbackobject);
+	
+ 	public void onPathUpdate(String path,String methodname,Html5Controller callbackobject) {
+ 		eventmanager.onPathUpdate(path, methodname, callbackobject);
 	}
-	*/
+	
  	
  	public void onPropertyUpdate(String path,String methodname,Html5Controller callbackobject) {
 		eventmanager.onPropertyUpdate(path,methodname,callbackobject);
