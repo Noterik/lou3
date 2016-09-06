@@ -26,34 +26,4 @@ import org.springfield.marge.*;
 
 public class ScreenModel extends MemoryModel {
 	
-	/*
-	private Html5ApplicationInterface app;
-	
-	private Map<String, String> screenproperties = new HashMap<String,String>();
-	private Screen screen;
-	
-	public ScreenModel(Html5ApplicationInterface a,Screen s) {
-		screen = s;
-		app = a;
-	}
-	
-	
-	public boolean setProperty(String path,String value) {
-		//System.out.println("screen model -> setProperty("+path+","+value+") "+this);
-		screenproperties.put(path, value);
-		// ok lets check if we also need to store it in the session object in smithers
-		ArrayList<String> list = app.getRecoveryList();
-		if (list.contains(path)) {
-			// ok we need to store this for now just works for Strings
-			Fs.setProperty(screen.getRecoveryId(), path, value.toString());
-		}
-		return true;
-	}
-	
-	public String getProperty(String path) {
-		//System.out.println("screen model -> getProperty("+path+")"+this);
-		return screenproperties.get(path);
-	}
-	*/
-	
 }

@@ -74,7 +74,7 @@ public class Model {
  	}
  	
  	public void onPropertiesUpdate(String path,String methodname,Html5Controller callbackobject) {
-		eventmanager.onPropertyUpdate(path,methodname,callbackobject);
+		eventmanager.onPropertiesUpdate(path,methodname,callbackobject);
  	}
 	
 	public boolean setProperties(String path,FsPropertySet properties) {

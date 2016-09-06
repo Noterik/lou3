@@ -138,7 +138,6 @@ public class ModelEventManager {
     }
 
     public void onPropertiesUpdate(String path,String methodname,Html5Controller callbackobject) {
-		//System.out.println("WBIND = "+path);
     	try {
  			Method method = callbackobject.getClass().getMethod(methodname,ModelEvent.class);
  			String screenid = callbackobject.getScreenId();
@@ -282,33 +281,6 @@ public class ModelEventManager {
 	}
 	
 	
-	/*
-    public void deliverPath(String path,String value) {
-    	String[] parts = path.split("/"); 
-    	String key = parts[1]+"/"+parts[2];
-    	String nodeid = parts[parts.length-2];
-    	String propertyname = parts[parts.length-1];
-   	
-    	FsNode node = new FsNode(key,nodeid);
-    	node.setProperty(propertyname, value);
-   	
-    	key = "/"+key+"/";
-		ArrayList<ModelBindObject> binds = propertybinds.get(path);
-		if (binds!=null) {
-			for (int i=0;i<binds.size();i++) {
-				ModelBindObject bind  = binds.get(i);
-				try {		
-					ModelEvent event = new ModelEvent();
-					event.path = key;
-					event.target = node;
-					bind.methodcall.invoke(bind.obj,event);
-				} catch(Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}	 
-    }
-    */
  	
     public void deliverProperty(String path,String value) {
     	String[] parts = path.split("/"); 
@@ -368,6 +340,7 @@ public class ModelEventManager {
 			for (int i=0;i<binds.size();i++) {
 				ModelBindObject bind  = binds.get(i);
 				try {		
+					
 					ModelEvent event = new ModelEvent();
 					event.path = path;
 					event.target = set;
