@@ -22,6 +22,7 @@ public class ModelEventManager {
     private Map<String, ArrayList<ModelBindObject>> propertybinds = new HashMap<String, ArrayList<ModelBindObject>>();
     private Map<String, ArrayList<ModelBindObject>> propertiesbinds = new HashMap<String, ArrayList<ModelBindObject>>();
     private Map<String, ArrayList<ModelBindObject>> pathbinds = new HashMap<String, ArrayList<ModelBindObject>>();
+    private Map<String, ArrayList<ModelBindObject>> notifybinds = new HashMap<String, ArrayList<ModelBindObject>>();
 
     
 	protected Stack<ModelBindEvent> eventqueue  = new Stack<ModelBindEvent>();
@@ -32,7 +33,7 @@ public class ModelEventManager {
     }
     
     public int getTotalBindsCount() {
-    	return getPropertyBindsCount()+getPropertiesBindsCount();
+    	return getPropertyBindsCount()+getPropertiesBindsCount()+getPathBindsCount()+getNotifyBindsCount();
     }
     
     public int getPropertyBindsCount() {
@@ -41,6 +42,17 @@ public class ModelEventManager {
     	while(it.hasNext()){
     		String key = it.next();
     		List<ModelBindObject> l = (List)propertybinds.get(key);
+    		count+=l.size();
+    	}
+    	return count;
+    }
+    
+    public int getNotifyBindsCount() {
+    	int count = 0;
+    	Iterator<String> it = notifybinds.keySet().iterator();
+    	while(it.hasNext()){
+    		String key = it.next();
+    		List<ModelBindObject> l = (List)notifybinds.get(key);
     		count+=l.size();
     	}
     	return count;
@@ -78,6 +90,10 @@ public class ModelEventManager {
     
     public Map<String, ArrayList<ModelBindObject>> getPropertyBinds() {
     	return propertybinds;
+    }
+    
+    public Map<String, ArrayList<ModelBindObject>> getNotifyBinds() {
+    	return notifybinds;
     }
     
  	public void onPathUpdate(String path,String methodname,Html5Controller callbackobject) {
@@ -157,9 +173,31 @@ public class ModelEventManager {
  		}
     }
     
+    public void onNotify(String path,String methodname,Html5Controller callbackobject) {
+    	try {
+ 			Method method = callbackobject.getClass().getMethod(methodname,ModelEvent.class);
+ 			String screenid = callbackobject.getScreenId();
+ 			String targetid = callbackobject.getSelector();
+			ArrayList<ModelBindObject> list = notifybinds.get(path);
+			if (list!=null) {
+				// find the screen id and targetid
+				list.add(new ModelBindObject(methodname,screenid,callbackobject.getApplicationHashCode(),targetid,callbackobject,method));
+			} else {
+				list = new ArrayList<ModelBindObject>();
+				list.add(new ModelBindObject(methodname,screenid,callbackobject.getApplicationHashCode(),targetid,callbackobject,method));
+				notifybinds.put(path, list);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+ 			return;
+ 		}
+    }
+
+    
     public void removeApplication(int applicationhashcode) {
     	removePropertyApplicationBinds(applicationhashcode);
     	removePropertiesApplicationBinds(applicationhashcode);
+    	removeNotifyApplicationBinds(applicationhashcode);
     	removePathApplicationBinds(applicationhashcode);
     }
     
@@ -168,6 +206,7 @@ public class ModelEventManager {
     	//System.out.println("SCREEN REMOVE ="+screenid);
     	removePropertyScreenBinds(screenid);
     	removePropertiesScreenBinds(screenid);
+    	removeNotifyScreenBinds(screenid);
     	removePathScreenBinds(screenid);
     }
     
@@ -192,6 +231,21 @@ public class ModelEventManager {
     	while(it.hasNext()){
     		String key = it.next();
     		List<ModelBindObject> l = (List)pathbinds.get(key);
+    		for (int i=l.size()-1;i>=0;i--) {
+				ModelBindObject bind  = l.get(i);
+				if (bind.applicationhashcode==applicationhashcode) {
+					l.remove(i);
+				}
+    		}
+
+    	}
+	}
+    
+    public synchronized void removeNotifyApplicationBinds(int applicationhashcode) {
+    	Iterator<String> it = notifybinds.keySet().iterator();
+    	while(it.hasNext()){
+    		String key = it.next();
+    		List<ModelBindObject> l = (List)notifybinds.get(key);
     		for (int i=l.size()-1;i>=0;i--) {
 				ModelBindObject bind  = l.get(i);
 				if (bind.applicationhashcode==applicationhashcode) {
@@ -248,6 +302,21 @@ public class ModelEventManager {
     	}
 	}
     
+    public synchronized void removeNotifyScreenBinds(String screenid) {
+    	Iterator<String> it = notifybinds.keySet().iterator();
+    	while(it.hasNext()){
+    		String key = it.next();
+    		List<ModelBindObject> l = (List)notifybinds.get(key);
+    		for (int i=l.size()-1;i>=0;i--) {
+				ModelBindObject bind  = l.get(i);
+				if (bind.screenid.equals(screenid)) {
+					l.remove(i);
+				}
+    		}
+    		//if (l.size()==0) propertiesbinds.remove(key);
+    	}
+	}
+    
     
     public synchronized void removePropertiesApplicationBinds(int applicationhashcode) {
     	Iterator<String> it = propertiesbinds.keySet().iterator();
@@ -269,6 +338,14 @@ public class ModelEventManager {
     	if (eventqueue.size()>0) {
     		normalthread.check();
     	//	checkNormalQueue(); // direct delivery for testing.
+    	}
+    
+    }
+    
+    public void notify(String path,FsNode value) {
+    	eventqueue.push(new ModelBindEvent(ModelBindEvent.NOTIFY,path,value));
+    	if (eventqueue.size()>0) {
+    		normalthread.check();
     	}
     
     }
@@ -354,13 +431,33 @@ public class ModelEventManager {
 		deliverPath(path,set,ModelBindEvent.PROPERTIES);
     }
     
+    public void deliverNotify(String path,FsNode node) {	
+		ArrayList<ModelBindObject> binds = notifybinds.get(path); // direct hit
+		if (binds!=null) {
+			for (int i=0;i<binds.size();i++) {
+				ModelBindObject bind  = binds.get(i);
+				try {		
+					
+					ModelEvent event = new ModelEvent();
+					event.path = path;
+					event.target = node;
+					event.eventtype = ModelBindEvent.NOTIFY;
+					bind.methodcall.invoke(bind.obj,event);
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+    }
+    
+    
     public void checkNormalQueue() {
     	while (eventqueue.size()>0) {
     		ModelBindEvent b = eventqueue.pop(); // should be a case statement
     		if (b.type == ModelBindEvent.PROPERTY) {
     			deliverProperty(b.path,(String)b.value);
-    		} else if (b.type == ModelBindEvent.PROPERTIES) {
-    			deliverProperties(b.path,(FsPropertySet)b.value);
+    		} else if (b.type == ModelBindEvent.NOTIFY) {
+    			deliverNotify(b.path,(FsNode)b.value);
     		}
     	}
     }

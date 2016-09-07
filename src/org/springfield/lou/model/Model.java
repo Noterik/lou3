@@ -64,6 +64,14 @@ public class Model {
 	}
 	
 	
+ 	public void onNotify(String path,String methodname,Html5Controller callbackobject) {
+ 		eventmanager.onNotify(path, methodname, callbackobject);
+	}
+ 	
+ 	public void notify(String path,FsNode node) {
+ 		eventmanager.notify(path,node);
+	}
+	
  	public void onPathUpdate(String path,String methodname,Html5Controller callbackobject) {
  		eventmanager.onPathUpdate(path, methodname, callbackobject);
 	}
@@ -105,7 +113,7 @@ public class Model {
 		   	 	eventmanager.setProperty(path, value); // signal the others new code
 		   	 	return true;
 		} else if (path.startsWith("/app/")) {
-			amodel.setProperty(path.substring(5),value);
+			amodel.setProperty(path,value);
 	   	 	eventmanager.setProperty(path, value); // signal the others new code
 	   	 	return true;
 		} else if (path.startsWith("/domain/")) {
@@ -117,13 +125,16 @@ public class Model {
 	}
 	
 	public String getProperty(String path) {
+		if (path.startsWith("//")) {
+			path=xpathToFs(path);
+		}
 		if (path.startsWith("/screen/")) {
 			//return smodel.getProperty(path.substring(8));
 			return smodel.getProperty(path);
 		} else  if (path.startsWith("/shared/")) {
 				return sharedmodel.getProperty(path);
 		} else if (path.startsWith("/app/")) {
-			return amodel.getProperty(path.substring(5));
+			return amodel.getProperty(path);
 		}
 		return null;
 	}
@@ -142,6 +153,8 @@ public class Model {
 			return amodel.getNode(path);
 		} else if (path.startsWith("/shared/")) { 
 			return sharedmodel.getNode(path);
+		} else if (path.startsWith("/screen/")) { 
+			return smodel.getNode(path);
 		} else if (path.startsWith("/domain/")) { 
 			return dmodel.getNode(path);
 		}
@@ -153,6 +166,8 @@ public class Model {
 			amodel.putNode(uri,node);
 		} else if (uri.startsWith("/shared")) { 
 				sharedmodel.putNode(uri,node);
+		} else if (uri.startsWith("/screen")) { 
+			smodel.putNode(uri,node);
 		} else if (uri.startsWith("/domain/")) { 
 			System.out.println("PUTNODE NOT DONE YET FOR DOMAIN");
 		}
@@ -178,6 +193,35 @@ public class Model {
 			return Fs.insertNode(node, path);
 		}
 		return false;
+	}
+	
+	public String FsToXpath(String input) {
+		// //app[@id='remotepointer']/position
+		return null;
+	}
+	
+	public String xpathToFs(String input) {
+		// //app[@id='remotepointer']/position
+		String result = "/";
+		input = input.substring(1);
+		String tags[] = input.split("/");
+		for (int i=0;i<tags.length;i++) {
+			String tag =  tags[i];
+			int pos = tag.indexOf("[");
+			if (pos!=-1){
+				String type = tag.substring(1,pos);
+				System.out.println("TYPE="+type);
+				int pos2=tag.indexOf("@id='");
+				String id = tag.substring(pos2+4);
+				pos2=tag.indexOf("'");
+				if (pos2!=-1) {
+					id = id.substring(0,pos2);
+					System.out.println("ID="+id);
+				}
+			}
+		}
+		
+		return "/app/remotepointer/position";
 	}
 	
 	

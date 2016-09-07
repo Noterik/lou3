@@ -61,7 +61,6 @@ public class MemoryModel  {
 
 	
 	public boolean setProperty(String path,String value) {
-		//System.out.println("SETPROP="+path+" "+value);
 		int pos =  path.lastIndexOf("/");
 		if (pos!=-1) {
 			String nodepath = path.substring(0,pos);
@@ -78,7 +77,6 @@ public class MemoryModel  {
 	
 
 	public String getProperty(String path) {
-		//System.out.println("GETPROP="+path);
 		int pos =  path.lastIndexOf("/");
 		if (pos!=-1) {
 			String nodepath = path.substring(0,pos);
@@ -153,14 +151,14 @@ public class MemoryModel  {
 		String[] steps = path.substring(1).split("/");
 		int stepc = 0;
 		int stept = steps.length;
-		FsNode current = root;
+		FsNode current = root;		
 		
-		FsNode snode = null;
 		while ((stepc+1)<stept) {
-			snode = current.getChild(steps[stepc+1]);
+			FsNode snode = current.getChild(steps[stepc+1]);
 			if (snode==null) { // create the node in its path if needed ( like mkdirs() )
-				return null;
-			}
+				snode = new FsNode(steps[stepc],steps[stepc+1]);
+				current.addNode(snode);
+			} 
 			stepc=stepc+2;
 			current = snode;
 		}
