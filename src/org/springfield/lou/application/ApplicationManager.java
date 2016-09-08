@@ -65,7 +65,6 @@ public class ApplicationManager extends Thread implements MargeObserver {
     private static FSList logcollection = null;
     
 	private ApplicationManager() {
-        System.out.println("Application Manager started");
 		if (!running) {
 			running = true;
 			if (availableapps==null) loadAvailableApps(); // new test for urlmapping
@@ -82,7 +81,6 @@ public class ApplicationManager extends Thread implements MargeObserver {
     
     public void addApplication(Html5ApplicationInterface app) {
     	// for now its just one app not static/instance based yet
-    	//System.out.println("ADDAPPLICATION="+app.getFullId()+" ID="+app.getId());
     	runningapps.put(app.getId(),app);
     	//update();
     }
@@ -193,7 +191,6 @@ public class ApplicationManager extends Thread implements MargeObserver {
 			newapp.setHtmlPath("/springfield/lou/apps/"+newapp.getAppname()+"/"+version+"/");
 			// execute the first command list
 			//newapp.executeActionlist("init");
-    		System.out.println("NEW APP="+newapp+" version="+version+" D="+LazyHomer.inDeveloperMode());
     		return newapp;
     	} catch(Exception e) {
     		System.out.println("ApplicationManager ");
@@ -429,7 +426,6 @@ public class ApplicationManager extends Thread implements MargeObserver {
     			
     			try {
     				JarFile war = new JarFile(warfile);  
-    				System.out.println("WARFILE="+war+" "+warfile);
     		
     				// ok lets first find the jar file !
     				 JarEntry entry = war.getJarEntry("WEB-INF/lib/smt_"+appname+"app.jar");  
@@ -447,7 +443,6 @@ public class ApplicationManager extends Thread implements MargeObserver {
     				    	   int pos = lname.indexOf("/"+appname+"/");
     				    	   if (pos!=-1) {
     				    		   String nname = lname.substring(pos+appname.length()+2);
-    				    		   System.out.println("nname="+nname);
     				    		   String dname = nname.substring(0,nname.lastIndexOf('/'));
     				    		   File de = new File(writedir+"/"+dname);
     				    		   de.mkdirs();
@@ -467,7 +462,6 @@ public class ApplicationManager extends Thread implements MargeObserver {
     				 // should we make in development or production based on autodeploy ?
 		    	     vapp = getAvailableApplication(appname);
 		    	     if (vapp!=null) {
-		    	    	 System.out.println("AUTODEPLOY="+vapp.getAutoDeploy());
 		    	    	 String mode = vapp.getAutoDeploy();
 		    	    	 if (mode.equals("production")) {
 		    	    		 makeProduction(appname, datestring);
@@ -488,7 +482,6 @@ public class ApplicationManager extends Thread implements MargeObserver {
     				 */
     				 
     				 // lets tell set the available variable to tell the others we have it.
-    				 System.out.println("DANIEL CHECK 1");
     				 FsNode unode = Fs.getNode("/domain/internal/service/lou/apps/"+appname+"/versions/"+datestring);
     				 if (unode!=null) {
     					 String warlist = unode.getProperty("waravailableat");
@@ -499,7 +492,7 @@ public class ApplicationManager extends Thread implements MargeObserver {
     					 }
     				 }
     			} catch(Exception e) {
-    				e.printStackTrace();
+    				System.out.println("VERSION NOT READY STILL UPLOADING? RETRY WILL HAPPEN SOON");
     			}    	
     		}
     	}
@@ -534,7 +527,6 @@ public class ApplicationManager extends Thread implements MargeObserver {
     			
     			try {
     				JarFile war = new JarFile(warfile);  
-    				System.out.println("WARFILE="+war+" "+warfile);
     		
     				// ok lets first find the jar file !
     				 JarEntry entry = war.getJarEntry("WEB-INF/lib/smt_"+appname+"app.jar");  
@@ -597,6 +589,7 @@ public class ApplicationManager extends Thread implements MargeObserver {
     		}
     		Html5AvailableApplicationVersion newv = avapp.getVersion(version);
     		if (newv!=null) {
+    			System.out.println("SET PRODUCTION STATE TRUE "+avapp.getId());
     			newv.setProductionState(true);
     		}
     		
@@ -638,7 +631,6 @@ public class ApplicationManager extends Thread implements MargeObserver {
 			String appn = (String)iter.next();
 			if (appn.indexOf("html5application/"+appname)!=-1) {
 				Html5ApplicationInterface rapp = runningapps.get(appn);
-				System.out.println("SHUTDOWN OLD APP="+rapp.getId());
 				rapp.shutdown();
 				runningapps.remove(appn);
 			}
@@ -746,11 +738,8 @@ public class ApplicationManager extends Thread implements MargeObserver {
 				Element child = (Element)iter.next();
 				if (!child.getName().equals("properties")) {
 					String id = child.attributeValue("id");
-					//System.out.println("AVAIL="+id);
 			    	Html5AvailableApplication vapp = new Html5AvailableApplication();
-					//System.out.println("N0");
 			    	vapp.setId(id);
-					//System.out.println("N1");
 	
 			    	// get all the versions and nodes
 			    	String production = null;
@@ -822,8 +811,7 @@ public class ApplicationManager extends Thread implements MargeObserver {
 						}
 						//System.out.println("N99");
 					}				
-					//System.out.println("AVAIL PUT="+id);
-			    		availableapps.put(id, vapp);
+		    		availableapps.put(id, vapp);
 			    	
 			    	// parse it again to get the nodes, don't like it but simplest way
 					for(Iterator<Node> iter2 = child.nodeIterator(); iter2.hasNext(); ) {
@@ -886,7 +874,6 @@ public class ApplicationManager extends Thread implements MargeObserver {
 	    String jarname = "/springfield/lou/apps/"+appname+"/"+id+"/jar/smt_"+appname+"app.jar";
 		File file = new File(jarname);
 		if (file.exists()) {
-			System.out.println("APP JAR FOUND");
 			return true;
 		}
 		return false;
@@ -895,7 +882,7 @@ public class ApplicationManager extends Thread implements MargeObserver {
 	private boolean copyAppFromRemote(String ipnumber,String appname,String id) {
 		int pos = appname.indexOf("html5application/");
 	    appname = appname.substring(pos+17);
-		System.out.println("REMOTE NAME = "+appname+" ID="+id);
+		//System.out.println("REMOTE NAME = "+appname+" ID="+id);
 		ServiceInterface lou = ServiceManager.getService("lou",ipnumber);
 		if (lou!=null) {
 			String xml = "<fsxml><properties></properties></fsxml>";
@@ -919,6 +906,7 @@ public class ApplicationManager extends Thread implements MargeObserver {
 	}
 	
 	public void remoteSignal(String from,String method,String url) {
+		try {
 		//System.out.println("MULTICAST="+from+" "+method+" "+url);
 		if (!method.equals("PUT") || url.indexOf("/versions/")==-1) return;
 		
@@ -952,7 +940,6 @@ public class ApplicationManager extends Thread implements MargeObserver {
 			    		return;
 			    	}
 					
-						System.out.println("I CAN INSTALL 2IP="+ipnumber+" APP="+appname+" ID="+version+" URL="+url);
 			    		if (!haveAppLocally("html5application/"+appname,version)) {
 			    			copyAppFromRemote(ipnumber,"html5application/"+appname,version);
 			    	    	Html5AvailableApplication avapp = getAvailableApplication(appname);
@@ -1004,6 +991,9 @@ public class ApplicationManager extends Thread implements MargeObserver {
 			    		}
 				}
 			}
+		}
+		} catch(Exception e) {
+			System.out.println("APP not fully send yet.. will retry");
 		}
 	}
 	

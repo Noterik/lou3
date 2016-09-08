@@ -24,100 +24,18 @@ import org.springfield.lou.homer.LazyHomer;
 import org.springfield.lou.screen.Screen;
 import org.springfield.marge.*;
 
-public class AppModel  {
+public class AppModel extends MemoryModel  {
 	
 	private Html5Application app;
 	
-	private Map<String, String> properties = new HashMap<String,String>();
+	//private Map<String, String> properties = new HashMap<String,String>();
 	
 	public AppModel(Html5Application a) {
+		super();
 		app = a;
 		// create our master node in mojo
-		FSListManager.put("/app"+app.getId().substring(7), new FSList());
+		//FSListManager.put("/app"+app.getId().substring(7), new FSList());
 		loadAppConfig();		
-	}
-	
-	
-	public boolean setProperty(String path,String value) {
-		//System.out.println("app model -> setProperty("+path+","+value+") "+this);
-		properties.put(path, value);
-		return true;
-	}
-	
-	public String getProperty(String path) {
-		//System.out.println("app model -> getProperty("+path+")"+this);
-		return properties.get(path);
-	}
-	
-	public boolean setProperties(String path,FsPropertySet set) {
-		for(Iterator<String> iter = set.getKeys() ; iter.hasNext(); ) {
-			String key = (String)iter.next();
-			String value = set.getProperty(key);
-			properties.put(path+"/"+key, value);
-		}
-		return true;
-	}
-	
-	
-	
-	public void putNode(String uri,FsNode node) {
-		if (uri.equals("/app")) {
-			String listurl = "/app"+app.getId().substring(7);
-
-			FSList list = FSListManager.get(listurl);
-			if (list==null) {
-				
-				list = new FSList(listurl);
-				FSListManager.put(listurl, list);
-			}
-			list.addNode(node);
-		} else if (uri.startsWith("/app/")) {
-			String listurl = "/app"+app.getId().substring(7)+uri.substring(4);
-			FSList list = FSListManager.get(listurl);
-			if (list==null) {
-				list = new FSList(listurl);
-				FSListManager.put(listurl, list);
-			}
-			list.addNode(node);
-			
-		}
-	}
-	
-	public FSList getControllerList(String selector) {
-		String listurl = "/app"+app.getId().substring(7)+"/view/"+selector;
-		FSList list = FSListManager.get(listurl);
-		return list;
-	}
-	
-	
-	public FsNode getNode(String uri) {
-			// memory app
-		//System.out.println("AMODEL GET="+uri);
-			String listurl = "/app"+app.getId().substring(7)+uri.substring(4);
-			int pos = listurl.lastIndexOf("/");
-			String id = listurl.substring(pos+1);
-			listurl = listurl.substring(0, pos);
-			pos = listurl.lastIndexOf("/");
-			String name = listurl.substring(pos+1);
-			listurl = listurl.substring(0, pos);
-			FSList list = FSListManager.get(listurl);
-			if (list!=null) {
-				for(Iterator<FsNode> iter = list.getNodes().iterator() ; iter.hasNext(); ) {
-					FsNode n = (FsNode)iter.next();	
-					if (n.getId().equals(id) && n.getName().equals(name)) {
-						return n;
-					}
-				}
-			}
-		return null;
-	}
-	
-	public void observeNode(MargeObserver o,String url) {
-		Marge.addObserver(url, o);
-	}
-	
-	public void observeTree(MargeObserver o,String url) {
-		Marge.addObserver(url+"*", o);
 	}
 	
 	public void loadAppConfig() {
@@ -127,7 +45,6 @@ public class AppModel  {
 		String part = app.getAppname().substring(app.getAppname().lastIndexOf("/")+1);
 		String filename = basepath+File.separator+"apps"+File.separator+part+File.separator+"components"+File.separator+"app.xml";
 		File file = new File(filename);
-		System.out.println("LOADING APP VARS FROM="+filename+" into "+this);
 		if (file.exists()) {
 			try {
 				BufferedReader br = new BufferedReader(new FileReader(filename));
@@ -150,7 +67,7 @@ public class AppModel  {
 						Element view = (Element)child;
 						String viewid = view.attributeValue("id");	
 						FsNode viewnode = new FsNode("view",viewid);
-						putNode("/app",viewnode);
+						putNode("/app/component",viewnode);
 						
 						for(Iterator<Node> iter2 = view.nodeIterator(); iter2.hasNext();) {
 							Node child2 = (Node)iter2.next();
@@ -160,7 +77,7 @@ public class AppModel  {
 									Element controller = (Element)child2;
 									String controllerid = controller.attributeValue("id");	
 									FsNode controllernode = new FsNode("controller",controllerid);
-									putNode("/app/view/"+viewid,controllernode);
+									putNode("/app/component/view/"+viewid,controllernode);
 									for(Iterator<Node> iter3 = controller.nodeIterator(); iter3.hasNext();) {
 										Node child3 = (Node)iter3.next();
 										String id2 = child3.getName();

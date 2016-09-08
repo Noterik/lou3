@@ -34,7 +34,6 @@ public class Model {
 	private static SharedModel sharedmodel = new SharedModel();
 	private AppModel amodel;
 	private ScreenModel smodel;
-	private static BindManager bindmanager;
 	private static ModelEventManager eventmanager;
 	
 	/* screen/
@@ -51,40 +50,39 @@ public class Model {
 	
 	public Model(Screen s) {
 		Html5ApplicationInterface app = s.getApplication();
-		smodel = new ScreenModel(app,s); // answers the /screen/ calls
+		//smodel = new ScreenModel(app,s); // answers the /screen/ calls
+		smodel = new ScreenModel(); // answers the /screen/ calls
 		imodel = app.getAppInstanceModel(); // answers the /instance/ calls
 		amodel = app.getAppModel(); // answers the /app/ calls
 		if (dmodel==null) dmodel = new DomainModel(); // answers the /domain/ calls
-		if (bindmanager==null) bindmanager = new BindManager();
 		if (eventmanager==null) eventmanager = new ModelEventManager();
 		
 	}
 	
-	public ModelEventManager getEventManager() {
+	public static ModelEventManager getEventManager() {
 		return eventmanager;
 	}
 	
- 	public void onPathUpdate(String paths,String methodname,Html5Controller callbackobject) {
- 		//System.out.println("onPathUpdate "+paths+" "+methodname+" "+callbackobject);
- 		bindmanager.onPathUpdate(paths, methodname, callbackobject);
+	
+ 	public void onNotify(String path,String methodname,Html5Controller callbackobject) {
+ 		eventmanager.onNotify(path, methodname, callbackobject);
 	}
  	
+ 	public void notify(String path,FsNode node) {
+ 		eventmanager.notify(path,node);
+	}
+	
+ 	public void onPathUpdate(String path,String methodname,Html5Controller callbackobject) {
+ 		eventmanager.onPathUpdate(path, methodname, callbackobject);
+	}
+	
+ 	
  	public void onPropertyUpdate(String path,String methodname,Html5Controller callbackobject) {
-		if (path.startsWith("/app/")) {
-			eventmanager.onPropertyUpdate(path,methodname,callbackobject);
-		} else if (path.startsWith("/screen/")) {
-			eventmanager.onPropertyUpdate(path,methodname,callbackobject);
-		} else if (path.startsWith("/domain/")) {
-			eventmanager.onPropertyUpdate(path,methodname,callbackobject);
-		}
+		eventmanager.onPropertyUpdate(path,methodname,callbackobject);
  	}
  	
  	public void onPropertiesUpdate(String path,String methodname,Html5Controller callbackobject) {
-		if (path.startsWith("/app/")) {
-			eventmanager.onPropertiesUpdate(path,methodname,callbackobject);
-		} else if (path.startsWith("/shared/")) {
-			eventmanager.onPropertiesUpdate(path,methodname,callbackobject);
-		}
+		eventmanager.onPropertiesUpdate(path,methodname,callbackobject);
  	}
 	
 	public boolean setProperties(String path,FsPropertySet properties) {
@@ -92,8 +90,12 @@ public class Model {
 			amodel.setProperties(path.substring(5),properties);
 	   	 	eventmanager.setProperties(path, properties); // signal the others new code
 	   	 	return true;
+		} else if (path.startsWith("/screen/")) {
+				smodel.setProperties(path.substring(5),properties);
+		   	 	eventmanager.setProperties(path, properties); // signal the others new code
+		   	 	return true;
 		} else 	if (path.startsWith("/shared/")) {
-			sharedmodel.setProperties(path.substring(8),properties);
+			sharedmodel.setProperties(path,properties);
 	   	 	eventmanager.setProperties(path, properties); // signal the others new code
 	   	 	return true;
 		}
@@ -101,20 +103,20 @@ public class Model {
 	}
 	
 	public boolean setProperty(String path,String value) {
-		//System.out.println("model -> setProperty("+path+","+value+") "+this);
 		if (path.startsWith("/screen/"))  {
-			smodel.setProperty(path.substring(8),value);
-	   	 	//bindmanager.setProperty(path, value); // signal the others
+			//smodel.setProperty(path.substring(8),value);
+			smodel.setProperty(path,value);
 	   	 	eventmanager.setProperty(path, value); // signal the others new code
 	   	 	return true;
-		} else 
-		if (path.startsWith("/app/")) {
-			amodel.setProperty(path.substring(5),value);
-	   	 	bindmanager.setProperty(path, value); // signal the others old code
+		} else if (path.startsWith("/shared/"))  {
+				sharedmodel.setProperty(path,value);
+		   	 	eventmanager.setProperty(path, value); // signal the others new code
+		   	 	return true;
+		} else if (path.startsWith("/app/")) {
+			amodel.setProperty(path,value);
 	   	 	eventmanager.setProperty(path, value); // signal the others new code
 	   	 	return true;
-		} else                
-		if (path.startsWith("/domain/")) {
+		} else if (path.startsWith("/domain/")) {
 			dmodel.setProperty(path.substring(8),value);
 	   	 	eventmanager.setProperty(path, value); // signal the others new code
 	   	 	return true;
@@ -123,16 +125,36 @@ public class Model {
 	}
 	
 	public String getProperty(String path) {
-		//System.out.println("model -> getProperty("+path+")"+this);
-		if (path.startsWith("/screen/")) return smodel.getProperty(path.substring(8));
-		if (path.startsWith("/app/")) return amodel.getProperty(path.substring(5));
+		if (path.startsWith("//")) {
+			path=xpathToFs(path);
+		}
+		if (path.startsWith("/screen/")) {
+			//return smodel.getProperty(path.substring(8));
+			return smodel.getProperty(path);
+		} else  if (path.startsWith("/shared/")) {
+				return sharedmodel.getProperty(path);
+		} else if (path.startsWith("/app/")) {
+			return amodel.getProperty(path);
+		}
+		return null;
+	}
+	
+	public FSList getList(String path) {
+		if (path.startsWith("/shared")) { 
+			return sharedmodel.getList(path);
+		} else if (path.startsWith("/domain/")) { 
+		//	return dmodel.getNode(path);
+		}
 		return null;
 	}
 	
 	public FsNode getNode(String path) {
-		//System.out.println("AMODE="+amodel);
 		if (path.startsWith("/app/")) { 
 			return amodel.getNode(path);
+		} else if (path.startsWith("/shared/")) { 
+			return sharedmodel.getNode(path);
+		} else if (path.startsWith("/screen/")) { 
+			return smodel.getNode(path);
 		} else if (path.startsWith("/domain/")) { 
 			return dmodel.getNode(path);
 		}
@@ -142,6 +164,10 @@ public class Model {
 	public void putNode(String uri,FsNode node) {
 		if (uri.startsWith("/app/") || uri.equals("/app")) { 
 			amodel.putNode(uri,node);
+		} else if (uri.startsWith("/shared")) { 
+				sharedmodel.putNode(uri,node);
+		} else if (uri.startsWith("/screen")) { 
+			smodel.putNode(uri,node);
 		} else if (uri.startsWith("/domain/")) { 
 			System.out.println("PUTNODE NOT DONE YET FOR DOMAIN");
 		}
@@ -160,12 +186,42 @@ public class Model {
 	}
 	
 	public boolean insertNode(FsNode node,String path) {
-		//System.out.println("AMODE="+amodel);
 		if (path.startsWith("/app/")) { 
+		} else if (path.startsWith("/shared/")) { 
+			return sharedmodel.putNode(path,node);
 		} else if (path.startsWith("/domain/")) { 
 			return Fs.insertNode(node, path);
 		}
 		return false;
+	}
+	
+	public String FsToXpath(String input) {
+		// //app[@id='remotepointer']/position
+		return null;
+	}
+	
+	public String xpathToFs(String input) {
+		// //app[@id='remotepointer']/position
+		String result = "/";
+		input = input.substring(1);
+		String tags[] = input.split("/");
+		for (int i=0;i<tags.length;i++) {
+			String tag =  tags[i];
+			int pos = tag.indexOf("[");
+			if (pos!=-1){
+				String type = tag.substring(1,pos);
+				System.out.println("TYPE="+type);
+				int pos2=tag.indexOf("@id='");
+				String id = tag.substring(pos2+4);
+				pos2=tag.indexOf("'");
+				if (pos2!=-1) {
+					id = id.substring(0,pos2);
+					System.out.println("ID="+id);
+				}
+			}
+		}
+		
+		return "/app/remotepointer/position";
 	}
 	
 	

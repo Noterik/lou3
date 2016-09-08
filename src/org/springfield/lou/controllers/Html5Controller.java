@@ -25,6 +25,10 @@ public class Html5Controller implements MargeObserver {
 		
 	}
 	
+	public int getApplicationHashCode() {
+		return screen.getApplication().hashCode();
+	}
+	
 	public String getScreenId() {
 		return screen.getId();
 	}
@@ -95,7 +99,7 @@ public class Html5Controller implements MargeObserver {
 	}
 	
 	public FsNode getViewNode(String selector) {
-		FsNode node = model.getNode("/app/view/"+selector);
+		FsNode node = model.getNode("/app/component/view/"+selector);
 		return node;
 	}
 	
@@ -108,7 +112,7 @@ public class Html5Controller implements MargeObserver {
 	public FsNode getControllerNode(String selector) {
 		//String cname = this.getClass().getName();
 		//cname = cname.substring(cname.lastIndexOf(".")+1);
-		FsNode node = model.getNode("/app/view/"+selector+"/controller/"+getControllerName());
+		FsNode node = model.getNode("/app/component/view/"+selector+"/controller/"+getControllerName());
 		return node;
 	}
 	

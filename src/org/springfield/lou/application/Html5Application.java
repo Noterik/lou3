@@ -40,7 +40,6 @@ import org.springfield.fs.*;
 import org.springfield.lou.homer.LazyHomer;
 import org.springfield.lou.model.AppInstanceModel;
 import org.springfield.lou.model.AppModel;
-import org.springfield.lou.model.BindManager;
 import org.springfield.lou.model.Model;
 import org.springfield.lou.screen.Capabilities;
 import org.springfield.lou.screen.Html5Element;
@@ -274,6 +273,9 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 			System.out.println("SHUTDOWN");
 			this.removeScreen(next,username);	
 		}
+		
+		Model.getEventManager().removeApplication(this.hashCode());
+		
 		ApplicationManager.instance().removeApplication(this.id);
 	}
 	
@@ -396,7 +398,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	public void removeScreen(String id,String username){
 		Screen screen = this.screenmanager.get(id);
 		if (screen!=null) {
-			System.out.println("REQUEST SCREEN REMOVE ID="+id+"");
+			//System.out.println("REQUEST SCREEN REMOVE ID="+id+"");
 			screen.getModel().getEventManager().removeScreenBinds(id);
 			username = screen.getUserName();
 		}
@@ -489,9 +491,8 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     	int level = LOG_INFO; // default to info
     	if (l.equals("warning")) { level = LOG_WARNING; }
     	else if (l.equals("error")) { level = LOG_ERROR; }
-    	FsNode n = new FsNode("log");	
   		SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss");
-  		n.setId(f.format(new Date()));
+    	FsNode n = new FsNode("log",f.format(new Date()));	
   		n.setProperty("level", loglevels[level-1]);
   		n.setProperty("source", "js");
   		n.setProperty("msg", parts[0]);
@@ -569,9 +570,8 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	}
     
     public void log(Screen s,String msg,int level) {
-    		FsNode n = new FsNode("log");	
     		SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss");
-    		n.setId(f.format(new Date()));
+    		FsNode n = new FsNode("log",f.format(new Date()));
     		n.setProperty("level", loglevels[level-1]);
     		n.setProperty("source", "java");
     		n.setProperty("msg", msg);
@@ -607,45 +607,18 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     }
     
     
-    /*
-    public Model getModel() {
-    	return model;
-    }
-    */
     
     public Html5Controller createController(String name) {
     	System.out.println("PLACE createController node in your app");
     	return null;
     }
     
-    /*
- 	public void onPathUpdate(String paths,String methodname,Html5Controller callbackobject) {
- 		bindmanager.onPathUpdate(paths, methodname, callbackobject);
-	}
-	*/
- 	
- 	/*
-    public void setProperty(String path,String value) {
-		long starttime = new Date().getTime();
-   	 	properties.put(path,value);
-   	 	bindmanager.setProperty(path, value); // signal the others
-   	 	
-		long endtime = new Date().getTime();
-		//System.out.println("SET APP PROPERTY TIME="+(endtime-starttime)+" P="+path+" V="+value);			
-    }
-    */
-    
- 	/*
-    public Object getProperty(String path) {
-		return properties.get(path);
-    }
-    */
+
     
     public void removeEvents(Object obj) {
     	// remove all event callbacks this objects has
     	
     	// remove from path binds
-    	System.out.println("REMOVE PATH BINDS !!");
     }
 
 }

@@ -173,7 +173,7 @@ public class Html5Element {
 	}
 	
 	public boolean parsehtml(JSONObject json) {
-		FsNode node = screen.getModel().getNode("/app/view/"+selector);
+		FsNode node = screen.getModel().getNode("/app/component/view/"+selector);
 		if (node!=null) {
 			String template = node.getProperty("template");
 			// extend for the real path
@@ -221,7 +221,7 @@ public class Html5Element {
 		controller = c;
 		//Model model = screen.getApplication().getModel();
 		//System.out.println("SELECTOR="+selector);
-		FsNode node = screen.getModel().getNode("/app/view/"+selector+"/controller/"+controller.getControllerName());
+		FsNode node = screen.getModel().getNode("/app/component/view/"+selector+"/controller/"+controller.getControllerName());
 		if (node!=null) {
 			String scriptname = node.getProperty("javascript");
 			if (scriptname==null || scriptname.equals("")) {
@@ -322,15 +322,23 @@ public class Html5Element {
 		controller = c;
 		controller.setScreen(screen);
 		controller.setModel(screen.getModel());
-		FsNode node = screen.getModel().getNode("/app/view/"+selector);
+		FsNode node = screen.getModel().getNode("/app/component/view/"+selector);
 		if (node!=null) {
 			String style = node.getProperty("style");
 			if (style!=null) {
-				System.out.println("STYLE="+style);
 				screen.loadStyleSheet(style);
 			}
 		}
 		controller.attach(selector);
+		if (javascript==null) {
+			node = screen.getModel().getNode("/app/component/view/"+selector+"/controller/"+controller.getControllerName());
+			if (node!=null) {
+				String scriptname = node.getProperty("javascript");
+				if (scriptname!=null && !scriptname.equals("")) {
+					loadScript(c); 
+				}
+			}
+		}
 		return true;
 	}
 	
@@ -351,8 +359,7 @@ public class Html5Element {
 	}
 
 	public void setViewProperty(String name,String value) {
-		//Model m = screen.getApplication().getModel();
-		FsNode view  = screen.getModel().getNode("/app/view/"+selector);
+		FsNode view  = screen.getModel().getNode("/app/component/view/"+selector);
 		if (view==null) {
 			view = new FsNode("view",selector);
 			screen.getModel().putNode("/app",view);
@@ -361,12 +368,11 @@ public class Html5Element {
 	}
 	
 	public void setControllerProperty(String controllername,String name,String value) {
-		//Model m = screen.getApplication().getModel();
-		FsNode controller  = screen.getModel().getNode("/app/view/"+selector+"/controller/"+controllername);
+		FsNode controller  = screen.getModel().getNode("/app/component/view/"+selector+"/controller/"+controllername);
 		
 		if (controller==null) {
 			controller = new FsNode("controller",controllername);
-			screen.getModel().putNode("/app/view/"+selector,controller);
+			screen.getModel().putNode("/app/component/view/"+selector,controller);
 		}
 		controller.setProperty(name,value);
 	}
