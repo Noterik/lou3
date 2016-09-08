@@ -66,6 +66,12 @@ public class Model {
 	
  	public void onNotify(String path,String methodname,Html5Controller callbackobject) {
  		eventmanager.onNotify(path, methodname, callbackobject);
+ 		// signal the admin tool
+ 		FsNode node = new FsNode("bind","1");
+ 		node.setProperty("action","new onNotify");
+ 		node.setProperty("path",path);
+ 		node.setProperty("methodname",methodname);
+ 		notify("/shared/internal",node);
 	}
  	
  	public void notify(String path,FsNode node) {
@@ -74,15 +80,30 @@ public class Model {
 	
  	public void onPathUpdate(String path,String methodname,Html5Controller callbackobject) {
  		eventmanager.onPathUpdate(path, methodname, callbackobject);
+ 		FsNode node = new FsNode("bind","1");
+ 		node.setProperty("action","new onPathUpdate");
+ 		node.setProperty("path",path);
+ 		node.setProperty("methodname",methodname);
+ 		notify("/shared/internal",node);
 	}
 	
  	
  	public void onPropertyUpdate(String path,String methodname,Html5Controller callbackobject) {
 		eventmanager.onPropertyUpdate(path,methodname,callbackobject);
+ 		FsNode node = new FsNode("bind","1");
+ 		node.setProperty("action","new onPropertyUpdate");
+ 		node.setProperty("path",path);
+ 		node.setProperty("methodname",methodname);
+ 		notify("/shared/internal",node);
  	}
  	
  	public void onPropertiesUpdate(String path,String methodname,Html5Controller callbackobject) {
 		eventmanager.onPropertiesUpdate(path,methodname,callbackobject);
+ 		FsNode node = new FsNode("bind","1");
+ 		node.setProperty("action","new onPropertiesUpdate");
+ 		node.setProperty("path",path);
+ 		node.setProperty("methodname",methodname);
+ 		notify("/shared/internal",node);
  	}
 	
 	public boolean setProperties(String path,FsPropertySet properties) {

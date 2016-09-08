@@ -107,7 +107,7 @@ public class ModelEventManager {
 				for (int i=list.size()-1;i>=0;i--) {
 					ModelBindObject co = list.get(i);
 					if (co.screenid.equals(screenid) && co.method.equals(methodname)) {
-						list.remove(i);
+						list.remove(i); // dub kill
 					}
 				}
 				list.add(new ModelBindObject(methodname,screenid,callbackobject.getApplicationHashCode(),targetid,callbackobject,method));
@@ -129,15 +129,10 @@ public class ModelEventManager {
  			String targetid = callbackobject.getSelector();
 			ArrayList<ModelBindObject> list = propertybinds.get(path);
 			if (list!=null) {
-				// find the screen id and targetid
-				//System.out.println("LIST SIZE="+list.size());
-				// for it gets tricky do we allow same screen with same method to join 2 times ?
 				for (int i=list.size()-1;i>=0;i--) {
 					ModelBindObject co = list.get(i);
-					//System.out.println("CHECK ="+co.method+" "+methodname);
 					if (co.screenid.equals(screenid) && co.method.equals(methodname)) {
-						//System.out.println("SHOULD REPLACE INSTEAD OF INSERT REMOVE");
-						list.remove(i);
+						list.remove(i); // dub kill
 					}
 				}
 				list.add(new ModelBindObject(methodname,screenid,callbackobject.getApplicationHashCode(),targetid,callbackobject,method));
@@ -160,7 +155,12 @@ public class ModelEventManager {
  			String targetid = callbackobject.getSelector();
 			ArrayList<ModelBindObject> list = propertiesbinds.get(path);
 			if (list!=null) {
-				// find the screen id and targetid
+				for (int i=list.size()-1;i>=0;i--) {
+					ModelBindObject co = list.get(i);
+					if (co.screenid.equals(screenid) && co.method.equals(methodname)) {
+						list.remove(i); // dub kill
+					}
+				}
 				list.add(new ModelBindObject(methodname,screenid,callbackobject.getApplicationHashCode(),targetid,callbackobject,method));
 			} else {
 				list = new ArrayList<ModelBindObject>();
@@ -180,7 +180,12 @@ public class ModelEventManager {
  			String targetid = callbackobject.getSelector();
 			ArrayList<ModelBindObject> list = notifybinds.get(path);
 			if (list!=null) {
-				// find the screen id and targetid
+				for (int i=list.size()-1;i>=0;i--) {
+					ModelBindObject co = list.get(i);
+					if (co.screenid.equals(screenid) && co.method.equals(methodname)) {
+						list.remove(i); // dub kill
+					}
+				}
 				list.add(new ModelBindObject(methodname,screenid,callbackobject.getApplicationHashCode(),targetid,callbackobject,method));
 			} else {
 				list = new ArrayList<ModelBindObject>();
@@ -193,146 +198,89 @@ public class ModelEventManager {
  		}
     }
 
+    public void removeController(Object controller) {
+    	removeControllerBinds(notifybinds,controller);
+    	removeControllerBinds(propertybinds,controller);
+    	removeControllerBinds(propertiesbinds,controller);
+    	removeControllerBinds(pathbinds,controller);
+ 		FsNode node = new FsNode("bind","1");
+ 		node.setProperty("action","remove controller");
+ 		node.setProperty("controller",""+controller.hashCode());
+ 		notify("/shared/internal",node);
+    }
     
     public void removeApplication(int applicationhashcode) {
-    	removePropertyApplicationBinds(applicationhashcode);
-    	removePropertiesApplicationBinds(applicationhashcode);
-    	removeNotifyApplicationBinds(applicationhashcode);
-    	removePathApplicationBinds(applicationhashcode);
+    	removeApplicationBinds(propertybinds,applicationhashcode);
+    	removeApplicationBinds(propertiesbinds,applicationhashcode);
+    	removeApplicationBinds(notifybinds,applicationhashcode);
+    	removeApplicationBinds(pathbinds,applicationhashcode);
+ 		FsNode node = new FsNode("bind","1");
+ 		node.setProperty("action","remove application");
+ 		node.setProperty("application",""+applicationhashcode);
+ 		notify("/shared/internal",node);
     }
     
     
     public void removeScreenBinds(String screenid) {
-    	//System.out.println("SCREEN REMOVE ="+screenid);
-    	removePropertyScreenBinds(screenid);
-    	removePropertiesScreenBinds(screenid);
-    	removeNotifyScreenBinds(screenid);
-    	removePathScreenBinds(screenid);
+    	removeScreenBinds(propertybinds,screenid);
+    	removeScreenBinds(propertiesbinds,screenid);
+    	removeScreenBinds(notifybinds,screenid);
+    	removeScreenBinds(pathbinds,screenid);
+ 		FsNode node = new FsNode("bind","1");
+ 		node.setProperty("action","remove screen");
+ 		node.setProperty("screen",screenid);
+ 		notify("/shared/internal",node);
     }
     
-    public synchronized void removePropertyApplicationBinds(int applicationhashcode) {
-    	Iterator<String> it = propertybinds.keySet().iterator();
+    public synchronized void removeApplicationBinds(Map<String, ArrayList<ModelBindObject>> binds,int applicationhashcode) {
+    	Iterator<String> it = binds.keySet().iterator();
     	while(it.hasNext()){
     		String key = it.next();
-    		List<ModelBindObject> l = (List)propertybinds.get(key);
-    		for (int i=l.size()-1;i>=0;i--) {
-				ModelBindObject bind  = l.get(i);
-				if (bind.applicationhashcode==applicationhashcode) {
-					System.out.println("REMOVE OF OLD APPLICATION BIND !");
-					l.remove(i);
-				}
-    		}
-    		//if (l.size()==0) propertybinds.remove(key);
-    	}
-	}
-    
-    public synchronized void removePathApplicationBinds(int applicationhashcode) {
-    	Iterator<String> it = pathbinds.keySet().iterator();
-    	while(it.hasNext()){
-    		String key = it.next();
-    		List<ModelBindObject> l = (List)pathbinds.get(key);
+    		List<ModelBindObject> l = (List)binds.get(key);
     		for (int i=l.size()-1;i>=0;i--) {
 				ModelBindObject bind  = l.get(i);
 				if (bind.applicationhashcode==applicationhashcode) {
 					l.remove(i);
 				}
     		}
-
     	}
 	}
     
-    public synchronized void removeNotifyApplicationBinds(int applicationhashcode) {
-    	Iterator<String> it = notifybinds.keySet().iterator();
+    
+    
+    public synchronized void removeControllerBinds(Map<String, ArrayList<ModelBindObject>> binds,Object controller) {
+    	Iterator<String> it = binds.keySet().iterator();
     	while(it.hasNext()){
     		String key = it.next();
-    		List<ModelBindObject> l = (List)notifybinds.get(key);
+    		List<ModelBindObject> l = (List)binds.get(key);
     		for (int i=l.size()-1;i>=0;i--) {
 				ModelBindObject bind  = l.get(i);
-				if (bind.applicationhashcode==applicationhashcode) {
+				if (bind.obj==controller) {
 					l.remove(i);
 				}
     		}
-
     	}
 	}
+    
+ 
 
 
-    public synchronized void removePropertyScreenBinds(String screenid) {
-    	Iterator<String> it = propertybinds.keySet().iterator();
+    public synchronized void removeScreenBinds(Map<String, ArrayList<ModelBindObject>> binds,String screenid) {
+    	Iterator<String> it = binds.keySet().iterator();
     	while(it.hasNext()){
     		String key = it.next();
-    		List<ModelBindObject> l = (List)propertybinds.get(key);
+    		List<ModelBindObject> l = (List)binds.get(key);
     		for (int i=l.size()-1;i>=0;i--) {
 				ModelBindObject bind  = l.get(i);
 				if (bind.screenid.equals(screenid)) {
 					l.remove(i);
 				}
     		}
-    		//if (l.size()==0) propertybinds.remove(key);
     	}
 	}
     
-    public synchronized void removePropertiesScreenBinds(String screenid) {
-    	Iterator<String> it = propertiesbinds.keySet().iterator();
-    	while(it.hasNext()){
-    		String key = it.next();
-    		List<ModelBindObject> l = (List)propertiesbinds.get(key);
-    		for (int i=l.size()-1;i>=0;i--) {
-				ModelBindObject bind  = l.get(i);
-				if (bind.screenid.equals(screenid)) {
-					l.remove(i);
-				}
-    		}
-    		//if (l.size()==0) propertiesbinds.remove(key);
-    	}
-	}
+     
     
-    public synchronized void removePathScreenBinds(String screenid) {
-    	Iterator<String> it = pathbinds.keySet().iterator();
-    	while(it.hasNext()){
-    		String key = it.next();
-    		List<ModelBindObject> l = (List)pathbinds.get(key);
-    		for (int i=l.size()-1;i>=0;i--) {
-				ModelBindObject bind  = l.get(i);
-				if (bind.screenid.equals(screenid)) {
-					l.remove(i);
-				}
-    		}
-    		//if (l.size()==0) propertiesbinds.remove(key);
-    	}
-	}
-    
-    public synchronized void removeNotifyScreenBinds(String screenid) {
-    	Iterator<String> it = notifybinds.keySet().iterator();
-    	while(it.hasNext()){
-    		String key = it.next();
-    		List<ModelBindObject> l = (List)notifybinds.get(key);
-    		for (int i=l.size()-1;i>=0;i--) {
-				ModelBindObject bind  = l.get(i);
-				if (bind.screenid.equals(screenid)) {
-					l.remove(i);
-				}
-    		}
-    		//if (l.size()==0) propertiesbinds.remove(key);
-    	}
-	}
-    
-    
-    public synchronized void removePropertiesApplicationBinds(int applicationhashcode) {
-    	Iterator<String> it = propertiesbinds.keySet().iterator();
-    	while(it.hasNext()){
-    		String key = it.next();
-    		List<ModelBindObject> l = (List)propertiesbinds.get(key);
-    		for (int i=l.size()-1;i>=0;i--) {
-				ModelBindObject bind  = l.get(i);
-				if (bind.applicationhashcode==applicationhashcode) {
-					l.remove(i);
-				}
-    		}
-    		//if (l.size()==0) propertiesbinds.remove(key);
-    	}
-	}
- 	
     public void setProperty(String path,String value) {
     	eventqueue.push(new ModelBindEvent(ModelBindEvent.PROPERTY,path,value));
     	if (eventqueue.size()>0) {

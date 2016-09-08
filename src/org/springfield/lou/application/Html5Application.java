@@ -84,7 +84,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 
     protected Map<String, String> callbackmethods = new HashMap<String, String>();
     protected Map<String, Object> callbackobjects = new HashMap<String, Object>();
-    private Map<String, ArrayList<PathBindObject>> pathbindobjects = new HashMap<String, ArrayList<PathBindObject>>();
+    //private Map<String, ArrayList<PathBindObject>> pathbindobjects = new HashMap<String, ArrayList<PathBindObject>>();
 	private Map<String, Object> properties = new HashMap<String, Object>();
 	//private BindManager bindmanager;
 	private  AppModel appmodel; // i think this is wrong should be per url no?
@@ -616,9 +616,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 
     
     public void removeEvents(Object obj) {
-    	// remove all event callbacks this objects has
-    	
-    	// remove from path binds
+		Model.getEventManager().removeController(obj);
     }
 
 }
