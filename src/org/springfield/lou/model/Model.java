@@ -65,6 +65,9 @@ public class Model {
 	
 	
  	public void onNotify(String path,String methodname,Html5Controller callbackobject) {
+		if (path.indexOf("[")!=-1) {
+			path=xpathToFs(path);
+		}
  		eventmanager.onNotify(path, methodname, callbackobject);
  		// signal the admin tool
  		FsNode node = new FsNode("bind","1");
@@ -75,10 +78,16 @@ public class Model {
 	}
  	
  	public void notify(String path,FsNode node) {
+		if (path.indexOf("[")!=-1) {
+			path=xpathToFs(path);
+		}
  		eventmanager.notify(path,node);
 	}
 	
  	public void onPathUpdate(String path,String methodname,Html5Controller callbackobject) {
+		if (path.indexOf("[")!=-1) {
+			path=xpathToFs(path);
+		}
  		eventmanager.onPathUpdate(path, methodname, callbackobject);
  		FsNode node = new FsNode("bind","1");
  		node.setProperty("action","new onPathUpdate");
@@ -89,6 +98,9 @@ public class Model {
 	
  	
  	public void onPropertyUpdate(String path,String methodname,Html5Controller callbackobject) {
+		if (path.indexOf("[")!=-1) {
+			path=xpathToFs(path);
+		}
 		eventmanager.onPropertyUpdate(path,methodname,callbackobject);
  		FsNode node = new FsNode("bind","1");
  		node.setProperty("action","new onPropertyUpdate");
@@ -98,6 +110,9 @@ public class Model {
  	}
  	
  	public void onPropertiesUpdate(String path,String methodname,Html5Controller callbackobject) {
+		if (path.indexOf("[")!=-1) {
+			path=xpathToFs(path);
+		}
 		eventmanager.onPropertiesUpdate(path,methodname,callbackobject);
  		FsNode node = new FsNode("bind","1");
  		node.setProperty("action","new onPropertiesUpdate");
@@ -107,6 +122,9 @@ public class Model {
  	}
 	
 	public boolean setProperties(String path,FsPropertySet properties) {
+		if (path.indexOf("[")!=-1) {
+			path=xpathToFs(path);
+		}
 		if (path.startsWith("/app/")) {
 			amodel.setProperties(path.substring(5),properties);
 	   	 	eventmanager.setProperties(path, properties); // signal the others new code
@@ -124,6 +142,9 @@ public class Model {
 	}
 	
 	public boolean setProperty(String path,String value) {
+		if (path.indexOf("[")!=-1) {
+			path=xpathToFs(path);
+		}
 		if (path.startsWith("/screen/"))  {
 			//smodel.setProperty(path.substring(8),value);
 			smodel.setProperty(path,value);
@@ -146,7 +167,7 @@ public class Model {
 	}
 	
 	public String getProperty(String path) {
-		if (path.startsWith("//")) {
+		if (path.indexOf("[")!=-1) {
 			path=xpathToFs(path);
 		}
 		if (path.startsWith("/screen/")) {
@@ -161,15 +182,25 @@ public class Model {
 	}
 	
 	public FSList getList(String path) {
+		if (path.indexOf("[")!=-1) {
+			path=xpathToFs(path);
+		}
 		if (path.startsWith("/shared")) { 
 			return sharedmodel.getList(path);
+		} else if (path.startsWith("/screen")) { 
+				return smodel.getList(path);
+		} else if (path.startsWith("/app")) { 
+			return amodel.getList(path);
 		} else if (path.startsWith("/domain/")) { 
-		//	return dmodel.getNode(path);
+			return FSListManager.get(path,false); // need to support cache calls
 		}
 		return null;
 	}
 	
 	public FsNode getNode(String path) {
+		if (path.indexOf("[")!=-1) {
+			path=xpathToFs(path);
+		}
 		if (path.startsWith("/app/")) { 
 			return amodel.getNode(path);
 		} else if (path.startsWith("/shared/")) { 
@@ -183,6 +214,9 @@ public class Model {
 	}
 	
 	public void putNode(String uri,FsNode node) {
+		if (uri.indexOf("[")!=-1) {
+			uri=xpathToFs(uri);
+		}
 		if (uri.startsWith("/app/") || uri.equals("/app")) { 
 			amodel.putNode(uri,node);
 		} else if (uri.startsWith("/shared")) { 
@@ -194,7 +228,8 @@ public class Model {
 		}
 	}
 	
-	public void observeNode(MargeObserver o,String url) {
+	
+	public void observeNode(MargeObserver o,String url) { // need to be removed
 		Marge.addObserver(url, o);
 	}
 	
@@ -202,11 +237,15 @@ public class Model {
 		Marge.addObserver(url+"*", o);
 	}
 	
+	
 	public boolean isMainNode(String path) {
 		return Fs.isMainNode(path);
 	}
 	
-	public boolean insertNode(FsNode node,String path) {
+	public boolean insertNode(FsNode node,String path) { // needs to be removed?
+		if (path.indexOf("[")!=-1) {
+			path=xpathToFs(path);
+		}
 		if (path.startsWith("/app/")) { 
 		} else if (path.startsWith("/shared/")) { 
 			return sharedmodel.putNode(path,node);
@@ -222,27 +261,26 @@ public class Model {
 	}
 	
 	public String xpathToFs(String input) {
-		// //app[@id='remotepointer']/position
-		String result = "/";
-		input = input.substring(1);
+		String result = "";
+		input =  input.substring(1);
 		String tags[] = input.split("/");
 		for (int i=0;i<tags.length;i++) {
 			String tag =  tags[i];
-			int pos = tag.indexOf("[");
+			int pos = tag.indexOf("['");
 			if (pos!=-1){
-				String type = tag.substring(1,pos);
+				String type = tag.substring(0,pos);
 				System.out.println("TYPE="+type);
-				int pos2=tag.indexOf("@id='");
-				String id = tag.substring(pos2+4);
-				pos2=tag.indexOf("'");
-				if (pos2!=-1) {
-					id = id.substring(0,pos2);
-					System.out.println("ID="+id);
-				}
+				int pos2=tag.indexOf("']");
+				String id = tag.substring(pos+2,pos2);
+				if (id.equals("")) id="default";
+				System.out.println("ID="+id);
+				result+="/"+type+"/"+id;
+			} else {
+				result+="/"+tag;
 			}
 		}
-		
-		return "/app/remotepointer/position";
+		System.out.println("CPATH="+result);
+		return result;
 	}
 	
 	
