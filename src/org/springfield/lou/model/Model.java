@@ -36,18 +36,6 @@ public class Model {
 	private ScreenModel smodel;
 	private static ModelEventManager eventmanager;
 	
-	/* screen/
- 	domain/
-	app/
-	
-	model.onPropertyInsert 
-	model.onPropertyUpdate
-	model.onPropertyDelete
-	model.onNodeInsert
-	model.onNodeUpdate
-	model.onNodeDelete
-	*/
-	
 	public Model(Screen s) {
 		Html5ApplicationInterface app = s.getApplication();
 		//smodel = new ScreenModel(app,s); // answers the /screen/ calls
@@ -224,7 +212,7 @@ public class Model {
 		} else if (uri.startsWith("/screen")) { 
 			smodel.putNode(uri,node);
 		} else if (uri.startsWith("/domain/")) { 
-			System.out.println("PUTNODE NOT DONE YET FOR DOMAIN");
+			Fs.insertNode(node, uri);
 		}
 	}
 	
@@ -255,11 +243,6 @@ public class Model {
 		return false;
 	}
 	
-	public String FsToXpath(String input) {
-		// //app[@id='remotepointer']/position
-		return null;
-	}
-	
 	public String xpathToFs(String input) {
 		String result = "";
 		input =  input.substring(1);
@@ -269,17 +252,14 @@ public class Model {
 			int pos = tag.indexOf("['");
 			if (pos!=-1){
 				String type = tag.substring(0,pos);
-				System.out.println("TYPE="+type);
 				int pos2=tag.indexOf("']");
 				String id = tag.substring(pos+2,pos2);
 				if (id.equals("")) id="default";
-				System.out.println("ID="+id);
 				result+="/"+type+"/"+id;
 			} else {
 				result+="/"+tag;
 			}
 		}
-		System.out.println("CPATH="+result);
 		return result;
 	}
 	
