@@ -830,8 +830,8 @@ var Eddie = function(options){
 
 	}
 
-    function sendBasicEvent(targetid,obj,data,event) {
-        console.log("DATA="+obj.tagName);
+ 
+     function sendBasicEvent(targetid,obj,data,event) {
 		if (obj.tagName==="INPUT") {
 		      var map = {};
               map[targetid+".value"]=obj.value;
@@ -852,7 +852,12 @@ var Eddie = function(options){
 			map["clientY"] = event.clientY;
 			map["screenX"] = event.screenX;
 			map["screenY"] = event.screenY;
-
+        	var xp = (event.clientX/window.innerWidth)*100;
+            var yp = (event.clientY/window.innerHeight)*100;
+            map["screenXp"] = xp;
+			map["screenYp"] = yp;
+			
+	
 			if (padding.length>1) {
         			for (var i = 1; i < padding.length; i++) {
                 			var name = padding[i];
@@ -875,16 +880,16 @@ var Eddie = function(options){
 				var elementOffsetTop = dragOffset.top;
 				map["elementOffsetTop"] = elementOffsetTop;
                         	map["elementOffsetLeft"] = elementOffsetLeft;
-			}
-
+			}		
+	
 			var dragPosition = draggedElement.position();
 			if (dragPosition !== undefined) {
 				var elementPositionLeft = dragPosition.left;
 				var elementPositionTop = dragPosition.top;
 				map["elementPositionTop"] = elementPositionTop;
                         	map["elementPositionLeft"] = elementPositionLeft;
-			}
-
+			}	
+			
 			if (draggedElement[0] !== undefined) {
 				var elementWidth = draggedElement[0].clientWidth;
 				var elementHeight = draggedElement[0].clientHeight;
@@ -896,6 +901,7 @@ var Eddie = function(options){
 		}
 	}
 
+ 
 	function simpleKeys (original) {
   		return Object.keys(original).reduce(function (obj, key) {
     			obj[key] = typeof original[key] === 'object' ? '{ ... }' : original[key];
