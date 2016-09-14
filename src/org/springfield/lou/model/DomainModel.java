@@ -43,8 +43,14 @@ public class DomainModel  {
 	}
 	
 	public String getProperty(String path) {
-		System.out.println("domain model -> getProperty("+path+")"+this+" NOT IMPLEMENTED");
-		return null;
+		int pos=path.lastIndexOf("/");
+    	String propertyname = path.substring(pos+1);
+    	path = path.substring(0,pos);
+    	FsNode node = Fs.getNode("/domain/"+path);
+    	if  (node!=null) {
+    		return node.getProperty(propertyname);
+    	}
+    	return null;
 	}
 	
 	public FsNode getNode(String uri) {

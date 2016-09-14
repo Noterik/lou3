@@ -365,7 +365,6 @@ public class ModelEventManager {
 			for (int i=0;i<binds.size();i++) {
 				ModelBindObject bind  = binds.get(i);
 				try {		
-					
 					ModelEvent event = new ModelEvent();
 					event.path = path;
 					event.target = set;
@@ -404,6 +403,8 @@ public class ModelEventManager {
     		ModelBindEvent b = eventqueue.pop(); // should be a case statement
     		if (b.type == ModelBindEvent.PROPERTY) {
     			deliverProperty(b.path,(String)b.value);
+    		} else if (b.type == ModelBindEvent.PROPERTIES) {
+        			deliverProperties(b.path,(FsPropertySet)b.value);
     		} else if (b.type == ModelBindEvent.NOTIFY) {
     			deliverNotify(b.path,(FsNode)b.value);
     		}

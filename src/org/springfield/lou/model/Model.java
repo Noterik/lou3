@@ -122,7 +122,7 @@ public class Model {
 		   	 	eventmanager.setProperties(path, properties); // signal the others new code
 		   	 	return true;
 		} else 	if (path.startsWith("/shared/")) {
-			sharedmodel.setProperties(path,properties);
+			sharedmodel.setProperties(path.substring(5),properties);
 	   	 	eventmanager.setProperties(path, properties); // signal the others new code
 	   	 	return true;
 		}
@@ -165,6 +165,8 @@ public class Model {
 				return sharedmodel.getProperty(path);
 		} else if (path.startsWith("/app/")) {
 			return amodel.getProperty(path);
+		} else if (path.startsWith("/domain/")) {
+			return dmodel.getProperty(path.substring(8));
 		}
 		return null;
 	}
