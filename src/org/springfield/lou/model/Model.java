@@ -132,7 +132,13 @@ public class Model {
 	public boolean setProperty(String path,String value) {
 		if (path.startsWith("@")) {
 			// its a model mapping
-			path = getModelMapping(path.substring(1));
+			int pos=path.indexOf("/"); // not sure if i can move tis in getModeMapping will try later
+			if (pos==-1) {
+				path = getModelMapping(path.substring(1));
+			} else {
+				String n = getModelMapping(path.substring(1,pos));
+				path = n+path.substring(pos);
+			}
 			System.out.println("SET PROPERTY @ PATH="+path);
 		}
 		
@@ -163,7 +169,13 @@ public class Model {
 	public String getProperty(String path) {
 		if (path.startsWith("@")) {
 			// its a model mapping
-			path = getModelMapping(path.substring(1));
+			int pos=path.indexOf("/"); // not sure if i can move tis in getModeMapping will try later
+			if (pos==-1) {
+				path = getModelMapping(path.substring(1));
+			} else {
+				String n = getModelMapping(path.substring(1,pos));
+				path = n+path.substring(pos);
+			}
 			System.out.println("GET PROPERTY @ PATH="+path);
 		}
 		
@@ -291,11 +303,9 @@ public class Model {
 	private String getModelMapping(String key) {
 		// find out more complex values based on the defined mapping
 		String path="";
-		//System.out.println("key="+key);
+
 		FsNode df = getNode("/app['component']/model['default']");
-		//System.out.println("DF="+df.asXML());
 		String mapping = df.getProperty(key);
-		//System.out.println("mapping="+mapping);	
 		
 		int pos = mapping.indexOf("@");
 		while (pos!=-1) {
