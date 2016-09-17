@@ -28,7 +28,7 @@ public class Model {
 	
 	private Html5Application app;
 	
-	private Map<String, String> screenproperties = new HashMap<String,String>();
+	private Map<String, String> modelmappings = new HashMap<String,String>();
 	private AppInstanceModel imodel;
 	private static DomainModel dmodel;
 	private static SharedModel sharedmodel = new SharedModel();
@@ -130,6 +130,12 @@ public class Model {
 	}
 	
 	public boolean setProperty(String path,String value) {
+		if (path.startsWith("@")) {
+			// its a model mapping
+			path = getModelMapping(path.substring(1));
+			System.out.println("SET PROPERTY @ PATH="+path);
+		}
+		
 		if (path.indexOf("[")!=-1) {
 			path=xpathToFs(path);
 		}
@@ -155,6 +161,12 @@ public class Model {
 	}
 	
 	public String getProperty(String path) {
+		if (path.startsWith("@")) {
+			// its a model mapping
+			path = getModelMapping(path.substring(1));
+			System.out.println("GET PROPERTY @ PATH="+path);
+		}
+		
 		if (path.indexOf("[")!=-1) {
 			path=xpathToFs(path);
 		}
@@ -172,6 +184,12 @@ public class Model {
 	}
 	
 	public FSList getList(String path) {
+		if (path.startsWith("@")) {
+			// its a model mapping
+			path = getModelMapping(path.substring(1));
+			System.out.println("GET LIST @ PATH="+path);
+		}
+		
 		if (path.indexOf("[")!=-1) {
 			path=xpathToFs(path);
 		}
@@ -188,6 +206,11 @@ public class Model {
 	}
 	
 	public FsNode getNode(String path) {
+		if (path.startsWith("@")) {
+			// its a model mapping
+			path = getModelMapping(path.substring(1));
+			//System.out.println("GET NODE @ PATH="+path);
+		}
 		if (path.indexOf("[")!=-1) {
 			path=xpathToFs(path);
 		}
@@ -264,6 +287,41 @@ public class Model {
 		}
 		return result;
 	}
+	
+	private String getModelMapping(String key) {
+		// find out more complex values based on the defined mapping
+		String path="";
+		//System.out.println("key="+key);
+		FsNode df = getNode("/app['component']/model['default']");
+		//System.out.println("DF="+df.asXML());
+		String mapping = df.getProperty(key);
+		//System.out.println("mapping="+mapping);	
+		
+		int pos = mapping.indexOf("@");
+		while (pos!=-1) {
+			path +=mapping.substring(0,pos);
+			mapping = mapping.substring(pos+1);
+			// find end of the new key
+			int pos2=  mapping.indexOf("'");
+			if (pos2!=-1) {
+				String subkey=mapping.substring(0,pos2);
+				//System.out.println("SUBKEY="+subkey);
+				String subvalue = getModelMapping(subkey); // recursive danger :)
+				//System.out.println("SUBVAL1="+subvalue);
+				if (subvalue.startsWith("/")) {
+					subvalue = getProperty(subvalue); // get the string value defined in 
+				}
+				//System.out.println("SUBVAL2="+subvalue);
+				path += subvalue;
+				mapping = mapping.substring(pos2);
+			}
+			pos = mapping.indexOf("@");
+		}
+		path +=mapping;
+		return path;
+	}
+	
+	
 	
 	
 }

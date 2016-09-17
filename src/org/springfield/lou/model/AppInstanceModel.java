@@ -153,7 +153,20 @@ public class AppInstanceModel  {
 					
 					Node child = (Node)iter.next();
 					//System.out.println("C="+child.getName());
-					if (child.getName()!=null && child.getName().equals("view")) {
+					if (child.getName()!=null && child.getName().equals("model")) {
+						Element model = (Element)child;
+						String modelid = model.attributeValue("id");	
+						FsNode modelnode = new FsNode("model",modelid);
+						for(Iterator<Node> iter2 = model.nodeIterator(); iter2.hasNext();) {
+							Node child2 = (Node)iter2.next();
+							String id = child2.getName();
+							if(id!=null) {
+								modelnode.setProperty(id,child2.getText());
+							}
+						}
+						putNode("/app/component",modelnode);
+						System.out.println("MODELNODE="+modelnode.asXML());
+					} else if (child.getName()!=null && child.getName().equals("view")) {
 						Element view = (Element)child;
 						String viewid = view.attributeValue("id");	
 						FsNode viewnode = new FsNode("view",viewid);
