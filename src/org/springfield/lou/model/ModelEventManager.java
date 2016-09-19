@@ -314,7 +314,7 @@ public class ModelEventManager {
     	String propertyname = parts[parts.length-1];
    	
     	FsNode node = new FsNode(key,nodeid);
-    	System.out.println("p="+propertyname+" v="+value);
+    	//System.out.println("p="+propertyname+" v="+value);
     	node.setProperty(propertyname, value);
    	
     	key = "/"+key+"/";

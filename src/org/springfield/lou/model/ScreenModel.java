@@ -26,4 +26,24 @@ import org.springfield.marge.*;
 
 public class ScreenModel extends MemoryModel {
 	
+	String recoverykey;
+	ArrayList<String> recoverylist;
+	
+	public ScreenModel() {
+	}
+	public void setRecoveryList(ArrayList<String> l) {
+		recoverylist = l;
+	}
+	
+	public void setRecoveryKey(String r) {
+		recoverykey = r;
+	}
+	
+	public boolean setProperty(String path,String value) {
+		if (recoverylist.contains(path.substring(8))) {
+			// ok we need to store this for now just works for Strings
+			Fs.setProperty(recoverykey,path.substring(8), value.toString());
+		}
+		return super.setProperty(path, value);
+	}
 }

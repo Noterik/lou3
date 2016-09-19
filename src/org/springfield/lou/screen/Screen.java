@@ -88,6 +88,7 @@ public class Screen {
 		this.app = a;
 		this.properties = new HashMap<String, Object>();
 	    model = new Model(this);
+
 		
 		// so some session recovery, only allow sessions per user !!!
 		if (a.getSessionRecovery()) {
@@ -111,11 +112,12 @@ public class Screen {
 				}
 				// ok lets look at the recovery list and see what to load back into the screen
 				ArrayList<String> list = app.getRecoveryList();
+			    model.setRecoveryKey(recoveryid);
+			    model.setRecoveryList(app.getRecoveryList());
 				for(Iterator<String> iter = list.iterator(); iter.hasNext(); ) {
 					String name =  iter.next();
 					String value = n2.getProperty(name);
 					if (value!=null) {
-						System.out.println("RECOVERY SET="+name+" value="+value+"!!");
 						model.setProperty("/screen/"+name, value); // put it back for now just String work !
 						
 					}

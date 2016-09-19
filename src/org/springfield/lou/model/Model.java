@@ -3,6 +3,7 @@ package org.springfield.lou.model;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -35,6 +36,7 @@ public class Model {
 	private AppModel amodel;
 	private ScreenModel smodel;
 	private static ModelEventManager eventmanager;
+
 	
 	public Model(Screen s) {
 		Html5ApplicationInterface app = s.getApplication();
@@ -45,6 +47,14 @@ public class Model {
 		if (dmodel==null) dmodel = new DomainModel(); // answers the /domain/ calls
 		if (eventmanager==null) eventmanager = new ModelEventManager();
 		
+	}
+	
+	public void setRecoveryList(ArrayList<String> l) {
+		smodel.setRecoveryList(l);
+	}
+	
+	public void setRecoveryKey(String r) {
+		smodel.setRecoveryKey(r);
 	}
 	
 	public static ModelEventManager getEventManager() {

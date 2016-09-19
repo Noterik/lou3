@@ -102,6 +102,8 @@ public class MemoryModel  {
 			}
 			return true;
 		} else {
+			System.out.println("SOMETHING WEIRD HERE NEW CALL MEMORY MODEL");
+			/*
 			int pos = path.lastIndexOf("/");
 			if (pos==-1) return false;
 			String idpart=path.substring(pos+1);
@@ -118,7 +120,8 @@ public class MemoryModel  {
 				String value = set.getProperty(key);
 				node.setProperty(key, value);
 			}
-			putNode("/shared/pointer", node);
+			*/
+		//	putNode("/shared/pointer", node);
 		}
 		return false;
 	}
