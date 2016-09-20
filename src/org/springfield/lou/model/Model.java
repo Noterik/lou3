@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -12,6 +13,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Node;
+import org.json.simple.JSONObject;
 import org.springfield.fs.FSList;
 import org.springfield.fs.FSListManager;
 import org.springfield.fs.Fs;
@@ -140,6 +142,10 @@ public class Model {
 	}
 	
 	public boolean setProperty(String path,String value) {
+		if (value==null) {
+			System.out.println("model trying to set empty value on "+path);
+			return false;
+		}
 		if (path.startsWith("@")) {
 			// its a model mapping
 			int pos=path.indexOf("/"); // not sure if i can move tis in getModeMapping will try later
@@ -249,6 +255,15 @@ public class Model {
 	}
 	
 	public void putNode(String uri,FsNode node) {
+		if (uri.startsWith("@")) {
+			// its a model mapping
+			uri = getModelMapping(uri.substring(1));
+			System.out.println("PUT NODE @ PATH="+uri);
+			if (uri.endsWith(node.getName())) {
+				uri=uri.substring(0,uri.lastIndexOf("/"));
+				System.out.println("PUT2 NODE @ PATH="+uri);
+			}
+		}
 		if (uri.indexOf("[")!=-1) {
 			uri=xpathToFs(uri);
 		}
@@ -341,7 +356,68 @@ public class Model {
 		return path;
 	}
 	
+	public boolean importNode(String to,JSONObject from,String mapping) {
+		System.out.println("IMPORT NODE ="+to+" data "+mapping);
+		String idnode = getProperty("/app['component']/mapping['"+mapping+"']/idnode");
+		String typenode = getProperty("/app['component']/mapping['"+mapping+"']/typenode");
+		if (idnode==null || typenode==null) return false;
+		if (idnode.equals("$epoch")) {
+			idnode = ""+new Date().getTime();
+		}
+		System.out.println("idnode="+idnode+" typenode="+typenode);
+		FsNode newnode = new FsNode(typenode, idnode);
+		
+		FSList mappings = getList("/app['component']/mapping['"+mapping+"']");
+		if (mappings!=null) {
+			for(Iterator<FsNode> iter = mappings.getNodes().iterator() ; iter.hasNext(); ) {
+				FsNode n = (FsNode)iter.next();	
+				String type=n.getName();
+				if (type.equals("map")) {
+					String fto = n.getId();
+					String ffrom = n.getProperty("from");
+					Object o = from.get(ffrom);
+					if (o!=null) {
+						newnode.setProperty(fto,(String)o); // ugly and slow does it per property
+					}
+				} else if (type.equals("constant")) {
+					String fto = n.getId();
+					String value = n.getProperty("value");
+					if (value!=null) {
+						newnode.setProperty(fto,value); // ugly and slow does it per property
+					}
+				}
+
+			}
+		}
+		System.out.println("NEWNODE="+newnode.asXML());
+		putNode(to, newnode);
+		return true;
+		
+	}
 	
-	
-	
+	public boolean mergeNode(String to,JSONObject from,String mapping) {
+		FSList mappings = getList("/app['component']/mapping['"+mapping+"']");
+		if (mappings!=null) {
+			for(Iterator<FsNode> iter = mappings.getNodes().iterator() ; iter.hasNext(); ) {
+				FsNode n = (FsNode)iter.next();	
+				String type=n.getName();
+				if (type.equals("map")) {
+					String fto = n.getId();
+					String ffrom = n.getProperty("from");
+					Object o = from.get(ffrom);
+					if (o!=null) {
+						setProperty(to+"/"+fto,(String)o); // ugly and slow does it per property
+					}
+				} else if (type.equals("constant")) {
+					String fto = n.getId();
+					String value = n.getProperty("value");
+					if (value!=null) {
+						setProperty(to+"/"+fto,value); // ugly and slow does it per property
+					}
+				}
+
+			}
+		}
+		return false;
+	}
 }

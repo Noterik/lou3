@@ -165,7 +165,7 @@ public class AppInstanceModel  {
 							}
 						}
 						putNode("/app/component",modelnode);
-						System.out.println("MODELNODE="+modelnode.asXML());
+						System.out.println("MIDELNODE="+modelnode.asXML());
 					} else if (child.getName()!=null && child.getName().equals("view")) {
 						Element view = (Element)child;
 						String viewid = view.attributeValue("id");	
