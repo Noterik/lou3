@@ -91,10 +91,8 @@ public class MemoryModel  {
 	
 	
 	public boolean setProperties(String path,FsPropertySet set) {
-		//System.out.println("SETPROPS="+path);
 		FsNode node  = getNode(path);
 		if (node!=null) {
-			//System.out.println("SETPROPS2="+node);
 			for(Iterator<String> iter = set.getKeys() ; iter.hasNext(); ) {
 				String key = (String)iter.next();
 				String value = set.getProperty(key);

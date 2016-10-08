@@ -113,10 +113,10 @@ public class Screen {
 				// ok lets look at the recovery list and see what to load back into the screen
 				ArrayList<String> list = app.getRecoveryList();
 			    model.setRecoveryKey(recoveryid);
-			    model.setRecoveryList(app.getRecoveryList());
+			    model.setRecoveryList(app.getRecoveryList());			    
 				for(Iterator<String> iter = list.iterator(); iter.hasNext(); ) {
 					String name =  iter.next();
-					String value = n2.getProperty(name);
+					String value = n2.getProperty(name.replace("/", "_"));
 					if (value!=null) {
 						model.setProperty("/screen/"+name, value); // put it back for now just String work !
 						

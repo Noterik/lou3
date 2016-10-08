@@ -68,7 +68,11 @@ public class Model {
 		if (path.indexOf("[")!=-1) {
 			path=xpathToFs(path);
 		}
- 		eventmanager.onNotify(path, methodname, callbackobject);
+		if (path.startsWith("/screen/")) {
+			eventmanager.onNotify(getScreenPath(path), methodname, callbackobject);
+		} else {
+			eventmanager.onNotify(path, methodname, callbackobject);
+		}
  		// signal the admin tool
  		FsNode node = new FsNode("bind","1");
  		node.setProperty("action","new onNotify");
@@ -81,14 +85,22 @@ public class Model {
 		if (path.indexOf("[")!=-1) {
 			path=xpathToFs(path);
 		}
- 		eventmanager.notify(path,node);
+		if (path.startsWith("/screen/")) {
+			eventmanager.notify(getScreenPath(path),node);
+		} else {
+			eventmanager.notify(path,node);	
+		}
 	}
 	
  	public void onPathUpdate(String path,String methodname,Html5Controller callbackobject) {
 		if (path.indexOf("[")!=-1) {
 			path=xpathToFs(path);
 		}
- 		eventmanager.onPathUpdate(path, methodname, callbackobject);
+		if (path.startsWith("/screen/")) {
+			eventmanager.onPathUpdate(getScreenPath(path), methodname, callbackobject);
+		} else {
+			eventmanager.onPathUpdate(path, methodname, callbackobject);
+		}
  		FsNode node = new FsNode("bind","1");
  		node.setProperty("action","new onPathUpdate");
  		node.setProperty("path",path);
@@ -101,7 +113,11 @@ public class Model {
 		if (path.indexOf("[")!=-1) {
 			path=xpathToFs(path);
 		}
-		eventmanager.onPropertyUpdate(path,methodname,callbackobject);
+		if (path.startsWith("/screen/")) {
+			eventmanager.onPropertyUpdate(getScreenPath(path),methodname,callbackobject);
+		} else {
+			eventmanager.onPropertyUpdate(path,methodname,callbackobject);
+		}
  		FsNode node = new FsNode("bind","1");
  		node.setProperty("action","new onPropertyUpdate");
  		node.setProperty("path",path);
@@ -113,7 +129,11 @@ public class Model {
 		if (path.indexOf("[")!=-1) {
 			path=xpathToFs(path);
 		}
-		eventmanager.onPropertiesUpdate(path,methodname,callbackobject);
+		if (path.startsWith("/screen/")) {
+			eventmanager.onPropertiesUpdate(getScreenPath(path),methodname,callbackobject);
+		} else {
+			eventmanager.onPropertiesUpdate(path,methodname,callbackobject);
+		}
  		FsNode node = new FsNode("bind","1");
  		node.setProperty("action","new onPropertiesUpdate");
  		node.setProperty("path",path);
@@ -131,7 +151,7 @@ public class Model {
 	   	 	return true;
 		} else if (path.startsWith("/screen/")) {
 				smodel.setProperties(path.substring(5),properties);
-		   	 	eventmanager.setProperties(path, properties); // signal the others new code
+		   	 	eventmanager.setProperties(getScreenPath(path), properties); // signal the others new code
 		   	 	return true;
 		} else 	if (path.startsWith("/shared/")) {
 			sharedmodel.setProperties(path.substring(5),properties);
@@ -155,7 +175,7 @@ public class Model {
 				String n = getModelMapping(path.substring(1,pos));
 				path = n+path.substring(pos);
 			}
-			System.out.println("SET PROPERTY @ PATH="+path);
+		//	System.out.println("SET PROPERTY @ PATH="+path);
 		}
 		
 		if (path.indexOf("[")!=-1) {
@@ -164,7 +184,9 @@ public class Model {
 		if (path.startsWith("/screen/"))  {
 			//smodel.setProperty(path.substring(8),value);
 			smodel.setProperty(path,value);
-	   	 	eventmanager.setProperty(path, value); // signal the others new code
+	   	 	eventmanager.setProperty(getScreenPath(path), value); // signal the others new code
+	   	 	//eventmanager.setProperty(path, value); // signal the others new code
+
 	   	 	return true;
 		} else if (path.startsWith("/shared/"))  {
 				sharedmodel.setProperty(path,value);
@@ -192,7 +214,7 @@ public class Model {
 				String n = getModelMapping(path.substring(1,pos));
 				path = n+path.substring(pos);
 			}
-			System.out.println("GET PROPERTY @ PATH="+path);
+			//System.out.println("GET PROPERTY @ PATH="+path);
 		}
 		
 		if (path.indexOf("[")!=-1) {
@@ -215,7 +237,7 @@ public class Model {
 		if (path.startsWith("@")) {
 			// its a model mapping
 			path = getModelMapping(path.substring(1));
-			System.out.println("GET LIST @ PATH="+path);
+			//System.out.println("GET LIST @ PATH="+path);
 		}
 		
 		if (path.indexOf("[")!=-1) {
@@ -258,10 +280,10 @@ public class Model {
 		if (uri.startsWith("@")) {
 			// its a model mapping
 			uri = getModelMapping(uri.substring(1));
-			System.out.println("PUT NODE @ PATH="+uri);
+			//System.out.println("PUT NODE @ PATH="+uri);
 			if (uri.endsWith(node.getName())) {
 				uri=uri.substring(0,uri.lastIndexOf("/"));
-				System.out.println("PUT2 NODE @ PATH="+uri);
+				//System.out.println("PUT2 NODE @ PATH="+uri);
 			}
 		}
 		if (uri.indexOf("[")!=-1) {
@@ -357,14 +379,14 @@ public class Model {
 	}
 	
 	public boolean importNode(String to,JSONObject from,String mapping) {
-		System.out.println("IMPORT NODE ="+to+" data "+mapping);
+		//System.out.println("IMPORT NODE ="+to+" data "+mapping);
 		String idnode = getProperty("/app['component']/mapping['"+mapping+"']/idnode");
 		String typenode = getProperty("/app['component']/mapping['"+mapping+"']/typenode");
 		if (idnode==null || typenode==null) return false;
 		if (idnode.equals("$epoch")) {
 			idnode = ""+new Date().getTime();
 		}
-		System.out.println("idnode="+idnode+" typenode="+typenode);
+		//System.out.println("idnode="+idnode+" typenode="+typenode);
 		FsNode newnode = new FsNode(typenode, idnode);
 		
 		FSList mappings = getList("/app['component']/mapping['"+mapping+"']");
@@ -389,7 +411,7 @@ public class Model {
 
 			}
 		}
-		System.out.println("NEWNODE="+newnode.asXML());
+		//System.out.println("NEWNODE="+newnode.asXML());
 		putNode(to, newnode);
 		return true;
 		
@@ -419,5 +441,9 @@ public class Model {
 			}
 		}
 		return false;
+	}
+	
+	private String getScreenPath(String path) {
+		return "/screen/"+smodel.hashCode()+path.substring(7);
 	}
 }

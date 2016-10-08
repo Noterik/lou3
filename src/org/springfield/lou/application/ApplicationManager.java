@@ -21,10 +21,12 @@
 
 package org.springfield.lou.application;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -39,6 +41,7 @@ import org.dom4j.Element;
 import org.dom4j.Node;
 import org.springfield.fs.*;
 import org.springfield.lou.homer.LazyHomer;
+import org.springfield.lou.servlet.LouServlet;
 import org.springfield.marge.Marge;
 import org.springfield.marge.MargeObserver;
 // org.springfield.lou.maggie.MaggieLoader;
@@ -54,7 +57,8 @@ import org.springfield.mojo.interfaces.ServiceManager;
  *
  */
 public class ApplicationManager extends Thread implements MargeObserver {
-	
+	// temp LouServlet.addUrlTrigger("/lou/" + getDomain() + "/" + jumper + ",/lou/domain/" + getDomain() + "/user/admin/html5application/senso?event=" + jumper,"newscreen");
+
 	private static Map<String, Html5ApplicationInterface> runningapps = new HashMap<String, Html5ApplicationInterface>();
 	private static Map<String, Html5AvailableApplication> availableapps = null;
 	private static ApplicationManager instance;
@@ -463,6 +467,10 @@ public class ApplicationManager extends Thread implements MargeObserver {
 		    	     vapp = getAvailableApplication(appname);
 		    	     if (vapp!=null) {
 		    	    	 String mode = vapp.getAutoDeploy();
+		    	    	 if (appname.equals("dashboard")) {
+		    	    		 mode ="development/production";
+		    	    	 }
+		    	    	 System.out.println("APPNAME="+appname+" mode="+mode);
 		    	    	 if (mode.equals("production")) {
 		    	    		 makeProduction(appname, datestring);
 		    	    	 } else if (mode.equals("development")) {
@@ -789,8 +797,9 @@ public class ApplicationManager extends Thread implements MargeObserver {
 								if (pv!=null) {
 									pv.loadProductionState(true);
 									// lets scan for triggers !
-									String scanpath="/springfield/lou/apps/"+vapp.getId()+"/"+pv.getId()+"/actionlists/";
+									String scanpath="/springfield/lou/apps/"+vapp.getId()+"/"+pv.getId()+"/components/app.xml";
 									//System.out.println("ACTIONLIST PRESCANNER="+scanpath);
+									readJumpersForApp(scanpath);
 								//	if (!LazyHomer.inDeveloperMode()) ActionListManager.readActionListsDirForUrlTriggers(scanpath);
 								}
 							}
@@ -1082,5 +1091,80 @@ public class ApplicationManager extends Thread implements MargeObserver {
 				
 			}
 		}
+    }
+    
+    
+    private void readJumpersForApp(String filename) {
+ //   	System.out.println("SCANPATH="+filename);
+//		String filename = basepath+File.separator+"apps"+File.separator+part+File.separator+"components"+File.separator+"app.xml";
+		File file = new File(filename);
+		if (file.exists()) {
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(filename));
+				StringBuffer str = new StringBuffer();
+				String line = br.readLine();
+				while (line != null) {
+					str.append(line);
+					str.append("\n");
+					line = br.readLine();
+				}
+				br.close();
+				
+				String body = str.toString();
+				Document result = DocumentHelper.parseText(body);
+				for(Iterator<Node> iter = result.getRootElement().nodeIterator(); iter.hasNext(); ) {
+					
+					Node child = (Node)iter.next();
+					//System.out.println("C="+child.getName());
+					if (child.getName()!=null && child.getName().equals("jumper")) {
+						Element model = (Element)child;
+						String sid = model.attributeValue("id");	
+						
+						//FsNode modelnode = new FsNode("model",modelid);
+						for(Iterator<Node> iter2 = model.nodeIterator(); iter2.hasNext();) {
+							Node child2 = (Node)iter2.next();
+							String id = child2.getName();
+							if(id!=null) {
+								System.out.println("JUMPER="+sid+" "+id+" "+child2.getText());
+								LouServlet.addUrlTrigger(sid+","+child2.getText(),"newscreen");
+
+							}
+						}
+					//	putNode("/app/component",modelnode);
+					//	System.out.println("MIDELNODE="+modelnode.asXML());
+					} else if (child.getName()!=null && child.getName().equals("jumpers")) {
+						Element model = (Element)child;
+						String sid = model.attributeValue("id");	
+						
+						//FsNode modelnode = new FsNode("model",modelid);
+						for(Iterator<Node> iter2 = model.nodeIterator(); iter2.hasNext();) {
+							Node child2 = (Node)iter2.next();
+							String id = child2.getName();
+							if(id!=null) {
+								System.out.println("JUMPERS="+sid+" "+id+" "+child2.getText());
+								FSList fslist = FSListManager.get(child2.getText(), false);
+								if (fslist!=null) {
+									List<FsNode> nodes = fslist.getNodes();
+									if (nodes != null) {
+										for (Iterator<FsNode> iter3 = nodes.iterator(); iter3.hasNext();) {
+											FsNode node = (FsNode) iter3.next();
+											String jumper = node.getId();
+											String target = node.getProperty("target");
+											String domain = node.getProperty("domain");
+											System.out.println("JUMPER=/lou/" + domain + "/" + jumper + ","+target);
+											LouServlet.addUrlTrigger("/lou/" + domain + "/" + jumper + ","+target,"newscreen");
+
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+
     }
 }

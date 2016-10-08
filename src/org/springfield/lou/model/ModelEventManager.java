@@ -199,6 +199,8 @@ public class ModelEventManager {
     }
 
     public void removeController(Object controller) {
+    	if (controller==null) return;
+    	
     	removeControllerBinds(notifybinds,controller);
     	removeControllerBinds(propertybinds,controller);
     	removeControllerBinds(propertiesbinds,controller);

@@ -81,13 +81,21 @@ var Eddie = function(options){
 					    		}
             						break;
             					case "mousemove":
-                                			var send = trackervalues[tid+"/"+track+"_send"];
-							if (send === 'true') {
-								trackervalues[tid+"/"+track+"_send"] = 'false';
-								map['clientXY'] = trackervalues[tid+"/"+track];
-								map['width'] = $('#'+tid).width();
-								map['height'] = $('#'+tid).height();
-							}
+                                	var send = trackervalues[tid+"/"+track+"_send"];
+									if (send === 'true') {
+											trackervalues[tid+"/"+track+"_send"] = 'false';
+											parts = trackervalues[tid+"/"+track].split(',');
+											map['screenX'] = parseFloat(parts[0]);
+											map['screenY'] = parseFloat(parts[1]);
+											map['clientX'] = parseFloat(parts[2]);
+											map['clientY'] = parseFloat(parts[3]);																		
+											map['screenXP'] = parseFloat(parts[4]);
+											map['screenYP'] = parseFloat(parts[5]);
+											map['clientXY'] = trackervalues[tid+"/"+track];
+											map['width'] = $('#'+tid).width();
+											map['height'] = $('#'+tid).height();
+								
+									}	
             						break;
             					case "devicemotion":
                                 			var send = trackervalues["screen/devicemotion_send"];
@@ -776,16 +784,18 @@ var Eddie = function(options){
 				// tricky since we need to track it
 				$("#"+targetid).mousemove(function() {
 					// set these already in the tracker to be send
-                                        var oldvalue = trackervalues[targetid+"/mousemove"];
-                                        var newvalue = event.offsetX+','+event.offsetY;
-                                        if (oldvalue!=newvalue) {
-                                             trackervalues[targetid+"/mousemove"] = newvalue;
-                                             trackervalues[targetid+"/mousemove_send"] = "true";
+                    var oldvalue = trackervalues[targetid+"/mousemove"];
+        			var xp = (event.clientX/window.innerWidth)*100;
+            		var yp = (event.clientY/window.innerHeight)*100;
+            		var newvalue = event.offsetX+','+event.offsetY+','+event.clientX+','+event.clientY+','+xp+','+yp;
+                    if (oldvalue!=newvalue) {
+                        	trackervalues[targetid+"/mousemove"] = newvalue;
+                            trackervalues[targetid+"/mousemove_send"] = "true";
 					}
 				});
 				$("#"+targetid).on('touchmove', function() {
 					// set these already in the tracker to be send
-          var oldvalue = trackervalues[targetid+"/mousemove"];
+          			var oldvalue = trackervalues[targetid+"/mousemove"];
 					var newvalue = '';
 
 					var boundingBox = this.getBoundingClientRect();
@@ -794,11 +804,14 @@ var Eddie = function(options){
 						var touch = event.touches[i];
 						var top = touch.pageY - boundingBox.top;
 						var left = touch.pageX - boundingBox.left;
-            if (i===0) {
-							newvalue += left+','+top;
-					  } else {
-							newvalue += ','+left+','+top;
-					  }
+            			if (i===0) {
+            			    var xp = (left/window.innerWidth)*100;
+            				var yp = (top/window.innerHeight)*100;
+							newvalue += left+','+top+','+left+','+top+','+xp+','+yp;
+
+					  	} else {
+							newvalue += ','+left+','+top+','+left+','+top+','+xp+','+yp;
+					  	}
 					}
           if (oldvalue!=newvalue) {
                trackervalues[targetid+"/mousemove"] = newvalue;

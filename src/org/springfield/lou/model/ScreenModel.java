@@ -41,6 +41,7 @@ public class ScreenModel extends MemoryModel {
 	
 	public boolean setProperty(String path,String value) {
 		if (recoverylist.contains(path.substring(8))) {
+			String spath = path.replace("/","_");
 			// ok we need to store this for now just works for Strings
 			Fs.setProperty(recoverykey,path.substring(8), value.toString());
 		}

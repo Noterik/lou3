@@ -63,6 +63,7 @@ public class LazyHomer implements MargeObserver {
 	private static int port = -1;
 	private static int bart_port = -1;
 	private static String external_ipnumber = "";
+	private static String dashboard_password =  null;
 	static String group = "224.0.0.0";
 	static int ttl = 1;
 	static boolean noreply = true;
@@ -478,6 +479,7 @@ public class LazyHomer implements MargeObserver {
 		
 		bart_port = Integer.parseInt(props.getProperty("default-bart-port"));
 		external_ipnumber = props.getProperty("external-ipnumber");	
+		dashboard_password = props.getProperty("dashboard-password");	
 		
 		role = props.getProperty("role");
 		if (role==null) role = "production";
@@ -524,6 +526,10 @@ public class LazyHomer implements MargeObserver {
 	
 	public static String getExternalIpNumber() {
 		return external_ipnumber;
+	}
+	
+	public static String getDashboardPassword() {
+		return dashboard_password;
 	}
 	
 	public static String getRole() {
