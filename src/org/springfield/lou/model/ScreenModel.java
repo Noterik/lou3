@@ -40,10 +40,12 @@ public class ScreenModel extends MemoryModel {
 	}
 	
 	public boolean setProperty(String path,String value) {
+		System.out.println("SET1="+path);
 		if (recoverylist.contains(path.substring(8))) {
+			System.out.println("SET2="+path+" value="+value+" RC="+recoverykey);
 			String spath = path.replace("/","_");
 			// ok we need to store this for now just works for Strings
-			Fs.setProperty(recoverykey,path.substring(8), value.toString());
+			Fs.setProperty(recoverykey,spath.substring(8), value);
 		}
 		return super.setProperty(path, value);
 	}

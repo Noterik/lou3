@@ -276,7 +276,7 @@ public class Model {
 		return null;
 	}
 	
-	public void putNode(String uri,FsNode node) {
+	public boolean putNode(String uri,FsNode node) {
 		if (uri.startsWith("@")) {
 			// its a model mapping
 			uri = getModelMapping(uri.substring(1));
@@ -290,14 +290,15 @@ public class Model {
 			uri=xpathToFs(uri);
 		}
 		if (uri.startsWith("/app/") || uri.equals("/app")) { 
-			amodel.putNode(uri,node);
+			return amodel.putNode(uri,node);
 		} else if (uri.startsWith("/shared")) { 
-				sharedmodel.putNode(uri,node);
+			return sharedmodel.putNode(uri,node);
 		} else if (uri.startsWith("/screen")) { 
-			smodel.putNode(uri,node);
+			return smodel.putNode(uri,node);
 		} else if (uri.startsWith("/domain/")) { 
-			Fs.insertNode(node, uri);
+			return Fs.insertNode(node, uri);
 		}
+		return false;
 	}
 	
 	
@@ -314,6 +315,7 @@ public class Model {
 		return Fs.isMainNode(path);
 	}
 	
+	/*
 	public boolean insertNode(FsNode node,String path) { // needs to be removed?
 		if (path.indexOf("[")!=-1) {
 			path=xpathToFs(path);
@@ -326,6 +328,7 @@ public class Model {
 		}
 		return false;
 	}
+	*/
 	
 	public String xpathToFs(String input) {
 		String result = "";

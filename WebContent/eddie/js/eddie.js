@@ -137,6 +137,10 @@ var Eddie = function(options){
 		}, 100);
 
 	};
+	
+	self.getTimeOffset = function() {
+		return settings.timeoffset;
+	};
 
 	self.destroy = function() {
 		/*
@@ -172,6 +176,7 @@ var Eddie = function(options){
 	self.getComponent = function(comp){
 		return components[comp];
 	};
+	
 
 	self.listen = function(){
 		if(!settings.worker){
@@ -515,6 +520,7 @@ var Eddie = function(options){
 			div.innerHTML = "";
 		}
 	}
+	
 
 	function removeScript(targetid){
 		$('#script_' + targetid).remove();
