@@ -81,6 +81,17 @@ public class Model {
  		notify("/shared/internal",node);
 	}
  	
+	public void notify(String path) {
+ 		FsNode notifynode = new FsNode("notify","1");
+ 		notify(path,notifynode);
+	}
+ 	
+ 	public void notify(String path,String message) {
+ 		FsNode notifynode = new FsNode("notify","1");
+ 		notifynode.setProperty("message",message);
+ 		notify(path,notifynode);
+	}
+ 	
  	public void notify(String path,FsNode node) {
 		if (path.indexOf("[")!=-1) {
 			path=xpathToFs(path);

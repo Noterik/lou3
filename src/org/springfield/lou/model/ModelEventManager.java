@@ -382,6 +382,7 @@ public class ModelEventManager {
     }
     
     public void deliverNotify(String path,FsNode node) {	
+    	System.out.println("PATH="+path+" N="+node.asXML());
 		ArrayList<ModelBindObject> binds = notifybinds.get(path); // direct hit
 		if (binds!=null) {
 			for (int i=0;i<binds.size();i++) {
