@@ -6,6 +6,8 @@ public class ModelBindEvent {
 	public final static int PROPERTIES = 2;
 	public final static int PATH = 3;
 	public final static int NOTIFY = 4;
+	public final static int TIMELINENOTIFY_ENTER = 5;
+	public final static int TIMELINENOTIFY_LEAVE = 6;
 	
 	
 	public String path;

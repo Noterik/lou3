@@ -23,6 +23,8 @@ public class ModelEventManager {
     private Map<String, ArrayList<ModelBindObject>> propertiesbinds = new HashMap<String, ArrayList<ModelBindObject>>();
     private Map<String, ArrayList<ModelBindObject>> pathbinds = new HashMap<String, ArrayList<ModelBindObject>>();
     private Map<String, ArrayList<ModelBindObject>> notifybinds = new HashMap<String, ArrayList<ModelBindObject>>();
+    private Map<String, ArrayList<ModelBindObject>> timelinenotifybinds = new HashMap<String, ArrayList<ModelBindObject>>();
+    private Map<String,TimeLineWatcher> timelinewatchers = new HashMap<String,TimeLineWatcher>();
 
     
 	protected Stack<ModelBindEvent> eventqueue  = new Stack<ModelBindEvent>();
@@ -33,7 +35,7 @@ public class ModelEventManager {
     }
     
     public int getTotalBindsCount() {
-    	return getPropertyBindsCount()+getPropertiesBindsCount()+getPathBindsCount()+getNotifyBindsCount();
+    	return getPropertyBindsCount()+getPropertiesBindsCount()+getPathBindsCount()+getNotifyBindsCount()+getTimeLineNotifyBindsCount();
     }
     
     public int getPropertyBindsCount() {
@@ -53,6 +55,17 @@ public class ModelEventManager {
     	while(it.hasNext()){
     		String key = it.next();
     		List<ModelBindObject> l = (List)notifybinds.get(key);
+    		count+=l.size();
+    	}
+    	return count;
+    }
+    
+    public int getTimeLineNotifyBindsCount() {
+    	int count = 0;
+    	Iterator<String> it = timelinenotifybinds.keySet().iterator();
+    	while(it.hasNext()){
+    		String key = it.next();
+    		List<ModelBindObject> l = (List)timelinenotifybinds.get(key);
     		count+=l.size();
     	}
     	return count;
@@ -94,6 +107,10 @@ public class ModelEventManager {
     
     public Map<String, ArrayList<ModelBindObject>> getNotifyBinds() {
     	return notifybinds;
+    }
+    
+    public Map<String, ArrayList<ModelBindObject>> getTimeLineNotifyBinds() {
+    	return timelinenotifybinds;
     }
     
  	public void onPathUpdate(String path,String methodname,Html5Controller callbackobject) {
@@ -205,6 +222,7 @@ public class ModelEventManager {
     	removeControllerBinds(propertybinds,controller);
     	removeControllerBinds(propertiesbinds,controller);
     	removeControllerBinds(pathbinds,controller);
+    	removeControllerBinds(timelinenotifybinds,controller);
  		FsNode node = new FsNode("bind","1");
  		node.setProperty("action","remove controller");
  		node.setProperty("controller",""+controller.hashCode());
@@ -216,6 +234,7 @@ public class ModelEventManager {
     	removeApplicationBinds(propertiesbinds,applicationhashcode);
     	removeApplicationBinds(notifybinds,applicationhashcode);
     	removeApplicationBinds(pathbinds,applicationhashcode);
+    	removeApplicationBinds(timelinenotifybinds,applicationhashcode);
  		FsNode node = new FsNode("bind","1");
  		node.setProperty("action","remove application");
  		node.setProperty("application",""+applicationhashcode);
@@ -228,6 +247,7 @@ public class ModelEventManager {
     	removeScreenBinds(propertiesbinds,screenid);
     	removeScreenBinds(notifybinds,screenid);
     	removeScreenBinds(pathbinds,screenid);
+    	removeScreenBinds(timelinenotifybinds,screenid);
  		FsNode node = new FsNode("bind","1");
  		node.setProperty("action","remove screen");
  		node.setProperty("screen",screenid);
@@ -299,6 +319,39 @@ public class ModelEventManager {
     	}
     
     }
+    
+	public void onTimeLineNotify(String path,String timer,String starttime,String duration,String methodname,Html5Controller callbackobject) {
+		System.out.println("timeline notify request="+path+" "+timer+" "+starttime+" "+duration+" callb="+callbackobject);
+		
+		TimeLineWatcher tw = timelinewatchers.get(path+":"+timer);
+		if (tw==null) {
+			tw = new TimeLineWatcher(path,timer,starttime,duration,this);
+			timelinewatchers.put(path+":"+timer, tw);
+		}
+    	try {
+ 			Method method = callbackobject.getClass().getMethod(methodname,ModelEvent.class);
+ 			String screenid = callbackobject.getScreenId();
+ 			String targetid = callbackobject.getSelector();
+			ArrayList<ModelBindObject> list = timelinenotifybinds.get(path+":"+timer);
+			if (list!=null) {
+				for (int i=list.size()-1;i>=0;i--) {
+					ModelBindObject co = list.get(i);
+					if (co.screenid.equals(screenid) && co.method.equals(methodname)) {
+						list.remove(i); // dub kill
+					}
+				}
+				list.add(new ModelBindObject(methodname,screenid,callbackobject.getApplicationHashCode(),targetid,callbackobject,method));
+			} else {
+				list = new ArrayList<ModelBindObject>();
+				list.add(new ModelBindObject(methodname,screenid,callbackobject.getApplicationHashCode(),targetid,callbackobject,method));
+				timelinenotifybinds.put(path+":"+timer, list);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+ 			return;
+ 		}
+	}
+ 	
     
 	public void setProperties(String path,FsPropertySet set) {
     	eventqueue.push(new ModelBindEvent(ModelBindEvent.PROPERTIES,path,set));
@@ -381,8 +434,28 @@ public class ModelEventManager {
 		deliverPath(path,set,ModelBindEvent.PROPERTIES);
     }
     
+    public void deliverTimeLineNotify(String path,int eventtype,FsNode node) {	
+ //   	System.out.println("PATH="+path+" N="+node.asXML());
+		ArrayList<ModelBindObject> binds = timelinenotifybinds.get(path); // direct hit
+		if (binds!=null) {
+			for (int i=0;i<binds.size();i++) {
+				ModelBindObject bind  = binds.get(i);
+				try {		
+					
+					ModelEvent event = new ModelEvent();
+					event.path = path;
+					event.target = node;
+					event.eventtype = eventtype;
+					bind.methodcall.invoke(bind.obj,event);
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+    }
+    
     public void deliverNotify(String path,FsNode node) {	
-    	System.out.println("PATH="+path+" N="+node.asXML());
+ //   	System.out.println("PATH="+path+" N="+node.asXML());
 		ArrayList<ModelBindObject> binds = notifybinds.get(path); // direct hit
 		if (binds!=null) {
 			for (int i=0;i<binds.size();i++) {

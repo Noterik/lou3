@@ -85,6 +85,26 @@ public class Model {
  		FsNode notifynode = new FsNode("notify","1");
  		notify(path,notifynode);
 	}
+	
+	public void onTimeLineNotify(String path,String timer,String starttime,String methodname,Html5Controller callbackobject) {
+		onTimeLineNotify(path,timer,starttime,null,methodname,callbackobject);
+	}
+	
+	public void onTimeLineNotify(String path,String timer,String starttime,String duration,String methodname,Html5Controller callbackobject) {
+		if (path.startsWith("@")) {
+			path = getModelMapping(path.substring(1));
+		}
+		if (timer.startsWith("@")) {
+			timer = getModelMapping(timer.substring(1));
+		}
+		if (path.indexOf("[")!=-1) {
+			path=xpathToFs(path);
+		}
+		if (timer.indexOf("[")!=-1) {
+			timer=xpathToFs(timer);
+		}
+		eventmanager.onTimeLineNotify(path,timer,starttime,duration,methodname,callbackobject);
+	}
  	
  	public void notify(String path,String message) {
  		FsNode notifynode = new FsNode("notify","1");
