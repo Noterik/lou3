@@ -123,7 +123,7 @@ public class ModelEventManager {
 			if (list!=null) {
 				for (int i=list.size()-1;i>=0;i--) {
 					ModelBindObject co = list.get(i);
-					if (co.screenid.equals(screenid) && co.method.equals(methodname)) {
+					if (co.screenid.equals(screenid) && co.method.equals(methodname) && co.methodcall.getDeclaringClass().getName().equals(method.getDeclaringClass().getName())) {
 						list.remove(i); // dub kill
 					}
 				}
@@ -148,7 +148,7 @@ public class ModelEventManager {
 			if (list!=null) {
 				for (int i=list.size()-1;i>=0;i--) {
 					ModelBindObject co = list.get(i);
-					if (co.screenid.equals(screenid) && co.method.equals(methodname)) {
+					if (co.screenid.equals(screenid) && co.method.equals(methodname) && co.methodcall.getDeclaringClass().getName().equals(method.getDeclaringClass().getName())) {
 						list.remove(i); // dub kill
 					}
 				}
@@ -174,7 +174,7 @@ public class ModelEventManager {
 			if (list!=null) {
 				for (int i=list.size()-1;i>=0;i--) {
 					ModelBindObject co = list.get(i);
-					if (co.screenid.equals(screenid) && co.method.equals(methodname)) {
+					if (co.screenid.equals(screenid) && co.method.equals(methodname) && co.methodcall.getDeclaringClass().getName().equals(method.getDeclaringClass().getName())) {
 						list.remove(i); // dub kill
 					}
 				}
@@ -199,7 +199,7 @@ public class ModelEventManager {
 			if (list!=null) {
 				for (int i=list.size()-1;i>=0;i--) {
 					ModelBindObject co = list.get(i);
-					if (co.screenid.equals(screenid) && co.method.equals(methodname)) {
+					if (co.screenid.equals(screenid) && co.method.equals(methodname) && co.methodcall.getDeclaringClass().getName().equals(method.getDeclaringClass().getName())) {
 						list.remove(i); // dub kill
 					}
 				}
@@ -336,7 +336,7 @@ public class ModelEventManager {
 			if (list!=null) {
 				for (int i=list.size()-1;i>=0;i--) {
 					ModelBindObject co = list.get(i);
-					if (co.screenid.equals(screenid) && co.method.equals(methodname)) {
+					if (co.screenid.equals(screenid) && co.method.equals(methodname) && co.methodcall.getDeclaringClass().getName().equals(method.getDeclaringClass().getName())) {
 						list.remove(i); // dub kill
 					}
 				}
