@@ -138,6 +138,7 @@ public class Screen {
 		//System.out.println("EVENT="+data+" KEY="+key);
 		HashMap<String,PathBindObject> binds = pathbindobjects.get(key);
 		//System.out.println("BB="+binds);
+		if (binds==null) return;
 		
 		Set<String> keys = binds.keySet();
 		Iterator<String> it = keys.iterator();

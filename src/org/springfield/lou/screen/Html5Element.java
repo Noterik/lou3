@@ -66,6 +66,11 @@ public class Html5Element {
 		return true;
 	}
 	
+	public boolean translate(String x,String y) {
+		screen.send("translateXY("+selector.substring(1)+")="+x+","+y);
+		return true;
+	}
+	
 	public boolean play() {
 		screen.send("play("+selector.substring(1)+")");
 		return true;

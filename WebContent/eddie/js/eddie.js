@@ -106,8 +106,8 @@ var Eddie = function(options){
 								map['gamma'] = trackervalues["screen/devicemotion_gamma"];
 							}
             						break;
-            					case "location":
-							navigator.geolocation.getCurrentPosition(getPosition);
+            				case "location":
+								navigator.geolocation.getCurrentPosition(getPosition);
 					    		newvalue = trackervalues["screen/location"];
                                 			oldvalue = trackervalues["screen/location_old"];
 					    		if (oldvalue!=newvalue) {
@@ -134,7 +134,7 @@ var Eddie = function(options){
                                 	self.putLou("","event("+tid+"/client,"+line+")");
 				}
 			}
-		}, 100);
+		}, 30);
 
 	};
 	
@@ -320,6 +320,14 @@ var Eddie = function(options){
             				content = content.substring(0,pos);
             			}
                     	window.location.href = content;
+            		break;
+            	case "translateXY":
+            		content = result.substring(pos+2);
+            		pos = content.indexOf("($end$)");
+            		if(pos!=-1) {
+            				content = content.substring(0,pos);
+            			}
+                    	doTranslateXY(targetid,content);
             		break;
                 case "append":
                         content = result.substring(pos+2);
@@ -727,6 +735,21 @@ var Eddie = function(options){
 			vars[key]=data[key];
 		}
 	}
+	
+	function doTranslateXY(targetid,content) {
+        var xy = content.split(",");
+        var x = xy[0];
+        var y = xy[1];
+        if (x.indexOf('%')!==0) {
+       		var pw = $('#'+targetid).parent();
+        	x = (pw.width()/100)*(x.substring(0,x.length-1));
+        } 
+        if (y.indexOf('%')!==0) {
+       		var ph = $('#'+targetid).parent();
+        	y = (ph.height()/100)*(y.substring(0,y.length-1));
+        } 
+        $('#'+targetid).css('transform','translate('+x+'px,'+y+'px)');
+	}
 
 	function setBind(targetid,content) {
          var div = document.getElementById(targetid);
@@ -873,8 +896,8 @@ var Eddie = function(options){
 			map["screenY"] = event.screenY;
         	var xp = (event.clientX/window.innerWidth)*100;
             var yp = (event.clientY/window.innerHeight)*100;
-            map["screenXp"] = xp;
-			map["screenYp"] = yp;
+            map["screenXP"] = xp;
+			map["screenYP"] = yp;
 			
 	
 			if (padding.length>1) {
