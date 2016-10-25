@@ -42,7 +42,11 @@ public class Html5Element {
 	public boolean remove() {
 		// need to remove this element and all that its tracking/doing
 		screen.removeContent(selector.substring(1));
-		screen.getApplication().removeEvents(controller);
+		if (controller!=null) {
+			screen.getApplication().removeEvents(controller);
+		} else {
+			System.out.println("remove called on null controller "+selector);
+		}
 		return true;
 	}
 	

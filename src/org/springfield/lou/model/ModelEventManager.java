@@ -216,8 +216,6 @@ public class ModelEventManager {
     }
 
     public void removeController(Object controller) {
-    	if (controller==null) return;
-    	
     	removeControllerBinds(notifybinds,controller);
     	removeControllerBinds(propertybinds,controller);
     	removeControllerBinds(propertiesbinds,controller);
@@ -375,7 +373,7 @@ public class ModelEventManager {
     	key = "/"+key+"/";
 		ArrayList<ModelBindObject> binds = propertybinds.get(path);
 		if (binds!=null) {
-			for (int i=0;i<binds.size();i++) {
+    		for (int i=binds.size()-1;i>-1;i--) {
 				ModelBindObject bind  = binds.get(i);
 				try {		
 					ModelEvent event = new ModelEvent();
@@ -397,7 +395,7 @@ public class ModelEventManager {
     	while (pos!=-1) {
     		ArrayList<ModelBindObject> binds = pathbinds.get(pathwalker);
     		if (binds!=null) {
-    			for (int i=0;i<binds.size();i++) {
+    			for (int i=binds.size()-1;i>-1;i--) {
     				ModelBindObject bind  = binds.get(i);
     				try {		
     					ModelEvent event = new ModelEvent();
@@ -418,7 +416,7 @@ public class ModelEventManager {
     public void deliverProperties(String path,FsPropertySet set) {	
 		ArrayList<ModelBindObject> binds = propertiesbinds.get(path); // direct hit
 		if (binds!=null) {
-			for (int i=0;i<binds.size();i++) {
+			for (int i=binds.size()-1;i>-1;i--) {
 				ModelBindObject bind  = binds.get(i);
 				try {		
 					ModelEvent event = new ModelEvent();
@@ -438,7 +436,7 @@ public class ModelEventManager {
  //   	System.out.println("PATH="+path+" N="+node.asXML());
 		ArrayList<ModelBindObject> binds = timelinenotifybinds.get(path); // direct hit
 		if (binds!=null) {
-			for (int i=0;i<binds.size();i++) {
+			for (int i=binds.size()-1;i>-1;i--) {
 				ModelBindObject bind  = binds.get(i);
 				try {		
 					
@@ -448,6 +446,7 @@ public class ModelEventManager {
 					event.eventtype = eventtype;
 					bind.methodcall.invoke(bind.obj,event);
 				} catch(Exception e) {
+					System.out.println("Error during Time nofity delivery : "+bind.selector+" "+bind.method+" "+bind.obj);
 					e.printStackTrace();
 				}
 			}
@@ -458,16 +457,17 @@ public class ModelEventManager {
  //   	System.out.println("PATH="+path+" N="+node.asXML());
 		ArrayList<ModelBindObject> binds = notifybinds.get(path); // direct hit
 		if (binds!=null) {
-			for (int i=0;i<binds.size();i++) {
+			for (int i=binds.size()-1;i>-1;i--) {
 				ModelBindObject bind  = binds.get(i);
-				try {		
-					
+				try {							
 					ModelEvent event = new ModelEvent();
 					event.path = path;
 					event.target = node;
 					event.eventtype = ModelBindEvent.NOTIFY;
 					bind.methodcall.invoke(bind.obj,event);
 				} catch(Exception e) {
+					System.out.println("Error during nofity delivery : "+bind.selector+" "+bind.method+" "+bind.obj);
+
 					e.printStackTrace();
 				}
 			}
