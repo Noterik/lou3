@@ -811,12 +811,13 @@ var Eddie = function(options){
 				});
 			} else if (content.indexOf('track/mousemove')===0) {
 				// tricky since we need to track it
+				console.log('track');
 				$("#"+targetid).mousemove(function() {
 					// set these already in the tracker to be send
                     var oldvalue = trackervalues[targetid+"/mousemove"];
-        			var xp = (event.clientX/window.innerWidth)*100;
-            		var yp = (event.clientY/window.innerHeight)*100;
-            		var newvalue = event.offsetX+','+event.offsetY+','+event.clientX+','+event.clientY+','+xp+','+yp;
+        			var xp = (event.layerX/event.target.offsetWidth)*100;
+            		var yp = (event.layerY/event.target.offsetHeight)*100;
+            		var newvalue = event.offsetX+','+event.offsetY+','+event.layerX+','+event.layerY+','+xp+','+yp;
                     if (oldvalue!=newvalue) {
                         	trackervalues[targetid+"/mousemove"] = newvalue;
                             trackervalues[targetid+"/mousemove_send"] = "true";
