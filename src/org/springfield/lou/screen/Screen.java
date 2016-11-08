@@ -39,6 +39,7 @@ import org.springfield.lou.homer.LazyHomer;
 import org.springfield.lou.model.Model;
 import org.springfield.lou.performance.PerformanceManager;
 import org.springfield.lou.tools.JavascriptInjector;
+import org.springfield.lou.websocket.LouWSConnection;
 import org.springfield.mojo.interfaces.ServiceInterface;
 import org.springfield.mojo.interfaces.ServiceManager;
 
@@ -58,6 +59,9 @@ public class Screen {
 	private String role = "unknown";
 	private Capabilities capabilities;
 	private Html5ApplicationInterface app;
+	
+	private LouWSConnection socket = null;
+	
 	private String language = null;
 	private String data = null;
 	private long lastseen = -1;
@@ -132,6 +136,14 @@ public class Screen {
 	
 	public Model getModel() {
 		return model;
+	}
+	
+	public LouWSConnection getSocket(){
+		return socket;
+	}
+	
+	public void setSocket(LouWSConnection conn){
+		this.socket = conn;
 	}
 	
 	public void event(String from,String key,JSONObject data) {

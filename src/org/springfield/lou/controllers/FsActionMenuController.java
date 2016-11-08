@@ -13,11 +13,11 @@ public class FsActionMenuController extends Html5Controller {
 	private String template;
 
 	public void attach(String s) {
-		System.out.println("ATTACH");
+		//System.out.println("ATTACH");
 		selector = s;
 		if (screen!=null) {
 			FsNode node = getControllerNode(selector);
-			System.out.println("ATTACH2="+node);
+			//System.out.println("ATTACH2="+node);
 			if (node!=null) {
 				nodepath = node.getProperty("nodepath");
 				template = node.getProperty("template");
@@ -35,7 +35,7 @@ public class FsActionMenuController extends Html5Controller {
 	private void fillMenu() {
 		FSList fslist = FSListManager.get(nodepath,false);
 		JSONObject data = fslist.toJSONObject(screen.getLanguageCode(),"name,action");
-		System.out.println("DATA="+data.toJSONString());
+	//	System.out.println("DATA="+data.toJSONString());
 		data.put("nodepath",nodepath);
 		data.put("size", fslist.size());
 		data.put("targetid",selector.substring(1));

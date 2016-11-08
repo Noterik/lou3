@@ -22,6 +22,7 @@
 package org.springfield.lou.application;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.springfield.lou.controllers.Html5Controller;
+ import org.springfield.lou.controllers.Html5Controller;
 import org.springfield.fs.*;
 import org.springfield.lou.homer.LazyHomer;
 import org.springfield.lou.model.AppInstanceModel;
@@ -88,6 +89,8 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	private Map<String, Object> properties = new HashMap<String, Object>();
 	//private BindManager bindmanager;
 	private  AppModel appmodel; // i think this is wrong should be per url no?
+	
+	public Map<String, Html5ApplicationFunction> api;
     
     public Html5Application(String id, String remoteReciever) {
     	this.timeoutcheck = false;
@@ -112,6 +115,8 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 
        if (appmodel==null) appmodel = new AppModel(this); // create the memory for all instances of this app
        appinstancemodel = new AppInstanceModel(this); // create the memory for this app
+       
+       this.api = new HashMap<String, Html5ApplicationFunction>();
     }
     
     public AppModel getAppModel() {
@@ -401,6 +406,8 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 			//System.out.println("REQUEST SCREEN REMOVE ID="+id+"");
 			screen.getModel().getEventManager().removeScreenBinds(id);
 			username = screen.getUserName();
+		}else{
+			System.out.println("ERROR, COULDN'T FIND SCREEN " + id + " IN SCREEN MANAGER!");
 		}
 		ScreenManager.globalremove(id);
 	//	bindmanager.onPathRemove(screen); problem for lou3 need fix
@@ -618,5 +625,23 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     public void removeEvents(Object obj) {
 		Model.getEventManager().removeController(obj);
     }
+
+	@Override
+	public void call(Screen s, String command, JSONObject arguments) {
+		if(api.containsKey(command)){
+			Html5ApplicationFunction fn = api.get(command);
+			if(arguments == null){
+				fn.call(s);
+			}else{
+				fn.call(s, arguments);
+			}
+		}else{
+			System.out.println("Html5ApplicationFunction " + command + " does not exist!");
+		}
+	}
+	
+	public void setFunction(String name, Html5ApplicationFunction fn){
+		this.api.put(name, fn);
+	}
 
 }

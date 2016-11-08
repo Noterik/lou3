@@ -35,6 +35,7 @@ import org.restlet.routing.Router;
 public class LouRestlet extends Router {	
 	public LouRestlet(Context cx) {
 		super(cx);
+		System.out.println("new LouRestlet()");
 		
 		this.setRoutingMode(Router.MODE_BEST_MATCH);
 		

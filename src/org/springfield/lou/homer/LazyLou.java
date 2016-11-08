@@ -73,7 +73,7 @@ class LazyLou extends Thread
 	}
 	
 	public void run() {
-    	System.out.println("There are " + buttons.length + " buttons mapped");
+    	//System.out.println("There are " + buttons.length + " buttons mapped");
     	try {
     		DatagramSocket dsoc=new DatagramSocket(65432);
 	        while (true) {
@@ -171,7 +171,7 @@ class LazyLou extends Thread
 	        		buttonClicked = "channeldown";
 	        		break;
         	}
-        	System.out.println(buttonClicked);
+        	//System.out.println(buttonClicked);
         	
         	String body = "<fsxml><message id=\"1\"><properties><msg>buttonClicked("+buttonClicked+")</msg></properties></message></fsxml>";
       //  	//TODO: the IP address should be configurable
@@ -179,7 +179,7 @@ class LazyLou extends Thread
         }
         
         for(int i=0;i<signalValues.size();i++) System.out.print(signalValues.get(i) + " ");
-        System.out.println("");
+        //System.out.println("");
     }
  
     public static int checkButton(ArrayList<Integer> signalValues){

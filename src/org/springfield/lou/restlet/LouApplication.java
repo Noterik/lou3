@@ -21,6 +21,8 @@
 
 package org.springfield.lou.restlet;
 
+import java.net.UnknownHostException;
+
 import org.restlet.Application;
 import org.restlet.Restlet;
 

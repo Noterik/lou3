@@ -194,7 +194,7 @@ public class Model {
 	
 	public boolean setProperty(String path,String value) {
 		if (value==null) {
-			System.out.println("model trying to set empty value on "+path);
+			//System.out.println("model trying to set empty value on "+path);
 			return false;
 		}
 		if (path.startsWith("@")) {

@@ -243,6 +243,8 @@ public class LouServlet extends HttpServlet {
 			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/jquery-ui.js\"></script>\n";
 			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/jquery.ui.touch-punch.min.js\"></script>\n";
 			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/mustache.js\"></script>\n";
+			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/eddie2/eddie/lib/socket.io-1.4.5.js\"></script>\n";
+			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/eddie2/eddie2.js\"></script>\n";
 
 			// check if the domain has a special eddie script (for devel use)
 			String domain = fullappname.substring(8);
@@ -340,7 +342,7 @@ public class LouServlet extends HttpServlet {
 			return;
 		}
 		
-		//System.out.println("DATA="+data);
+		System.out.println("DATA="+data);
 
 		Map<String,String[]> params = request.getParameterMap();
 		// lets find the correct nlication

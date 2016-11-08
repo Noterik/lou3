@@ -134,7 +134,7 @@ public class Capabilities {
 						return MODE_APHONE_LANDSCAPE;
 					}
 				}
-				System.out.println("ANDROID DETECTED2="+ua);
+				//System.out.println("ANDROID DETECTED2="+ua);
 				return MODE_APHONE_PORTRAIT;
 			}
 		}

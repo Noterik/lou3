@@ -63,11 +63,13 @@
 		<war destfile="${war.dir}/lou.war" webxml="${web.dir}/WEB-INF/web.xml">
 			<lib dir="${build.dir}" />
 			<fileset dir="${web.dir}">
-				<exclude name="WEB-INF/web.xml"/>
+				<exclude name="WEB-INF/web.xml" />
+				<exclude name="WEB-INF/lib/websocket-api.jar"/>
 				<exclude name="WEB-INF/lib/servlet-api.jar"/>
 				<exclude name="WEB-INF/lib/mojo.jar"/>
 				<exclude name="WEB-INF/lib/dom4j-1.6.1.jar"/>
 				<exclude name="WEB-INF/lib/log4j-1.2.15.jar"/>
+				
 				<exclude name="WEB-INF/lib/org.apache.commons.codec.jar"/>
 				<exclude name="WEB-INF/lib/org.apache.commons.httpclient.jar"/>
 				<exclude name="WEB-INF/lib/org.apache.commons.logging.jar"/>
@@ -75,6 +77,7 @@
 				<exclude name="WEB-INF/lib/json-simple-1.1.1.jar"/>
 				<exclude name="WEB-INF/lib/org.restlet.jar" />
 				<exclude name="WEB-INF/lib/javax.servlet.jar" />
+				
 			</fileset>
 		</war>
 	</target>

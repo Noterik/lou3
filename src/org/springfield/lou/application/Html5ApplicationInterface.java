@@ -26,6 +26,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.json.simple.JSONObject;
 import org.springfield.lou.controllers.Html5Controller;
 import org.springfield.lou.model.AppInstanceModel;
 import org.springfield.lou.model.AppModel;
@@ -87,5 +88,7 @@ public interface Html5ApplicationInterface {
 	public Html5Controller createController(String name);
  	//public void onPathUpdate(String paths,String methodname,Html5Controller callbackobject);
  	public void removeEvents(Object obj);
+ 	public void call(Screen s, String command, JSONObject arguments);
+ 	public void setFunction(String name, Html5ApplicationFunction fn);
  	//public void setProperty(String path,String value);
 }

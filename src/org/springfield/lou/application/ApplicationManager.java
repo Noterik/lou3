@@ -197,7 +197,7 @@ public class ApplicationManager extends Thread implements MargeObserver {
 			//newapp.executeActionlist("init");
     		return newapp;
     	} catch(Exception e) {
-    		System.out.println("ApplicationManager ");
+    		//System.out.println("ApplicationManager ");
     		e.printStackTrace();
     	}
     	return runningapps.get(name);
@@ -396,7 +396,7 @@ public class ApplicationManager extends Thread implements MargeObserver {
     		if (wantedname.equals(appname)) {
     			// ok found file is the wanted file
     			// format "29-Aug-2013-16:55"
-    			System.out.println("NEW VERSION OF "+appname+" FOUND INSTALLING");
+    			//System.out.println("NEW VERSION OF "+appname+" FOUND INSTALLING");
     			Date now = new Date();
     			SimpleDateFormat df = new SimpleDateFormat("d-MMM-yyyy-HH:mm");
     			String datestring = df.format(now);

@@ -22,7 +22,7 @@ public class ServiceHandler implements ServiceInterface{
 	}
 	
 	public String get(String uri,String fsxml,String mimetype) {
-		System.out.println("SH="+uri);
+		//System.out.println("SH="+uri);
 		int pos = uri.indexOf("(");
 		if (pos!=-1) {
 			String command = uri.substring(0,pos);
@@ -47,7 +47,7 @@ public class ServiceHandler implements ServiceInterface{
 	}
 	
 	private String handleGetCommand(String command,String[] params) {
-		System.out.println("HG="+command);
+		//System.out.println("HG="+command);
 		if (command.equals("getAppWAR")) return getAppWar(params[0],params[1]);
 		return null;
 	}
@@ -55,10 +55,10 @@ public class ServiceHandler implements ServiceInterface{
 	private String getAppWar(String appname,String version) {
 		String result = ApplicationManager.getApplicationWarAsString(appname,version);
 		if (result!=null) {
-			System.out.println("RETURNING STRING SIZE="+result.length());
+			//System.out.println("RETURNING STRING SIZE="+result.length());
 			return result;
 		} else { 
-			System.out.println("CAN'T find APP");
+			//System.out.println("CAN'T find APP");
 			return null;
 		}
 	}

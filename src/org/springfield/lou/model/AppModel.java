@@ -67,7 +67,7 @@ public class AppModel extends MemoryModel  {
 						Element mapping = (Element)child;
 						String mappingid = mapping.attributeValue("id");	
 						FsNode mappingnode = new FsNode("mapping",mappingid);
-						System.out.println("MAPPING="+mappingid);
+						//System.out.println("MAPPING="+mappingid);
 						
 						
 						for(Iterator<Node> iter2 = mapping.nodeIterator(); iter2.hasNext();) {

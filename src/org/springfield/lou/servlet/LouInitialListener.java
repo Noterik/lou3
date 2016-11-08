@@ -37,7 +37,6 @@ import org.springfield.lou.homer.LazyHomer;
 public class LouInitialListener implements ServletContextListener {
 	
 	public void contextInitialized(ServletContextEvent event) {
-		System.out.println("Lou: context created");
 		ServletContext servletContext = event.getServletContext();
 		
 		//load LazyHomer		
