@@ -89,6 +89,6 @@ public interface Html5ApplicationInterface {
  	//public void onPathUpdate(String paths,String methodname,Html5Controller callbackobject);
  	public void removeEvents(Object obj);
  	public void call(Screen s, String command, JSONObject arguments);
- 	public void setFunction(String name, Html5ApplicationFunction fn);
+ 	public void setCommand(String name, Html5ApplicationCommand fn);
  	//public void setProperty(String path,String value);
 }

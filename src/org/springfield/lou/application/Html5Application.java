@@ -1,8 +1,8 @@
-/* 
+/*
 * Html5Application.java
-* 
+*
 * Copyright (c) 2012 Noterik B.V.
-* 
+*
 * This file is part of Lou, related to the Noterik Springfield project.
 *
 * Lou is free software: you can redistribute it and/or modify
@@ -54,14 +54,14 @@ import org.springfield.mojo.interfaces.ServiceManager;
 
 /**
  * Html5Application
- * 
+ *
  * @author Daniel Ockeloen
  * @copyright Copyright: Noterik B.V. 2012
  * @package org.springfield.lou.application
  *
  */
 public class Html5Application implements Html5ApplicationInterface,Runnable {
-	
+
 	public final static int LOG_INFO = 1;
 	public final static int LOG_WARNING = 2;
 	public final static int LOG_ERROR = 3;
@@ -89,9 +89,10 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	private Map<String, Object> properties = new HashMap<String, Object>();
 	//private BindManager bindmanager;
 	private  AppModel appmodel; // i think this is wrong should be per url no?
-	
-	public Map<String, Html5ApplicationFunction> api;
-    
+
+  //Contains the commands for this application.
+	public Map<String, Html5ApplicationCommand> commands;
+
     public Html5Application(String id, String remoteReciever) {
     	this.timeoutcheck = false;
 		this.id = id;
@@ -115,76 +116,76 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 
        if (appmodel==null) appmodel = new AppModel(this); // create the memory for all instances of this app
        appinstancemodel = new AppInstanceModel(this); // create the memory for this app
-       
-       this.api = new HashMap<String, Html5ApplicationFunction>();
+
+       this.commands = new HashMap<String, Html5ApplicationCommand>();
     }
-    
+
     public AppModel getAppModel() {
     	return appmodel;
     }
-    
+
     public AppInstanceModel getAppInstanceModel() {
     	return appinstancemodel;
     }
-    
+
     public void addToRecoveryList(String name) {
     	recoverylist.add(name);
     }
-    
+
     public ArrayList<String> getRecoveryList() {
     	return recoverylist;
     }
-    
+
     public void setSessionRecovery(boolean s) {
     	sessionrecovery = s;
     }
-    
+
     public boolean getSessionRecovery() {
     	return sessionrecovery;
     }
-    
+
 	public Html5Application(String id) {
 		this(id, "video");
 	}
-	
+
 	public void setId(String i) {
 		this.id = i;
 	}
-	
+
 	public String getId() {
 		return id;
 	}
-	
+
 	public String getAppname() {
 		return appname;
 	}
-	
+
 	public String getDomain() {
 		String result = id.substring(id.indexOf("/domain/")+8);
 		result = result.substring(0,result.indexOf('/'));
 		return result;
 	}
-	
+
 	public void setFullId(String i) {
 		this.fullid = i;
 	}
-	
+
 	public String getFullId() {
 		return fullid;
 	}
-	
+
 	public String getHtmlPath() {
 		return htmlpath;
 	}
-	
+
 	public void setHtmlPath(String p) {
 		htmlpath = p;
 	}
-	
+
 	public void setCallback(String name,String m,Class c) {
-		
+
 	}
-	
+
 	public synchronized Screen getNewScreen(Capabilities caps,Map<String,String[]> p) {
 		Long newid = new Date().getTime();
 		screencounter++;
@@ -195,19 +196,19 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		this.onNewScreen(screen);
 		return screen;
 	}
-	
+
 	public Screen getScreen(String id) {
 		return this.screenmanager.get(id);
 	}
-	
+
 	public ScreenManager getScreenManager(){
 		return this.screenmanager;
 	}
-	
+
 	public UserManager getUserManager(){
 		return this.usermanager;
 	}
-	
+
 	public String getLibPaths() {
 		String result = null;
 		String libsdir = "";
@@ -228,7 +229,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		}
 		return result;
 	}
-	
+
 	public void run() {
 		while(running){
 			try {
@@ -242,7 +243,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		}
 		System.out.println("application run done, shutting down");
 	}
-	
+
 	public void timeoutCheckup() {
 		Set<String> keys = this.screenmanager.getScreens().keySet();
 		ArrayList<String> wantremove = new ArrayList<String>();
@@ -264,7 +265,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 			removeScreen(tmp[0],tmp[1]);
 		}
 	}
-	
+
 	public void shutdown() {
 		running = false;
 		Set<String> keys = this.screenmanager.getScreens().keySet();
@@ -276,14 +277,14 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 			this.onLogoutUser(screen,username);
 			it.remove(); // avoids a ConcurrentModificationException
 			System.out.println("SHUTDOWN");
-			this.removeScreen(next,username);	
+			this.removeScreen(next,username);
 		}
-		
+
 		Model.getEventManager().removeApplication(this.hashCode());
-		
+
 		ApplicationManager.instance().removeApplication(this.id);
 	}
-	
+
 	public void maintainanceRun() {
 			try {
 				if (!running) return;
@@ -298,7 +299,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 				System.out.println("Exception in maintainance run");
 			}
 	}
-	
+
 	public void setContent(String div,String content) {
 		Set<String> keys = this.screenmanager.getScreens().keySet();
 		Iterator<String> it = keys.iterator();
@@ -308,7 +309,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 			s.setContent(div,content);
 		}
 	}
-	
+
 	public void putData(String data) {
 		int pos = data.indexOf("put(");
 		if (pos!=-1) {
@@ -326,7 +327,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 				} else {
 				//	System.out.println("EMPTY FROM SCREEN = "+from);
 				}
-				
+
 				//System.out.println("FROM="+from+" TARGET="+target+" CONTENT="+content);
 				if (target.equals("")) {
 					// get the correct screen in this case the sender
@@ -344,12 +345,12 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 			}
 		}
  	}
-	
-	
+
+
 	public void loadStyleSheet(Screen s,String sname) {
 		s.loadStyleSheet(getApplicationCSS(sname) , this);
 	}
-	
+
 	public void loadStyleSheet(Screen s,String dstyle,String sname) {
 		String fs = getDeviceCSS(dstyle);
 		if (LazyHomer.isWindows()) {
@@ -364,12 +365,12 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 			s.loadStyleSheet(sname , this);
 		}
 	}
-	
-	
+
+
 	public void put(String from,String content) {
 		System.out.println("Application put should be overridden");
 	}
-	
+
 	public void putOnScreen(Screen s,String from,String content) {
 		String component = content.substring(content.indexOf("(")+1, content.indexOf(")"));
 		if(content.indexOf("load(")==0)	{
@@ -394,12 +395,12 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 			eddieLog(s,component);
 		}
 	}
-	
+
 	public void removeContent(Screen s, String comp){
-		s.removeContent(comp, this);	
+		s.removeContent(comp, this);
 	}
-	
-	
+
+
 	public void removeScreen(String id,String username){
 		Screen screen = this.screenmanager.get(id);
 		if (screen!=null) {
@@ -412,7 +413,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		ScreenManager.globalremove(id);
 	//	bindmanager.onPathRemove(screen); problem for lou3 need fix
 
-		
+
 		onScreenTimeout(screen);
 
 		if (username!=null) {
@@ -421,26 +422,26 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 					u.removeScreen(id);
 					if (u.getScreens().size()==0) {
 						// user not on any screen remove it from the app
-						usermanager.removeUser(u);	
+						usermanager.removeUser(u);
 					}
 			}
 		}
 	}
-	
-	
+
+
 	public void onScreenTimeout(Screen s) {
 	}
-	
+
 	public void onNewScreen(Screen s) {
 	}
-	
+
 	public void onLogoutUser(Screen s,String name) {
 		User u = usermanager.getUser(name);
 		if (u!=null) { // should check if still on other screen !!!
 			usermanager.removeUser(u);
 		}
 	}
-	
+
 	public void onNewUser(Screen s,String id) {
 		User u = usermanager.getUser(id);
 		if (u==null) {
@@ -451,17 +452,17 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 			u.addScreen(s);
 		}
 	}
-	
-	
-	
+
+
+
 	public void onLoginFail(Screen s,String id) {
 	}
-	
+
     public String getApplicationCSS(String name) {
     	String path = "apps/"+appname+"/css/"+name+".css";
     	return path;
      }
-    
+
     public String getApplicationCSSRefer(String refcss,String refappname) {
     	// weird for now.
     	//System.out.println("CSS NAME="+refcss);
@@ -470,28 +471,28 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		return path;
     }
 
-    
-    
+
+
     public String getDeviceCSS(String dstyle) {
     	// weird for now.
     	String path = "apps/"+appname+"/css/"+dstyle+".css";
     	return path;
     }
-    
-    
+
+
     public int getScreenCount() {
     	return screenmanager.getScreens().size();
     }
-    
+
     public int getUserCount() {
     	return usermanager.size();
     }
-    
+
     public int getScreenIdCounter() {
     	return screencounter-1;
     }
-    
-    
+
+
     private void eddieLog(Screen s,String content) {
     	String[] parts = content.split(",");
     	String l = parts[1];
@@ -499,7 +500,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     	if (l.equals("warning")) { level = LOG_WARNING; }
     	else if (l.equals("error")) { level = LOG_ERROR; }
   		SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss");
-    	FsNode n = new FsNode("log",f.format(new Date()));	
+    	FsNode n = new FsNode("log",f.format(new Date()));
   		n.setProperty("level", loglevels[level-1]);
   		n.setProperty("source", "js");
   		n.setProperty("msg", parts[0]);
@@ -513,27 +514,27 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
   		}
   		ApplicationManager.log(this, n);
     }
-    
+
     public void log(String msg) {
     		log(null,msg,LOG_INFO);
     }
-    
+
     public void log(String msg,int level) {
 		log(null,msg,level);
     }
-    
+
     public void log(Screen s,String msg) {
 		log(s,msg,LOG_INFO);
     }
-    
+
     public boolean inDevelopemntMode() {
     	return LazyHomer.inDeveloperMode();
     }
-    
+
     /**
-     * 
+     *
      * adds application id, checks with barney and talks to mojo if allowed
-     * 
+     *
      * @param path
      * @return
      */
@@ -553,29 +554,29 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     	}
     	return null;
     }
-    
+
 	public boolean checkNodeActions(FsNode node,String actions) {
     		return checkNodeActions(node,0,actions);
 	}
-    
+
 	public boolean checkNodeActions(FsNode node,int depth,String actions) {
     	String asker = this.getClass().getName(); // gets the name from the classloader
     	int pos = asker.indexOf("org.springfield.lou.application.types.");
     	if (pos==0) { // make sure we are in the right package
     		asker = asker.substring(pos+38);
-    		return node.checkActions(asker,"application",depth,actions); 
+    		return node.checkActions(asker,"application",depth,actions);
     	}
     	return false;
 	}
-	
+
 	public String getFavicon() {
 		return null;
 	}
-	
+
 	public String getMetaHeaders(HttpServletRequest request) {
 		return ""; // default is empty;
 	}
-    
+
     public void log(Screen s,String msg,int level) {
     		SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss");
     		FsNode n = new FsNode("log",f.format(new Date()));
@@ -587,20 +588,20 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     			if (s.getUserName()!=null) {
     					n.setProperty("user", s.getUserName());
     			} else {
-					n.setProperty("user","unknown");	
+					n.setProperty("user","unknown");
     			}
     		} else {
     			n.setProperty("screen", "application");
-    			n.setProperty("user","unknown");    			
+    			n.setProperty("user","unknown");
     		}
     		ApplicationManager.log(this, n);
     }
-    
+
     public void setCallback(String name,String m,Object o) {
-    	callbackmethods.put(name, m); 
-    	callbackobjects.put(name, o); 
+    	callbackmethods.put(name, m);
+    	callbackobjects.put(name, o);
     }
-    
+
     private String dirToName(String dir) {
     	// converts things like divione/mouseup to 'actionDivoneMouseup'
     	String name = "action";
@@ -612,24 +613,34 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     	}
     	return name;
     }
-    
-    
-    
+
+
+
     public Html5Controller createController(String name) {
     	System.out.println("PLACE createController node in your app");
     	return null;
     }
-    
 
-    
+
+
     public void removeEvents(Object obj) {
 		Model.getEventManager().removeController(obj);
     }
 
+  /**
+   * This function will attempt to find the command in this.commands, and
+   * after that attempt to execute it.
+   *
+   * @param s The screen which called the command
+   * @param command The command we're trying to execute
+   * @param arguments The parameters we're trying to pass to the command.
+   */
 	@Override
 	public void call(Screen s, String command, JSONObject arguments) {
-		if(api.containsKey(command)){
-			Html5ApplicationFunction fn = api.get(command);
+		if(commands.containsKey(command)){
+			Html5ApplicationCommand fn = commands.get(command);
+
+      //Attempt to call both with and without parameter, according to whether they where passed.
 			if(arguments == null){
 				fn.call(s);
 			}else{
@@ -639,9 +650,15 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 			System.out.println("Html5ApplicationFunction " + command + " does not exist!");
 		}
 	}
-	
-	public void setFunction(String name, Html5ApplicationFunction fn){
-		this.api.put(name, fn);
+
+  /**
+   * Adds a new command to the list of commands in this.commands.
+   *
+   * @param name The name of the command
+   * @param fn The implementation of the command (can be anonymous)
+   */
+	public void setCommand(String name, Html5ApplicationCommand fn){
+		this.commands.put(name, fn);
 	}
 
 }
