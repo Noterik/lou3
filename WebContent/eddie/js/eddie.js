@@ -850,26 +850,25 @@ var Eddie = function(options){
 					event.preventDefault();
 				});
 			}
-                } else if (div!==null) {
-                            var eventtargets = content.split(":");
-							for(j = 0; j < eventtargets.length; j++){
-
-								var padding = eventtargets[j].split(",");
+		} else if (div!==null) {
+                	var eventtargets = content.split(":");
+					for(j = 0; j < eventtargets.length; j++){
+						var padding = eventtargets[j].split(",");
                         $("#"+targetid).bind(padding[0], {etarget: eventtargets[j]}, function(event) {
-                                                        var data = event.data;
-														sendBasicEvent(targetid,this,data,event);
-                                                });
-                            }
-				} else {
-					        var eventtargets = content.split(":");
-							for(j = 0; j < eventtargets.length; j++){
-												var padding = eventtargets[j].split(",");
-                                                $("."+targetid).bind(padding[0], {etarget: eventtargets[j]}, function(event) {
-                                                        var data = event.data;
-														sendBasicEvent(targetid,this,data,event);
-                                                });
-                            }
-				}
+                           var data = event.data;
+                           sendBasicEvent(targetid,this,data,event);
+                        });
+					}
+		} else {
+					var eventtargets = content.split(":");
+					for(j = 0; j < eventtargets.length; j++){
+						var padding = eventtargets[j].split(",");
+						$("."+targetid).bind(padding[0], {etarget: eventtargets[j]}, function(event) {
+							var data = event.data;
+							sendBasicEvent(targetid,this,data,event);
+						});
+					}
+		}
 
 	}
 
@@ -888,14 +887,14 @@ var Eddie = function(options){
 		      self.putLou("","event("+targetid+"/"+data.etarget+","+JSON.stringify(map)+")");
         } else {
 			var padding = data.etarget.split(",");
-		      	map = {};
-                        //map[targetid+".value"]=obj.value;
+			map = {};
+			//map[targetid+".value"]=obj.value;
 			map["targetid"] = targetid;
 			map["clientX"] = event.clientX;
 			map["clientY"] = event.clientY;
 			map["screenX"] = event.screenX;
 			map["screenY"] = event.screenY;
-        	var xp = (event.clientX/window.innerWidth)*100;
+			var xp = (event.clientX/window.innerWidth)*100;
             var yp = (event.clientY/window.innerHeight)*100;
             map["screenXP"] = xp;
 			map["screenYP"] = yp;
