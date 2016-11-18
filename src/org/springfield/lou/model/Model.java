@@ -65,7 +65,18 @@ public class Model {
 	
 	
  	public void onNotify(String path,String methodname,Html5Controller callbackobject) {
-		if (path.indexOf("[")!=-1) {
+ 	    	if (path.startsWith("@")) {
+	    	    // its a model mapping
+	    	    int pos=path.indexOf("/"); // not sure if i can move tis in getModeMapping will try later
+	    	    if (pos==-1) {
+	    		path = getModelMapping(path.substring(1));
+	    	    } else {
+	    		String n = getModelMapping(path.substring(1,pos));
+	    		path = n+path.substring(pos);
+	    	    }
+	    	}
+ 	    
+ 	    	if (path.indexOf("[")!=-1) {
 			path=xpathToFs(path);
 		}
 		if (path.startsWith("/screen/")) {
@@ -113,7 +124,17 @@ public class Model {
 	}
  	
  	public void notify(String path,FsNode node) {
-		if (path.indexOf("[")!=-1) {
+ 	    	if (path.startsWith("@")) {
+	    	    // its a model mapping
+	    	    int pos=path.indexOf("/"); // not sure if i can move tis in getModeMapping will try later
+	    	    if (pos==-1) {
+	    		path = getModelMapping(path.substring(1));
+	    	    } else {
+	    		String n = getModelMapping(path.substring(1,pos));
+	    		path = n+path.substring(pos);
+	    	    }
+	    	}
+ 	    	if (path.indexOf("[")!=-1) {
 			path=xpathToFs(path);
 		}
 		if (path.startsWith("/screen/")) {
