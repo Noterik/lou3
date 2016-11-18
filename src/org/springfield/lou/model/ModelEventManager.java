@@ -318,7 +318,7 @@ public class ModelEventManager {
     
     }
     
-	public void onTimeLineNotify(String path,String timer,String starttime,String duration,String methodname,Html5Controller callbackobject) {
+	public synchronized void onTimeLineNotify(String path,String timer,String starttime,String duration,String methodname,Html5Controller callbackobject) {
 		System.out.println("timeline notify request="+path+" "+timer+" "+starttime+" "+duration+" callb="+callbackobject);
 		
 		TimeLineWatcher tw = timelinewatchers.get(path+":"+timer);
