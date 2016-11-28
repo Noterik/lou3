@@ -22,8 +22,6 @@
 
 package org.springfield.lou.websocket;
 
-import java.io.IOException;
-
 import javax.websocket.MessageHandler;
 import javax.websocket.RemoteEndpoint;
 
@@ -42,6 +40,8 @@ import org.springfield.lou.screen.Screen;
 public class LouWSConnection implements MessageHandler.Partial<String>{
 
 	private final RemoteEndpoint.Basic remoteEndPoint;
+	private LouWSEmitter emitter;
+	private LouWSEmitterFactory emitterFactory;
 
 	//The screen associated with this WebSocket connection.
 	private Screen s = null;
@@ -52,10 +52,12 @@ public class LouWSConnection implements MessageHandler.Partial<String>{
 	//Reference to the app associated with this Websocket Connection.
 	private Html5ApplicationInterface app = null;
 
-	public LouWSConnection(RemoteEndpoint.Basic remoteEndpoint){
+	public LouWSConnection(RemoteEndpoint.Basic remoteEndpoint, LouWSEmitterFactory emitterFactory){
 		this.remoteEndPoint = remoteEndpoint;
+		this.emitterFactory = emitterFactory;
+		this.emitter = emitterFactory.create(LouWSEmitterFactory.Type.SYNC);
 	}
-	
+
 	public void setScreen(Screen s){
 		this.s = s;
 	}
@@ -76,20 +78,29 @@ public class LouWSConnection implements MessageHandler.Partial<String>{
 	public Html5ApplicationInterface getApp(){
 		return this.app;
 	}
+	
+	public LouWSEmitterFactory getEmitterFactory(){
+		return emitterFactory;
+	}
+	
+	public void setEmitter(LouWSEmitter emitter){
+		this.emitter = emitter;
+		emitter.setRemote(remoteEndPoint);
+	}
 
 	//Emits a String message to the client.
-	public void emit(String message){
-		try {
-			remoteEndPoint.sendText(message);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void emit(JSONObject message){
+		emitter.emit(message);
+	}
+	
+	public void destroy(){
+		this.emitter.destroy();
 	}
 
 	//Called whenever a message is received from the client.
 	@Override
 	public void onMessage(String message, boolean arg1) {
+
 		JSONObject messageObj = (JSONObject) JSONValue.parse(message);
 
 		//Extract the command from the data.
@@ -98,6 +109,7 @@ public class LouWSConnection implements MessageHandler.Partial<String>{
 		//Check if this is the "register" command, if so, we don't forward it. But
 		//we cache some stuff.
 		if(command.equals("register")){
+			System.out.println("registering websocket connection to screen!");
 			String application = (String) messageObj.get("app");
 			Html5Application app = (Html5Application) ApplicationManager.instance().getApplication(application);
 			String screenId = (String) messageObj.get("screenId");
@@ -107,8 +119,11 @@ public class LouWSConnection implements MessageHandler.Partial<String>{
 				s.setSocket(this);
 				this.setScreen(s);
 			}
-
+					
+			app.wsRegistered(s);
+			
 			this.setApp(app);
+			
 		//Otherwise we attempt to call the command on the app.
 		//TODO: Still need proper error handling.
 		}else if(this.isRegistered()){

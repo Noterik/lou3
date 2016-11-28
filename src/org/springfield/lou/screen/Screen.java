@@ -843,6 +843,11 @@ public class Screen {
 		for(Html5Controller controller: controllers){
 			controller.destroyed();
 		}
+		
+		if(this.getSocket() != null){
+			System.out.println("DESTROY THAT SOCKET!");
+			this.getSocket().destroy();
+		}
 	}
 	
 	public String getLanguageCode() {

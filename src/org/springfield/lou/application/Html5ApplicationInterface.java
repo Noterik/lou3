@@ -90,5 +90,6 @@ public interface Html5ApplicationInterface {
  	public void removeEvents(Object obj);
  	public void call(Screen s, String command, JSONObject arguments);
  	public void setCommand(String name, Html5ApplicationCommand fn);
+ 	public void wsRegistered(Screen s);
  	//public void setProperty(String path,String value);
 }

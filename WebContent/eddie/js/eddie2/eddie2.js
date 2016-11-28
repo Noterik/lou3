@@ -64,7 +64,7 @@ var eddie2 = (function(context, louSettings) {
         newURI = loc.protocol === 'https:'
             ? 'wss:'
             : 'ws:';
-        newURI += "//" + loc.host + ':8080/lou/ws';
+        newURI += "//" + loc.host + '/lou/ws';
         return newURI;
     }
     
@@ -76,9 +76,8 @@ var eddie2 = (function(context, louSettings) {
 				conn.send(JSON.stringify(message));
 			})
 		}
-
-		function receiveMessage(message){
-			var data = JSON.parse(message.data);
+		
+		function handleMessage(data){
 			var action = data.action;
 			var data = data.data;
 			var target = data.target;
@@ -86,6 +85,18 @@ var eddie2 = (function(context, louSettings) {
 			listeners[action].forEach(function(callback){
 				callback.apply(this, [data]);
 			});
+		}
+
+		function receiveMessage(message){
+			
+			var data = JSON.parse(message.data);
+			if(data.messages){
+				data.messages.forEach(function(message){
+					handleMessage(message);
+				});
+			}else{
+				handleMessage(data);
+			}
 			
 		};
 

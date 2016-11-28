@@ -32,18 +32,32 @@ import javax.websocket.server.ServerEndpoint;
 //Register to /lou/ws
 @ServerEndpoint("/ws")
 public class LouWSAnnotation {
+	
+	private LouWSAsyncThread thread = LouWSAsyncThreadSingleton.getInstance();
+	private LouWSEmitterFactory emitterFactory;
+	
+	public LouWSAnnotation(){
+		if(!thread.isAlive()){
+			thread.start();
+		}
+		emitterFactory = new LouWSEmitterFactory(thread);
+		
+	}
 
 	@OnOpen
 	public void open(Session session){
+		System.out.println("Websocket opened!");
 		RemoteEndpoint.Basic remoteEndpointBasic = session.getBasicRemote();
 
 		//Create a new LouWSConnection that handles both receiving and sending data.
-		session.addMessageHandler(new LouWSConnection(remoteEndpointBasic));
+		session.addMessageHandler(new LouWSConnection(remoteEndpointBasic, emitterFactory));
 	}
 
 	@OnClose
 	public void close(Session session){
 		System.out.println("Websocket closed!");
 	}
+	
+	
 
 }

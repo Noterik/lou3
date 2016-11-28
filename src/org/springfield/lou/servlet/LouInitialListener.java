@@ -25,6 +25,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.springfield.lou.homer.LazyHomer;
+import org.springfield.lou.websocket.LouWSAsyncThreadSingleton;
 
 /**
  * LouInitialListener.java
@@ -47,6 +48,7 @@ public class LouInitialListener implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent event) {
 		//destroy LazyHomer
 		LazyHomer.destroy();
+		LouWSAsyncThreadSingleton.getInstance().stopExecution();
 		System.out.println("Lou: context destroyed");
 	}
 }

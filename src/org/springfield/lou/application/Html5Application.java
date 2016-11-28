@@ -661,4 +661,11 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		this.commands.put(name, fn);
 	}
 
+	@Override
+	public void wsRegistered(Screen s) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 }
