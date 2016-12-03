@@ -335,11 +335,14 @@ public class ModelEventManager {
 				for (int i=list.size()-1;i>=0;i--) {
 					ModelBindObject co = list.get(i);
 					if (co.screenid.equals(screenid) && co.method.equals(methodname) && co.methodcall.getDeclaringClass().getName().equals(method.getDeclaringClass().getName())) {
+						System.out.println("DUB KILL");
 						list.remove(i); // dub kill
 					}
 				}
+				System.out.println("ADD TO LIST 2");
 				list.add(new ModelBindObject(methodname,screenid,callbackobject.getApplicationHashCode(),targetid,callbackobject,method));
 			} else {
+				System.out.println("ADD TO LIST 1");
 				list = new ArrayList<ModelBindObject>();
 				list.add(new ModelBindObject(methodname,screenid,callbackobject.getApplicationHashCode(),targetid,callbackobject,method));
 				timelinenotifybinds.put(path+":"+timer, list);

@@ -662,7 +662,7 @@ var Eddie = function(options){
                     			$('#'+targetid).draggable('disable');
 					break;
                			case "style":
-                    			$('#'+targetid).css(eventtargets[1],eventtargets[2]);
+					$('#'+targetid).css(eventtargets[1],eventtargets[2]);
 					break;
                			case "sound":
 					self.makesound(content.substring(6));
@@ -909,7 +909,30 @@ var Eddie = function(options){
 					if (nt!==undefined) {
     						map[name] = nt;
                 			} else if (p.prop("tagName")==="INPUT") {
-    						map[name] = $("#"+name).val();
+						console.log('type='+p.prop("type"));
+						var fileparams = "?targetid="+name+"&screenid="+settings.screenId;
+						if (p.prop("type")==="file") {
+							var $i = $("#"+name);
+							input = $i[0];
+							file = input.files[0];
+							reader = new FileReader();
+							reader.readAsDataURL(file);
+							reader.onload = function(event) {  
+								file.data = event.target.result;
+								self.doRequest({
+									'type': 'POST',
+									'url': "http://" + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp+fileparams,
+									'data': file.data,
+									'dataType': 'data',
+									'processData': false,
+					                        	'contentType': 'application/data',
+									'async': false
+								});
+							};
+							map[name] = "filehandle";
+						} else {
+    							map[name] = $("#"+name).val(); 
+						}
 					} else {
     						map[name] = $("#"+name).val();
 					}

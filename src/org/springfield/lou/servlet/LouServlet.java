@@ -22,6 +22,7 @@
 package org.springfield.lou.servlet;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,10 +41,15 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.log4j.Logger;
+import org.springfield.fs.FsNode;
+import org.springfield.fs.FsPropertySet;
 import org.springfield.lou.application.ApplicationManager;
 import org.springfield.lou.application.Html5ApplicationInterface;
 import org.springfield.lou.homer.LazyHomer;
+import org.springfield.lou.model.Model;
+import org.springfield.lou.model.ModelEventManager;
 import org.springfield.lou.performance.PerformanceManager;
 import org.springfield.lou.screen.Capabilities;
 import org.springfield.lou.screen.Screen;
@@ -54,6 +60,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
+
 
 /**
  * Servlet implementation class ServletResource
@@ -327,7 +339,13 @@ public class LouServlet extends HttpServlet {
 		response.addHeader("Access-Control-Expose-Headers", "Content-Range");
 		//read the data from the put request
 		
-		//System.out.println("PUT REQ="+request.getRequestURI());
+		//System.out.println"PUT REQ="+request.getRequestURI());
+		
+		String mt = request.getContentType();
+		if (mt.equals("application/data")) {
+			handleFileUpload(request);
+			return;
+		}
 		
 		InputStream inst = request.getInputStream();
 		String data;
@@ -467,6 +485,102 @@ public class LouServlet extends HttpServlet {
 			 caps.addCapability(capabilities.item(i).getNodeName(), capabilities.item(i).getTextContent());
 		 }
 		return caps;
+	}
+	
+	private String handleFileUpload(HttpServletRequest request) {
+		 try {
+			 String targetid = request.getParameter("targetid");
+			 String screenid = request.getParameter("screenid");
+			 
+			Html5ApplicationInterface app = null;
+			String url = request.getRequestURI();
+			int pos = url.indexOf("/domain/");
+			if (pos!=-1) {
+				String tappname = url.substring(pos);
+				app = ApplicationManager.instance().getApplication(tappname);
+			}
+			 Screen eventscreen = app.getScreen(screenid);
+
+			 if (eventscreen==null) return null; 
+			 String destpath = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/destpath");
+			 if (destpath==null || destpath.equals("")) { setUploadError(eventscreen,targetid,"destpath not set");return null;}
+
+			 String pemfile = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/pemfile");
+			 if (destpath==null || destpath.equals("")) { setUploadError(eventscreen,targetid,"destpath not set");return null;}
+
+			 String destname_prefix = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/destname_prefix");
+			 if (destname_prefix==null || destname_prefix.equals("")) { setUploadError(eventscreen,targetid,"destname_prefix not set");return null;}
+
+			 String destname_type = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/destname_type");
+			 if (destname_type==null || destname_type.equals("")) { setUploadError(eventscreen,targetid,"destname_type not set");return null;}
+
+			 String storagehost = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/storagehost");
+			 if (storagehost==null || storagehost.equals("")) { setUploadError(eventscreen,targetid,"storagehost not set");return null;}
+
+			 String storagename = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/storagename");
+			 if (storagename==null || storagehost.equals("")) { setUploadError(eventscreen,targetid,"storagename not set");return null;}
+
+			 String filetype = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/filetype");
+			 if (filetype==null || filetype.equals("")) { setUploadError(eventscreen,targetid,"filetype not set");return null;}
+
+			 String fileext = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/fileext");
+			 if (fileext==null || fileext.equals("")) { setUploadError(eventscreen,targetid,"fileext not set");return null;}
+
+			 String checkupload = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/checkupload");
+			 if (checkupload==null || checkupload.equals("")) { setUploadError(eventscreen,targetid,"checkupload not set");return null;}
+
+		
+			 
+			 FsPropertySet ps = new FsPropertySet(); // we will use this to send status reports back
+			 ps.setProperty("action","start");
+			 ps.setProperty("progress","0");
+			 eventscreen.getModel().setProperties("/screen/upload/"+targetid,ps);
+			 
+			 String filename = "unknown";
+			 int storageport = 22;
+			 
+			 if (destname_type.equals("epoch")) {
+				 filename = destname_prefix+""+new Date().getTime();
+			 }
+			 
+	         JSch jsch = new JSch();
+	         jsch.addIdentity(pemfile);
+	         jsch.setConfig("StrictHostKeyChecking", "no");
+	         Session session = jsch.getSession(storagename,storagehost,storageport);
+	         session.connect();
+	         Channel channel = session.openChannel("sftp");
+
+	         channel.connect();
+	         ChannelSftp channelSftp = (ChannelSftp) channel;
+	         channelSftp.cd(destpath);
+
+	         
+			 InputStream inst = request.getInputStream();
+			 int read = 0;
+			 int readtotal = 0;
+			 int b;
+			 while ((b = inst.read())!=44) {
+				 // skip the base64 tagline, not sure how todo this better
+			 }
+			 Base64InputStream b64i = new Base64InputStream(inst);
+			 
+			 channelSftp.put(b64i,filename+"."+fileext);
+			 
+			 ps.setProperty("action","done");
+			 ps.setProperty("progress","100");
+			 eventscreen.getModel().setProperties("/screen/upload/"+targetid,ps);
+			 return filename+"."+fileext;
+		 } catch(Exception e) {
+			 e.printStackTrace();
+		 }
+		 return null;
+	}
+	
+	private void setUploadError(Screen eventscreen,String targetid,String message) {
+		 FsPropertySet ps = new FsPropertySet(); // we will use this to send status reports back
+		 ps.setProperty("action","error");
+		 ps.setProperty("message","0");
+		 eventscreen.getModel().setProperties("/screen/upload/"+targetid,ps);
 	}
 	
 	private String[] urlMappingPerApplication(String host,String inurl) {
