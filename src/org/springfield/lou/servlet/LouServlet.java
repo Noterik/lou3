@@ -239,7 +239,7 @@ public class LouServlet extends HttpServlet {
 			body+="<meta name=\"apple-mobile-web-app-capable\" content=\"yes\" />";
 			body+="<meta name=\"apple-mobile-web-app-status-bar-style\" content=\"black\" />";
 			body+="<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n";
-			body+="<meta name=\"viewport\" content=\"width=device-width, user-scalable = no,initial-scale=1.0; maximum-scale=1.0;\">";
+			body+="<meta name=\"viewport\" content=\"width=device-width, user-scalable=no,initial-scale=1, maximum-scale=1\">";
 			body+=app.getMetaHeaders(request);
 			body+="<script type=\"text/javascript\">if (!window.console) window.console = {};if (!window.console.log) window.console.log = function () { };</script>";
 			body+="<script language=\"javascript\" type=\"text/javascript\">var LouSettings = {\"lou_ip\": \"" + LazyHomer.getExternalIpNumber() + "\", \"lou_port\": \"" + LazyHomer.getBartPort() + "\", \"user\": \"" + user + "\", \"app\": \"" + nameapp + "\", \"fullapp\": \"" + fullappname + "\", \"appparams\": \"" + params + "\"}</script>\n";
