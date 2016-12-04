@@ -529,12 +529,10 @@ public class LouServlet extends HttpServlet {
 			 String checkupload = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/checkupload");
 			 if (checkupload==null || checkupload.equals("")) { setUploadError(eventscreen,targetid,"checkupload not set");return null;}
 
+			 String publicpath = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/publicpath");
+			 if (publicpath==null || publicpath.equals("")) { setUploadError(eventscreen,targetid,"publicpath not set");return null;}
+
 		
-			 
-			 FsPropertySet ps = new FsPropertySet(); // we will use this to send status reports back
-			 ps.setProperty("action","start");
-			 ps.setProperty("progress","0");
-			 eventscreen.getModel().setProperties("/screen/upload/"+targetid,ps);
 			 
 			 String filename = "unknown";
 			 int storageport = 22;
@@ -542,6 +540,14 @@ public class LouServlet extends HttpServlet {
 			 if (destname_type.equals("epoch")) {
 				 filename = destname_prefix+""+new Date().getTime();
 			 }
+			 
+			 String publicurl = publicpath+filename+"."+fileext;
+			 
+			 FsPropertySet ps = new FsPropertySet(); // we will use this to send status reports back
+			 ps.setProperty("action","start");
+			 ps.setProperty("progress","0");
+			 ps.setProperty("url",publicurl);
+			 eventscreen.getModel().setProperties("/screen/upload/"+targetid,ps);
 			 
 	         JSch jsch = new JSch();
 	         jsch.addIdentity(pemfile);
@@ -568,6 +574,7 @@ public class LouServlet extends HttpServlet {
 			 
 			 ps.setProperty("action","done");
 			 ps.setProperty("progress","100");
+			 ps.setProperty("url",publicurl);
 			 eventscreen.getModel().setProperties("/screen/upload/"+targetid,ps);
 			 return filename+"."+fileext;
 		 } catch(Exception e) {

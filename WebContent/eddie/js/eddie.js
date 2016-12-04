@@ -925,7 +925,7 @@ var Eddie = function(options){
 									'dataType': 'data',
 									'processData': false,
 					                        	'contentType': 'application/data',
-									'async': false
+									'async': true
 								});
 							};
 							map[name] = "filehandle";
