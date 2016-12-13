@@ -61,6 +61,12 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
@@ -488,6 +494,7 @@ public class LouServlet extends HttpServlet {
 	}
 	
 	private String handleFileUpload(HttpServletRequest request) {
+		System.out.println("HANDLE FILE UPLOAD");
 		 try {
 			 String targetid = request.getParameter("targetid");
 			 String screenid = request.getParameter("screenid");
@@ -502,81 +509,139 @@ public class LouServlet extends HttpServlet {
 			 Screen eventscreen = app.getScreen(screenid);
 
 			 if (eventscreen==null) return null; 
+			 
+			 String method = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/method");
+			 System.out.println("METHOD="+method);
+			 
 			 String destpath = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/destpath");
-			 if (destpath==null || destpath.equals("")) { setUploadError(eventscreen,targetid,"destpath not set");return null;}
+		 	 if (destpath==null || destpath.equals("")) { setUploadError(eventscreen,targetid,"destpath not set");return null;}
 
-			 String pemfile = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/pemfile");
-			 if (destpath==null || destpath.equals("")) { setUploadError(eventscreen,targetid,"destpath not set");return null;}
+		 	 String destname_prefix = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/destname_prefix");
+		 	 if (destname_prefix==null || destname_prefix.equals("")) { setUploadError(eventscreen,targetid,"destname_prefix not set");return null;}
 
-			 String destname_prefix = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/destname_prefix");
-			 if (destname_prefix==null || destname_prefix.equals("")) { setUploadError(eventscreen,targetid,"destname_prefix not set");return null;}
+			 	String filetype = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/filetype");
+			 	if (filetype==null || filetype.equals("")) { setUploadError(eventscreen,targetid,"filetype not set");return null;}
 
-			 String destname_type = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/destname_type");
-			 if (destname_type==null || destname_type.equals("")) { setUploadError(eventscreen,targetid,"destname_type not set");return null;}
+			 	String fileext = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/fileext");
+			 	if (fileext==null || fileext.equals("")) { setUploadError(eventscreen,targetid,"fileext not set");return null;}
 
-			 String storagehost = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/storagehost");
-			 if (storagehost==null || storagehost.equals("")) { setUploadError(eventscreen,targetid,"storagehost not set");return null;}
+			 	String checkupload = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/checkupload");
+			 	if (checkupload==null || checkupload.equals("")) { setUploadError(eventscreen,targetid,"checkupload not set");return null;}
 
-			 String storagename = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/storagename");
-			 if (storagename==null || storagehost.equals("")) { setUploadError(eventscreen,targetid,"storagename not set");return null;}
+			 	String storagehost = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/storagehost");
+			 	if (storagehost==null || storagehost.equals("")) { setUploadError(eventscreen,targetid,"storagehost not set");return null;}
 
-			 String filetype = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/filetype");
-			 if (filetype==null || filetype.equals("")) { setUploadError(eventscreen,targetid,"filetype not set");return null;}
+			 	String destname_type = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/destname_type");
+			 	if (destname_type==null || destname_type.equals("")) { setUploadError(eventscreen,targetid,"destname_type not set");return null;}
 
-			 String fileext = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/fileext");
-			 if (fileext==null || fileext.equals("")) { setUploadError(eventscreen,targetid,"fileext not set");return null;}
+			 	
+			 	String publicpath = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/publicpath");
+			 	if (publicpath==null || publicpath.equals("")) { setUploadError(eventscreen,targetid,"publicpath not set");return null;}
 
-			 String checkupload = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/checkupload");
-			 if (checkupload==null || checkupload.equals("")) { setUploadError(eventscreen,targetid,"checkupload not set");return null;}
+			 if (method.equals("s3amazon")) {
+				 System.out.println("S3 CHECK");
+				 	String bucketname = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/bucketname");
+				 	if (bucketname==null || bucketname.equals("")) { setUploadError(eventscreen,targetid,"bucketname not set");return null;}
 
-			 String publicpath = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/publicpath");
-			 if (publicpath==null || publicpath.equals("")) { setUploadError(eventscreen,targetid,"publicpath not set");return null;}
+				 
+				 AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withCredentials(new EnvironmentVariableCredentialsProvider()).build();
+				 System.out.println("S3 AMAZON="+s3Client);
+				 	String filename = "unknown";
+				 	int storageport = 22;
+				 
+				 	if (destname_type.equals("epoch")) {
+					 	filename = destpath+destname_prefix+""+new Date().getTime();
+				 	}
+				 	
+				 	String publicurl = publicpath+bucketname+"/"+filename+"."+fileext;
+				 	
+				 	FsPropertySet ps = new FsPropertySet(); // we will use this to send status reports back
+				 	ps.setProperty("action","start");
+				 	ps.setProperty("progress","0");
+				 	ps.setProperty("url",publicurl);
+				 	eventscreen.getModel().setProperties("/screen/upload/"+targetid,ps);
+				 	
+				      try {
+						 	InputStream inst = request.getInputStream();
+						 	int read = 0;
+						 	int readtotal = 0;
+						 	int b;
+						 	while ((b = inst.read())!=44) {
+						 		// skip the base64 tagline, not sure how todo this better
+						 	}	
+						 	Base64InputStream b64i = new Base64InputStream(inst);
+						 	
+				            System.out.println("Uploading a new object to S3 from a stream "+bucketname+"/"+filename+"."+fileext);
+			
+				            ObjectMetadata metadata = new ObjectMetadata();
+				            metadata.setContentType(filetype+"/"+fileext);
+				            
+				            PutObjectRequest or = new PutObjectRequest(bucketname,filename+"."+fileext, b64i, metadata);
+				            s3Client.putObject(or);
 
-		
+				         } catch (AmazonServiceException ase) {
+				        	ase.printStackTrace();
+				         }
+					 	ps.setProperty("action","done");
+					 	ps.setProperty("progress","100");
+					 	ps.setProperty("url",publicurl);
+					 
+					 	eventscreen.getModel().setProperties("/screen/upload/"+targetid,ps);
+					 	return bucketname+"/"+filename+"."+fileext;
+				 
+			 } else if (method.equals("scp")) {
+			 	String pemfile = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/pemfile");
+			 	if (destpath==null || destpath.equals("")) { setUploadError(eventscreen,targetid,"destpath not set");return null;}
+
+
+			 	String storagename = eventscreen.getModel().getProperty("/screen/upload/"+targetid+"/storagename");
+			 	if (storagename==null || storagehost.equals("")) { setUploadError(eventscreen,targetid,"storagename not set");return null;}
+
+
+			 	String filename = "unknown";
+			 	int storageport = 22;
 			 
-			 String filename = "unknown";
-			 int storageport = 22;
+			 	if (destname_type.equals("epoch")) {
+				 	filename = destname_prefix+""+new Date().getTime();
+			 	}
 			 
-			 if (destname_type.equals("epoch")) {
-				 filename = destname_prefix+""+new Date().getTime();
-			 }
+			 	String publicurl = publicpath+filename+"."+fileext;
 			 
-			 String publicurl = publicpath+filename+"."+fileext;
+			 	FsPropertySet ps = new FsPropertySet(); // we will use this to send status reports back
+			 	ps.setProperty("action","start");
+			 	ps.setProperty("progress","0");
+			 	ps.setProperty("url",publicurl);
+			 	eventscreen.getModel().setProperties("/screen/upload/"+targetid,ps);
 			 
-			 FsPropertySet ps = new FsPropertySet(); // we will use this to send status reports back
-			 ps.setProperty("action","start");
-			 ps.setProperty("progress","0");
-			 ps.setProperty("url",publicurl);
-			 eventscreen.getModel().setProperties("/screen/upload/"+targetid,ps);
-			 
-	         JSch jsch = new JSch();
-	         jsch.addIdentity(pemfile);
-	         jsch.setConfig("StrictHostKeyChecking", "no");
-	         Session session = jsch.getSession(storagename,storagehost,storageport);
-	         session.connect();
-	         Channel channel = session.openChannel("sftp");
+	         	JSch jsch = new JSch();
+	         	jsch.addIdentity(pemfile);
+	         	jsch.setConfig("StrictHostKeyChecking", "no");
+	         	Session session = jsch.getSession(storagename,storagehost,storageport);
+	         	session.connect();
+	         	Channel channel = session.openChannel("sftp");
 
-	         channel.connect();
-	         ChannelSftp channelSftp = (ChannelSftp) channel;
-	         channelSftp.cd(destpath);
+	         	channel.connect();
+	         	ChannelSftp channelSftp = (ChannelSftp) channel;
+	         	channelSftp.cd(destpath);
 
 	         
-			 InputStream inst = request.getInputStream();
-			 int read = 0;
-			 int readtotal = 0;
-			 int b;
-			 while ((b = inst.read())!=44) {
-				 // skip the base64 tagline, not sure how todo this better
+			 	InputStream inst = request.getInputStream();
+			 	int read = 0;
+			 	int readtotal = 0;
+			 	int b;
+			 	while ((b = inst.read())!=44) {
+			 		// skip the base64 tagline, not sure how todo this better
+			 	}	
+			 	Base64InputStream b64i = new Base64InputStream(inst);
+			 
+			 	channelSftp.put(b64i,filename+"."+fileext);
+			 
+			 	ps.setProperty("action","done");
+			 	ps.setProperty("progress","100");
+			 	ps.setProperty("url",publicurl);
+			 	eventscreen.getModel().setProperties("/screen/upload/"+targetid,ps);
+			 	return filename+"."+fileext;
 			 }
-			 Base64InputStream b64i = new Base64InputStream(inst);
-			 
-			 channelSftp.put(b64i,filename+"."+fileext);
-			 
-			 ps.setProperty("action","done");
-			 ps.setProperty("progress","100");
-			 ps.setProperty("url",publicurl);
-			 eventscreen.getModel().setProperties("/screen/upload/"+targetid,ps);
-			 return filename+"."+fileext;
 		 } catch(Exception e) {
 			 e.printStackTrace();
 		 }
