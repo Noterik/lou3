@@ -39,7 +39,7 @@ var Eddie = function(options){
 		interval = setInterval(function () {
 		nowdate = new Date().getTime();
 		delaydate = nowdate-responsetime;
-		if (delaydate>(30*1000)) {
+		if (delaydate>(5*1000)) {
 			clearInterval(interval);
 			window.location.href=window.location.href;
 		}
@@ -279,7 +279,7 @@ var Eddie = function(options){
 		responsetime = new Date().getTime();
 		var result = response;
 		if (result.indexOf("<screenid>appreset</screenid>")!=-1) {
-				alert('server reset');
+				console.log('server reset');
 		}
 		var pos = result.indexOf("(");
 		while (pos!=-1) {

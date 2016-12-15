@@ -422,7 +422,7 @@ public class LouServlet extends HttpServlet {
 					try {
 						synchronized (screen) {
 							//screen.wait();
-							screen.wait(60*1000);
+							screen.wait(2*1000); // turned into 'highspeed' for testing so 2 seconds instead of 60, also means eddie.js change
 						}
 					} catch (InterruptedException e) {
 						//	System.out.println("got interrupt.. getting data");
