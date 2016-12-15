@@ -5,6 +5,7 @@ var Requester = function(){
         self.init = function(args){
                 while(running){
                         request(args);
+                        console.log("request");
                 }
         };
 

@@ -128,7 +128,7 @@ public class LouServlet extends HttpServlet {
 			return;
 		}
 		
-		//System.out.println("REQ="+request.getRequestURI()+" PARAMS="+request.getQueryString()+" MT="+request.getContentType());
+		System.out.println("REQ="+request.getRequestURI()+" PARAMS="+request.getQueryString()+" MT="+request.getContentType());
 		String body = request.getRequestURI();
 		if(request.getParameter("method")!=null) {
 			if(request.getParameter("method").equals("post")){
@@ -221,7 +221,9 @@ public class LouServlet extends HttpServlet {
 			Html5ApplicationInterface app = ApplicationManager.instance().getApplication(fullappname);
 			if (app==null) { // no such app is available
 				System.out.println("MISSING APP REQUESTED="+fullappname);
-				String body ="No app under that name found";
+			    String body="<head><title>Lou error page - waiting for reload</title>";
+		        body+="<meta http-equiv=\"refresh\" content=\"2\" /></head>";
+				body+="<body>No app under that name found, retry in 5sec</body>";
 				out.write(body.getBytes());
 				out.flush();
 				out.close();
@@ -345,7 +347,8 @@ public class LouServlet extends HttpServlet {
 		response.addHeader("Access-Control-Expose-Headers", "Content-Range");
 		//read the data from the put request
 		
-		//System.out.println"PUT REQ="+request.getRequestURI());
+		System.out.println("PUT REQ="+request.getRequestURI());
+	
 		
 		String mt = request.getContentType();
 		if (mt.equals("application/data")) {
@@ -370,6 +373,7 @@ public class LouServlet extends HttpServlet {
 		// lets find the correct nlication
 		Html5ApplicationInterface app = null;
 		String url = request.getRequestURI();
+
 		int pos = url.indexOf("/domain/");
 		if (pos!=-1) {
 			String tappname = url.substring(pos);
@@ -428,8 +432,13 @@ public class LouServlet extends HttpServlet {
 						//	System.out.println("got interrupt.. getting data");
 					}
 					msg = screen.getMsg();
+					System.out.println("MSG="+msg);
 					if (msg==null) {
 						// simulated a drop connection
+						System.out.println("SIM DROP");
+						msg = "set(synctime)="+new Date().toString();
+						out.write(msg.getBytes());
+						out.flush();
 						out.close();
 						return;
 					}
