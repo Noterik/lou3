@@ -377,6 +377,10 @@ public class Screen {
 		removeContent(t, false, app);
 	}
 	
+	public void remove(String t) {
+		removeContent(t.substring(1));
+	}
+	
 	public void removeContent(String t){
 		removeContent(t, false, getApplication());
 	}
@@ -950,6 +954,14 @@ public class Screen {
     	e  = new Html5Element(this,s);
     	html5elements.put(s,e);
     	return e;
+    }
+    
+    public void snapshot(String s,String moment) {
+    	// send snapshot commando to client
+    }
+    
+    public void recoverSnapshot(String s,String moment) {
+    	// send client command to recover snapshot
     }
     
 	

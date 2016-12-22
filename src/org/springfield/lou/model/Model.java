@@ -38,6 +38,7 @@ public class Model {
 	private AppModel amodel;
 	private ScreenModel smodel;
 	private static ModelEventManager eventmanager;
+	private boolean debug = false;
 
 	
 	public Model(Screen s) {
@@ -49,6 +50,10 @@ public class Model {
 		if (dmodel==null) dmodel = new DomainModel(); // answers the /domain/ calls
 		if (eventmanager==null) eventmanager = new ModelEventManager();
 		
+	}
+	
+	public void setDebug(boolean b) {
+		debug = b;
 	}
 	
 	public void setRecoveryList(ArrayList<String> l) {
@@ -306,6 +311,7 @@ public class Model {
 	}
 	
 	public FSList getList(String path) {
+		if (debug) System.out.println("getlist path in = "+path);
 		if (path.startsWith("@")) {
 			// its a model mapping
 			path = getModelMapping(path.substring(1));
@@ -315,6 +321,7 @@ public class Model {
 		if (path.indexOf("[")!=-1) {
 			path=xpathToFs(path);
 		}
+		if (debug) System.out.println("getlist path full = "+path);
 		if (path.startsWith("/shared")) { 
 			return sharedmodel.getList(path);
 		} else if (path.startsWith("/screen")) { 

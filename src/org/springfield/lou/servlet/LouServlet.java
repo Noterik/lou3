@@ -128,7 +128,7 @@ public class LouServlet extends HttpServlet {
 			return;
 		}
 		
-		System.out.println("REQ="+request.getRequestURI()+" PARAMS="+request.getQueryString()+" MT="+request.getContentType());
+		//System.out.println("REQ="+request.getRequestURI()+" PARAMS="+request.getQueryString()+" MT="+request.getContentType());
 		String body = request.getRequestURI();
 		if(request.getParameter("method")!=null) {
 			if(request.getParameter("method").equals("post")){
@@ -347,7 +347,7 @@ public class LouServlet extends HttpServlet {
 		response.addHeader("Access-Control-Expose-Headers", "Content-Range");
 		//read the data from the put request
 		
-		System.out.println("PUT REQ="+request.getRequestURI());
+		//System.out.println("PUT REQ="+request.getRequestURI());
 	
 		
 		String mt = request.getContentType();
@@ -432,10 +432,10 @@ public class LouServlet extends HttpServlet {
 						//	System.out.println("got interrupt.. getting data");
 					}
 					msg = screen.getMsg();
-					System.out.println("MSG="+msg);
+					//System.out.println("MSG="+msg);
 					if (msg==null) {
 						// simulated a drop connection
-						System.out.println("SIM DROP");
+						//System.out.println("SIM DROP");
 						msg = "set(synctime)="+new Date().toString();
 						out.write(msg.getBytes());
 						out.flush();
@@ -452,7 +452,7 @@ public class LouServlet extends HttpServlet {
 				long endtime = new Date().getTime();	
 				PerformanceManager.addNetworkCallTime(endtime-starttime);
 			} else {
-				System.out.println("lost flow why ? screenId="+screenId+" "+app.getScreen(screenId));
+				//System.out.println("lost flow why ? screenId="+screenId+" "+app.getScreen(screenId));
 				if (!screenId.equals("-1")) {
 					System.out.println("Sending stop");
 					response.setContentType("text/xml; charset=UTF-8");

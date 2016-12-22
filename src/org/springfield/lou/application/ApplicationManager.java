@@ -41,6 +41,7 @@ import org.dom4j.Element;
 import org.dom4j.Node;
 import org.springfield.fs.*;
 import org.springfield.lou.homer.LazyHomer;
+import org.springfield.lou.screen.Screen;
 import org.springfield.lou.servlet.LouServlet;
 import org.springfield.marge.Marge;
 import org.springfield.marge.MargeObserver;
@@ -138,6 +139,22 @@ public class ApplicationManager extends Thread implements MargeObserver {
     			app = loadDashboardApp(name);
     		}
     		return app;
+    }
+    
+    public static Screen getScreenByFullid(String from) {
+		int pos = from.indexOf("/screen/");
+		if (pos!=-1) {
+			String fromapp = from.substring(0,pos);
+			String fromscreen = from.substring(pos+8);
+			pos = fromapp.lastIndexOf("/");
+			fromapp = fromapp.substring(0,pos);
+			System.out.println("APP="+fromapp+" SCR="+fromscreen);
+			Html5ApplicationInterface ca = ApplicationManager.instance().getApplication(fromapp);
+			System.out.println("CA="+ca);
+			Screen client = ca.getScreenManager().get(from);  
+			return client;
+		}
+		return null;
     }
     
     private Html5ApplicationInterface loadDashboardApp(String tappname) {
