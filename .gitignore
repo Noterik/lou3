@@ -6,3 +6,7 @@ build/lou.jar
 build/lou.jar
 
 dist/lou.war
+
+*.war
+
+*.jar

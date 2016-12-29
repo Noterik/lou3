@@ -355,6 +355,37 @@ public class Model {
 		return null;
 	}
 	
+	public boolean deleteNode(String uri) {
+		if (uri.startsWith("@")) {
+			// its a model mapping
+			int pos=uri.indexOf("/"); // not sure if i can move tis in getModeMapping will try later
+			if (pos==-1) {
+				uri = getModelMapping(uri.substring(1));
+			} else {
+				String n = getModelMapping(uri.substring(1,pos));
+				uri = n+uri.substring(pos);
+			}
+
+		}
+		if (uri.indexOf("[")!=-1) {
+			uri=xpathToFs(uri);
+		}
+		if (uri.startsWith("/app/") || uri.equals("/app")) { 
+			//return amodel.putNode(uri,node);
+			System.out.println("APP DELETE NODE NOT IMPLEMENTED YET");
+		} else if (uri.startsWith("/shared")) { 
+			//return sharedmodel.putNode(uri,node);
+			System.out.println("SHARED DELETE NODE NOT IMPLEMENTED YET");
+		} else if (uri.startsWith("/screen")) {
+			System.out.println("SHARED DELETE NODE NOT IMPLEMENTED YET");
+			//return smodel.putNode(uri,node);
+		} else if (uri.startsWith("/domain/")) { 
+			System.out.println("NODE DELETE WANTED ON "+uri);
+			return Fs.deleteNode(uri);
+		}
+		return false;
+	}
+	
 	public boolean putNode(String uri,FsNode node) {
 		if (uri.startsWith("@")) {
 			// its a model mapping
