@@ -317,7 +317,7 @@ public class Model {
 			path = getModelMapping(path.substring(1));
 			//System.out.println("GET LIST @ PATH="+path);
 		}
-		
+		if (debug) System.out.println("getlist path mid = "+path);
 		if (path.indexOf("[")!=-1) {
 			path=xpathToFs(path);
 		}
@@ -387,18 +387,19 @@ public class Model {
 	}
 	
 	public boolean putNode(String uri,FsNode node) {
+		if (debug) System.out.println("putNode path in = "+uri);
 		if (uri.startsWith("@")) {
 			// its a model mapping
 			uri = getModelMapping(uri.substring(1));
-			//System.out.println("PUT NODE @ PATH="+uri);
 			if (uri.endsWith(node.getName())) {
 				uri=uri.substring(0,uri.lastIndexOf("/"));
-				//System.out.println("PUT2 NODE @ PATH="+uri);
 			}
 		}
+		if (debug) System.out.println("putNode path mid = "+uri);
 		if (uri.indexOf("[")!=-1) {
 			uri=xpathToFs(uri);
 		}
+		if (debug) System.out.println("putNode path out = "+uri);
 		if (uri.startsWith("/app/") || uri.equals("/app")) { 
 			return amodel.putNode(uri,node);
 		} else if (uri.startsWith("/shared")) { 
