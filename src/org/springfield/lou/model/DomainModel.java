@@ -42,13 +42,22 @@ public class DomainModel  {
 		return true;
 	}
 	
-	public String getProperty(String path) {
+	public String getProperty(String path,String language) {
 		int pos=path.lastIndexOf("/");
     	String propertyname = path.substring(pos+1);
     	path = path.substring(0,pos);
     	FsNode node = Fs.getNode("/domain/"+path);
     	if  (node!=null) {
-    		return node.getProperty(propertyname);
+    		if (language!=null) {
+    			String lr = node.getProperty(language+"_"+propertyname);
+    			if (lr==null) {
+    				return node.getProperty(propertyname);
+    			} else {
+    				return lr;
+    			}
+    		} else {
+    			return node.getProperty(propertyname);	
+    		}
     	}
     	return null;
 	}

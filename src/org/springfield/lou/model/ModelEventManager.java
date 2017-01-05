@@ -216,6 +216,7 @@ public class ModelEventManager {
     }
 
     public void removeController(Object controller) {
+    	System.out.println("REMOVE CONTROLLER EVENTS="+controller);
     	removeControllerBinds(notifybinds,controller);
     	removeControllerBinds(propertybinds,controller);
     	removeControllerBinds(propertiesbinds,controller);

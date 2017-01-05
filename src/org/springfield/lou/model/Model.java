@@ -282,6 +282,10 @@ public class Model {
 	}
 	
 	public String getProperty(String path) {
+		return getProperty(path,null);
+	}
+	
+	public String getProperty(String path,String language) {
 		if (path.startsWith("@")) {
 			// its a model mapping
 			int pos=path.indexOf("/"); // not sure if i can move tis in getModeMapping will try later
@@ -305,7 +309,7 @@ public class Model {
 		} else if (path.startsWith("/app/")) {
 			return amodel.getProperty(path);
 		} else if (path.startsWith("/domain/")) {
-			return dmodel.getProperty(path.substring(8));
+			return dmodel.getProperty(path.substring(8),language);
 		}
 		return null;
 	}
