@@ -313,13 +313,18 @@ public class Model {
 		}
 		return null;
 	}
-	
+
 	public FSList getList(String path) {
 		if (debug) System.out.println("getlist path in = "+path);
 		if (path.startsWith("@")) {
 			// its a model mapping
-			path = getModelMapping(path.substring(1));
-			//System.out.println("GET LIST @ PATH="+path);
+			int pos=path.indexOf("/"); // not sure if i can move tis in getModeMapping will try later
+			if (pos==-1) {
+				path = getModelMapping(path.substring(1));
+			} else {
+				String n = getModelMapping(path.substring(1,pos));
+				path = n+path.substring(pos);
+			}
 		}
 		if (debug) System.out.println("getlist path mid = "+path);
 		if (path.indexOf("[")!=-1) {
@@ -393,6 +398,7 @@ public class Model {
 	public boolean putNode(String uri,FsNode node) {
 		if (debug) System.out.println("putNode path in = "+uri);
 		if (uri.startsWith("@")) {
+			
 			// its a model mapping
 			uri = getModelMapping(uri.substring(1));
 			if (uri.endsWith(node.getName())) {
