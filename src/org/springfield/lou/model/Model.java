@@ -39,6 +39,7 @@ public class Model {
 	private ScreenModel smodel;
 	private static ModelEventManager eventmanager;
 	private boolean debug = false;
+	private static ModelTimer modeltimer = null;
 
 	
 	public Model(Screen s) {
@@ -49,6 +50,7 @@ public class Model {
 		amodel = app.getAppModel(); // answers the /app/ calls
 		if (dmodel==null) dmodel = new DomainModel(); // answers the /domain/ calls
 		if (eventmanager==null) eventmanager = new ModelEventManager();
+		if (modeltimer==null) modeltimer = new ModelTimer(eventmanager);
 		
 	}
 	
@@ -569,5 +571,12 @@ public class Model {
 	
 	private String getScreenPath(String path) {
 		return "/screen/"+smodel.hashCode()+path.substring(7);
+	}
+	
+	public static void destroy() {
+		if (modeltimer!=null) {
+			modeltimer.destroy();
+			modeltimer=null;
+		}
 	}
 }
