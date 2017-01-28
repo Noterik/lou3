@@ -909,11 +909,11 @@ var Eddie = function(options){
     						map[name] = nt;
                 			} else if (p.prop("tagName")==="INPUT") {
 						console.log('type='+p.prop("type"));
-						var fileparams = "?targetid="+name+"&screenid="+settings.screenId;
 						if (p.prop("type")==="file") {
 							var $i = $("#"+name);
 							input = $i[0];
 							file = input.files[0];
+							var fileparams = "?targetid="+name+"&screenid="+settings.screenId+"&cfilename="+file.name;							
 							reader = new FileReader();
 							reader.readAsDataURL(file);
 							reader.onload = function(event) {  
@@ -928,6 +928,7 @@ var Eddie = function(options){
 									'async': true
 								});
 							};
+							map['filename'] = file.name;
 							map[name] = "filehandle";
 						} else {
     							map[name] = $("#"+name).val(); 

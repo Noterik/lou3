@@ -42,6 +42,13 @@ import org.springfield.lou.tools.JavascriptInjector;
 import org.springfield.mojo.interfaces.ServiceInterface;
 import org.springfield.mojo.interfaces.ServiceManager;
 
+import javax.websocket.OnClose;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.ServerEndpoint;
+
+
 /**
  * Screen
  * 
@@ -50,6 +57,8 @@ import org.springfield.mojo.interfaces.ServiceManager;
  * @package org.springfield.lou.screen
  *
  */
+
+@ServerEndpoint("/ws")
 public class Screen {
 	
 	private String id;
@@ -88,6 +97,7 @@ public class Screen {
 		this.app = a;
 		this.properties = new HashMap<String, Object>();
 	    model = new Model(this);
+	    System.out.println("daniel test");
 
 		
 		// so some session recovery, only allow sessions per user !!!
@@ -1008,6 +1018,28 @@ public class Screen {
 				propertybindobjects.put(vars[i], list);
 			}
 		}
+	}
+	
+	@OnOpen
+	public void open(Session session){
+		System.out.println("Websocket opened!");
+	}
+	
+	@OnClose
+	public void close(Session session){
+		System.out.println("Websocket closed!");
+	}
+	
+
+	@OnMessage
+	public void onMessage(Session session,String message) {
+		  System.out.println("GOT WS MESSAGE="+message);
+	      if(message.trim().isEmpty()) return; // is this normal?
+	      try {
+	    	  session.getBasicRemote().sendText("Received message "+message);
+	      } catch (IOException ex) {
+	    	  ex.printStackTrace();
+	      }
 	}
 
 }

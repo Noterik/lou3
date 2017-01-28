@@ -231,8 +231,10 @@ public class Html5Element {
 		//Model model = screen.getApplication().getModel();
 		//System.out.println("SELECTOR="+selector);
 		FsNode node = screen.getModel().getNode("/app/component/view/"+selector+"/controller/"+controller.getControllerName());
+		System.out.println("JSNODE="+node.asXML());
 		if (node!=null) {
 			String scriptname = node.getProperty("javascript");
+			System.out.println("JSNAME="+scriptname);
 			if (scriptname==null || scriptname.equals("")) {
 				scriptname = controller.getDefaultScript();
 			} else {
@@ -240,6 +242,7 @@ public class Html5Element {
 				String part = screen.getApplication().getAppname().substring(screen.getApplication().getAppname().lastIndexOf("/")+1);
 				scriptname = "/springfield/tomcat/webapps/ROOT/eddie/apps/"+part+"/components/"+scriptname;	
 			}
+			System.out.println("JSNAME2="+scriptname);
 			if (scriptname!=null && !scriptname.equals("")) {
 				
 				StringBuffer str = null;
