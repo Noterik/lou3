@@ -276,7 +276,7 @@ public class LouServlet extends HttpServlet {
 			//System.out.println("USER-AGENT="+request.getHeader("user-agent"));
 			String agent = request.getHeader("user-agent");
 			if (agent != null && agent.indexOf("HbbTV/1.1.1")==-1) {
-				body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/eddie.js?cache\"></script>\n";
+				body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/eddie.js?cache="+new Date().getTime()+"\"></script>\n";
 				body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/main.js\"></script>\n";
 				body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/stacktrace.js\"></script>\n";
 			} else {

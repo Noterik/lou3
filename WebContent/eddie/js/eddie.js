@@ -6,6 +6,9 @@ var Eddie = function(options){
 	var trackers = {};
 	var trackervalues = {};
 	var scripttypes = {};
+	var websocket = null;
+	var wsactive = false;
+	var delayresettime = 5000;
 
 	var settings = {
 		lou_ip: "",
@@ -18,7 +21,9 @@ var Eddie = function(options){
 		active: true,
 		appparams: null,
 		worker_location: '/eddie/js/eddie_worker.js',
-		worker: null
+		worker: null,
+		wsworker_location: '/eddie/js/eddie_wsworker.js',
+		wsworker: null
 	};
 	$.extend(settings, options);
 
@@ -39,7 +44,8 @@ var Eddie = function(options){
 		interval = setInterval(function () {
 		nowdate = new Date().getTime();
 		delaydate = nowdate-responsetime;
-		if (delaydate>(5*1000)) {
+		console.log('d='+delaydate);
+		if (delaydate>(delayresettime)) {
 			clearInterval(interval);
 			window.location.href=window.location.href;
 		}
@@ -226,14 +232,20 @@ var Eddie = function(options){
 
 	self.putLou = function(targetid, content, sync) {
 		var postData = "put(" + settings.screenId + "," + targetid + ")=" + content;
-		self.doRequest({
+		if (wsactive===false) {
+			console.log("send http data");
+			self.doRequest({
 			'type': 'POST',
 			'url': 'http://' + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp,
 			'contentType': 'text/plain',
 			'data': postData,
 			'dataType': 'text',
 			'async': !sync
-		});
+			});
+		} else {
+			console.log("send ws data");
+			websocket.send(postData);
+		}
 
 		return false;
 	};
@@ -281,6 +293,17 @@ var Eddie = function(options){
 		if (result.indexOf("<screenid>appreset</screenid>")!=-1) {
 				console.log('server reset');
 		}
+		// so we have a correct connection recheck and init websocket if needed
+		if (websocket===null) {
+			var uri = "ws://" + settings.lou_ip + ":" + settings.lou_port+"/lou/ws?screenid="+settings.screenId;
+  			 websocket = new WebSocket(uri);
+    		websocket.onopen = function(evt) { onWSOpen(evt) };
+    	    websocket.onclose = function(evt) { onWSClose(evt) };
+            websocket.onmessage = function(evt) { onWSMessage(evt) };
+            websocket.onerror = function(evt) { onWSError(evt) };
+			
+		}
+		
 		var pos = result.indexOf("(");
 		while (pos!=-1) {
 			var command = result.substring(0,pos);
@@ -319,6 +342,7 @@ var Eddie = function(options){
             		if(pos!=-1) {
             				content = content.substring(0,pos);
             			}
+            			System.out.println("LOCATION CALLED");
                     	window.location.href = content;
             		break;
             	case "translateXY":
@@ -574,6 +598,32 @@ var Eddie = function(options){
 	  fileref.setAttribute("href", filename);
 	  document.getElementsByTagName("head")[0].appendChild(fileref);
 	}
+	
+	  function onWSOpen(evt) {
+  		console.log("WS OPEN "+settings.worker);
+  		wsactive = true;
+  		delayresettime = 60000;
+		settings.worker.terminate()
+		settings.worker = null;
+		console.log("WS OPEN3 "+settings.worker);
+  	  }
+	  
+	  function onWSClose(evt) {
+  		console.log("WS CLOSE");
+  		wsactive = false;
+	  }
+	  
+	  function onWSError(evt) {
+  		console.log("WS Error");
+	  }
+	  
+	  function onWSMessage(evt) {
+  		console.log("WS Message2 "+wsactive);
+  		parseResponse(evt.data);
+	  }
+
+
+
 
 	function setStyle(content){
 		try{
@@ -723,6 +773,7 @@ var Eddie = function(options){
         function doUpdate(targetid,content) {
            	var data =  JSON.parse(content);
 		data['targetid'] = targetid;
+		console.log("targetid="+targetid);
 		callers[targetid].update(callvars[targetid],data);
 	}
 

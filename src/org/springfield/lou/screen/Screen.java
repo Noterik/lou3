@@ -39,14 +39,10 @@ import org.springfield.lou.homer.LazyHomer;
 import org.springfield.lou.model.Model;
 import org.springfield.lou.performance.PerformanceManager;
 import org.springfield.lou.tools.JavascriptInjector;
+import org.springfield.lou.websocket.LouWebSocketConnection;
 import org.springfield.mojo.interfaces.ServiceInterface;
 import org.springfield.mojo.interfaces.ServiceManager;
 
-import javax.websocket.OnClose;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
 
 
 /**
@@ -58,7 +54,6 @@ import javax.websocket.server.ServerEndpoint;
  *
  */
 
-@ServerEndpoint("/ws")
 public class Screen {
 	
 	private String id;
@@ -81,6 +76,7 @@ public class Screen {
     private Map<String, HashMap<String,PathBindObject>> pathbindobjects = new HashMap<String, HashMap<String,PathBindObject>>();
     protected Map<String, ArrayList<String>> bindoverrides = new HashMap<String, ArrayList<String>>();
     private Model model;
+    private LouWebSocketConnection websocketconnection;
     
     protected Map<String, ArrayList<PropertyBindObject>> propertybindobjects = new HashMap<String, ArrayList<PropertyBindObject>>();
 	
@@ -297,8 +293,15 @@ public class Screen {
 	}
 	
 	public void put(String from,String content) {
+		System.out.println("FROM="+from+" C2="+content);
 		app.putOnScreen(this,from, content);
 	}
+	
+	public void webSocketPut(String from,String content) {
+		System.out.println("WEB FROM="+from+" C3="+content);
+		app.putOnScreen(this,from, content);
+	}
+	
 
 	/**
 	 * Assigns capabilities the screen
@@ -317,24 +320,34 @@ public class Screen {
 	 * @param data the data to be sent
 	 */
 	public void setContent(String t,String c){
-		if (data==null) {
-			data = "set("+t+")="+c;
+		if (websocketconnection!=null) {
+			System.out.println("send websocket");
+			websocketconnection.send("set("+t+")="+c);
 		} else {
-			data += "($end$)set("+t+")="+c;
-		}
-		synchronized (this) {
-		    this.notify();
+			if (data==null) {
+				data = "set("+t+")="+c;
+			} else {
+				data += "($end$)set("+t+")="+c;
+			}
+			synchronized (this) {
+				this.notify();
+			}
 		}
 	}
 	
 	public void setDiv(String t,String p) {
-		if (data==null) {
-			data = "sdiv("+t+")="+p;
+		if (websocketconnection!=null) {
+			System.out.println("send websocket");
+			websocketconnection.send("sdiv("+t+")="+p);
 		} else {
-			data += "($end$)sdiv("+t+")="+p;
-		}
-		synchronized (this) {
-		    this.notify();
+			if (data==null) {
+				data = "sdiv("+t+")="+p;
+			} else {
+				data += "($end$)sdiv("+t+")="+p;
+			}
+			synchronized (this) {
+				this.notify();
+			}
 		}
 	}
 	
@@ -357,25 +370,34 @@ public class Screen {
 	 * @param data the data to be sent
 	 */
 	public void addContent(String t,String c){
-		if (data==null) {
-			data = "add("+t+")="+c;
+		if (websocketconnection!=null) {
+			System.out.println("send websocket");
+			websocketconnection.send("add("+t+")="+c);
 		} else {
-			data += "($end$)add("+t+")="+c;
-		}
-		synchronized (this) {
-		    this.notify();
+			if (data==null) {
+				data = "add("+t+")="+c;
+			} else {
+				data += "($end$)add("+t+")="+c;
+			}
+			synchronized (this) {
+				this.notify();
+			}
 		}
 	}
 	
 	public void setScript(String t,String c){
-		
-		if (data==null) {
-			data = "setscript("+t+")="+c;
+		if (websocketconnection!=null) {
+			System.out.println("send websocket");
+			websocketconnection.send("setscript("+t+")="+c);
 		} else {
-			data += "($end$)setscript("+t+")="+c;
-		}
-		synchronized (this) {
-		    this.notify();
+			if (data==null) {
+				data = "setscript("+t+")="+c;
+			} else {
+				data += "($end$)setscript("+t+")="+c;
+			}
+			synchronized (this) {
+				this.notify();
+			}
 		}
 	}
 	
@@ -396,15 +418,19 @@ public class Screen {
 	}
 	
 	public void removeContent(String t, boolean leaveElement, Html5ApplicationInterface app){
-		if (data==null) {
-			data = "remove("+t+"," + leaveElement + ")";
+		if (websocketconnection!=null) {
+			System.out.println("send websocket");
+			websocketconnection.send("remove("+t+"," + leaveElement + ")");
 		} else {
-			data += "($end$)remove("+t+"," + leaveElement + ")";
+			if (data==null) {
+				data = "remove("+t+"," + leaveElement + ")";
+			} else {
+				data += "($end$)remove("+t+"," + leaveElement + ")";
+			}
+			synchronized (this) {
+			this.notify();
+			}
 		}
-		synchronized (this) {
-		    this.notify();
-		}
-		
 	}
 		
 	/**
@@ -419,6 +445,10 @@ public class Screen {
 	}
 	
 	public void putMsg(String t,String f,String c) {
+		if (websocketconnection!=null) {
+			System.out.println("send websocket");
+			websocketconnection.send("put("+t+")="+c);
+		} else {
 		if (data==null) {
 			data = "put("+t+")="+c;
 		} else {
@@ -426,6 +456,7 @@ public class Screen {
 		}
 		synchronized (this) {
 		    this.notify();	
+		}
 		}
 	}
 	
@@ -470,13 +501,19 @@ public class Screen {
 		String body = ""+ str.toString();
 		String stylename = stylepath.substring(stylepath.lastIndexOf("/")+1, stylepath.indexOf(".css"));
 		if(stylename.contains("_")) stylename = stylename.substring(0, stylename.indexOf("_"));
-		if (data==null) {
-			data = "setstyle(head)=" + stylename +"style,"+body;
+		
+		if (websocketconnection!=null) {
+			System.out.println("send websocket");
+			websocketconnection.send("setstyle(head)=" + stylename +"style,"+body);
 		} else {
-			data += "($end$)setstyle(head)="+ stylename +"style,"+body;
-		}
-		synchronized (this) {
-		    this.notify();
+			if (data==null) {
+				data = "setstyle(head)=" + stylename +"style,"+body;
+			} else {
+				data += "($end$)setstyle(head)="+ stylename +"style,"+body;
+			}
+			synchronized (this) {
+				this.notify();
+			}
 		}
 	}
 	
@@ -555,6 +592,12 @@ public class Screen {
 		String body = ""+ str.toString();
 		String stylename = stylepath.substring(stylepath.lastIndexOf("/")+1, stylepath.indexOf(".css"));
 		if(stylename.contains("_")) stylename = stylename.substring(0, stylename.indexOf("_"));
+		
+		
+		if (websocketconnection!=null) {
+			System.out.println("send websocket");
+			websocketconnection.send("setstyle(head)=" + stylename +"style,"+body);
+		} else {
 		if (data==null) {
 			data = "setstyle(head)=" + stylename +"style,"+body;
 		} else {
@@ -562,6 +605,7 @@ public class Screen {
 		}
 		synchronized (this) {
 		    this.notify();
+		}
 		}
 	}
 	
@@ -607,6 +651,11 @@ public class Screen {
 		String body = ""+ str.toString();
 		String stylename = stylepath.substring(stylepath.lastIndexOf("/")+1, stylepath.indexOf(".css"));
 		if(stylename.contains("_")) stylename = stylename.substring(0, stylename.indexOf("_"));
+		
+		if (websocketconnection!=null) {
+			System.out.println("send websocket");
+			websocketconnection.send("setstyle(head)=" + stylename +"style,"+body);
+		} else {
 		if (data==null) {
 			data = "setstyle(head)=" + stylename +"style,"+body;
 		} else {
@@ -615,13 +664,17 @@ public class Screen {
 		synchronized (this) {
 		    this.notify();
 		}
+		}
 	}
 
 
 	
 
 	public void removeStyle(String style){
-		
+		if (websocketconnection!=null) {
+			System.out.println("send websocket");
+			websocketconnection.send("removestyle("+style+"style)");
+		} else {
 		if (data==null) {
 			data = "removestyle("+style+"style)";
 		} else {
@@ -629,6 +682,7 @@ public class Screen {
 		}
 		synchronized (this) {
 		    this.notify();
+		}
 		}
 	}
 	
@@ -766,6 +820,7 @@ public class Screen {
 				
 				String body = str.toString();
 				
+			
 				body = body.replace("$cname",target.substring(0,1).toUpperCase()+target.substring(1));
 				
 				body = JavascriptInjector.injectTryCatch(body, scriptpath);
@@ -889,6 +944,14 @@ public class Screen {
 		}
 		
 		if (!eventtype.equals("client") && selector.indexOf("/controller/")==-1 && !override) {
+			if (websocketconnection!=null) {
+				System.out.println("send websocket");
+				if (eventpadding.equals("")) {
+					websocketconnection.send("bind("+selector.substring(1)+")="+eventtype);
+				} else {
+					websocketconnection.send("bind("+selector.substring(1)+")="+eventtype+","+eventpadding);
+				}
+			} else {
 			if (data==null) {
 				if (eventpadding.equals("")) {
 					data = "bind("+selector.substring(1)+")="+eventtype;
@@ -904,6 +967,7 @@ public class Screen {
 			}
 			synchronized (this) {
 				this.notify();
+			}
 			}
 		}
 		
@@ -976,19 +1040,31 @@ public class Screen {
     
 	
 	public boolean send(String msg) {
-		if (data==null) {
-			data = msg;
+		if (websocketconnection!=null) {
+			System.out.println("send websocket");
+			websocketconnection.send(msg);
 		} else {
-			data += "($end$)"+msg;
-		}
-		synchronized (this) {
-		    this.notify();
+			System.out.println("send http");
+			if (data==null) {
+				data = msg;
+			} else {
+				data += "($end$)"+msg;
+			}
+			synchronized (this) {
+				this.notify();
+			}
 		}
 		return true;
 	}
 	
+
+	
     
 	public void append(String selector,String elementtype,String attributes,String content) {
+		if (websocketconnection!=null) {
+			System.out.println("send websocket");
+			websocketconnection.send("append("+selector+" "+elementtype+" "+attributes+")="+content);
+		} else {
 		
 		// for now hardcoded/fake
 		if (data==null) {
@@ -998,6 +1074,7 @@ public class Screen {
 		}
 		synchronized (this) {
 		    this.notify();
+		}
 		}
 	}
 	
@@ -1020,26 +1097,12 @@ public class Screen {
 		}
 	}
 	
-	@OnOpen
-	public void open(Session session){
-		System.out.println("Websocket opened!");
-	}
-	
-	@OnClose
-	public void close(Session session){
-		System.out.println("Websocket closed!");
+	public void setWebSocketConnection(LouWebSocketConnection wc) {
+		websocketconnection = wc;
 	}
 	
 
-	@OnMessage
-	public void onMessage(Session session,String message) {
-		  System.out.println("GOT WS MESSAGE="+message);
-	      if(message.trim().isEmpty()) return; // is this normal?
-	      try {
-	    	  session.getBasicRemote().sendText("Received message "+message);
-	      } catch (IOException ex) {
-	    	  ex.printStackTrace();
-	      }
-	}
+	
+
 
 }

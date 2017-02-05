@@ -239,6 +239,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	}
 	
 	public void timeoutCheckup() {
+		
 		Set<String> keys = this.screenmanager.getScreens().keySet();
 		ArrayList<String> wantremove = new ArrayList<String>();
 		Iterator<String> it = keys.iterator();
@@ -255,7 +256,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		}
 		for (int i=0;i<wantremove.size();i++) {
 			String[] tmp = wantremove.get(i).split(",");
-			System.out.println("S="+tmp[0]+" U="+tmp[1]);
+			//System.out.println("S="+tmp[0]+" U="+tmp[1]);
 			removeScreen(tmp[0],tmp[1]);
 		}
 	}

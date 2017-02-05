@@ -5,7 +5,7 @@ var Requester = function(){
         self.init = function(args){
                 while(running){
                         request(args);
-                        console.log("request");
+                        console.log("request2 "+running);
                 }
         };
 
@@ -29,8 +29,12 @@ var Requester = function(){
 
 onmessage = function(e){
         var message = JSON.parse(e.data);
-        var r = Requester();
-        if(message.fn){
+         console.log("mm "+message.fn);
+		if (message.fn==='stop') {
+		    console.log("stop "+running);
+			running=false;
+        } else if(message.fn){
+                var r = Requester();
                 r[message.fn](message.args);
         }
 };
