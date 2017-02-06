@@ -35,6 +35,7 @@ public class Model {
 	private AppInstanceModel imodel;
 	private static DomainModel dmodel;
 	private static SharedModel sharedmodel = new SharedModel();
+	private static BrowserModel browsermodel = new BrowserModel();
 	private AppModel amodel;
 	private ScreenModel smodel;
 	private static ModelEventManager eventmanager;
@@ -45,7 +46,7 @@ public class Model {
 	public Model(Screen s) {
 		Html5ApplicationInterface app = s.getApplication();
 		//smodel = new ScreenModel(app,s); // answers the /screen/ calls
-		smodel = new ScreenModel(); // answers the /screen/ calls
+		smodel = new ScreenModel(s); // answers the /screen/ calls
 		imodel = app.getAppInstanceModel(); // answers the /instance/ calls
 		amodel = app.getAppModel(); // answers the /app/ calls
 		if (dmodel==null) dmodel = new DomainModel(); // answers the /domain/ calls
@@ -160,6 +161,11 @@ public class Model {
 		} else {
 			eventmanager.onPathUpdate(path, methodname, callbackobject);
 		}
+		if (path.startsWith("/browser/")) {
+			eventmanager.onPathUpdate(getBrowserPath(path), methodname, callbackobject);
+		} else {
+			eventmanager.onPathUpdate(path, methodname, callbackobject);
+		}
  		FsNode node = new FsNode("bind","1");
  		node.setProperty("action","new onPathUpdate");
  		node.setProperty("path",path);
@@ -174,6 +180,11 @@ public class Model {
 		}
 		if (path.startsWith("/screen/")) {
 			eventmanager.onPropertyUpdate(getScreenPath(path),methodname,callbackobject);
+		} else {
+			eventmanager.onPropertyUpdate(path,methodname,callbackobject);
+		}
+		if (path.startsWith("/browser/")) {
+			eventmanager.onPropertyUpdate(getBrowserPath(path),methodname,callbackobject);
 		} else {
 			eventmanager.onPropertyUpdate(path,methodname,callbackobject);
 		}
@@ -200,6 +211,11 @@ public class Model {
 		}
 		if (path.startsWith("/screen/")) {
 			eventmanager.onPropertiesUpdate(getScreenPath(path),methodname,callbackobject);
+		} else {
+			eventmanager.onPropertiesUpdate(path,methodname,callbackobject);
+		}
+		if (path.startsWith("/browser/")) {
+			eventmanager.onPropertiesUpdate(getBrowserPath(path),methodname,callbackobject);
 		} else {
 			eventmanager.onPropertiesUpdate(path,methodname,callbackobject);
 		}
@@ -232,6 +248,10 @@ public class Model {
 				smodel.setProperties(path.substring(5),properties);
 		   	 	eventmanager.setProperties(getScreenPath(path), properties); // signal the others new code
 		   	 	return true;
+		} else if (path.startsWith("/browser/")) {
+			browsermodel.setProperties(path.substring(6),properties);
+	   	 	eventmanager.setProperties(getBrowserPath(path), properties); // signal the others new code
+	   	 	return true;
 		} else 	if (path.startsWith("/shared/")) {
 			sharedmodel.setProperties(path.substring(5),properties);
 	   	 	eventmanager.setProperties(path, properties); // signal the others new code
@@ -261,12 +281,14 @@ public class Model {
 			path=xpathToFs(path);
 		}
 		if (path.startsWith("/screen/"))  {
-			//smodel.setProperty(path.substring(8),value);
 			smodel.setProperty(path,value);
 	   	 	eventmanager.setProperty(getScreenPath(path), value); // signal the others new code
-	   	 	//eventmanager.setProperty(path, value); // signal the others new code
-
 	   	 	return true;
+		} else if (path.startsWith("/browser/"))  {
+				browsermodel.setProperty(path,value);
+		   	 	eventmanager.setProperty(getBrowserPath(path), value); // signal the others new code
+		   	 	return true;
+
 		} else if (path.startsWith("/shared/"))  {
 				sharedmodel.setProperty(path,value);
 		   	 	eventmanager.setProperty(path, value); // signal the others new code
@@ -307,8 +329,9 @@ public class Model {
 		}
 		if (debug) System.out.println("getProperty path end = "+path);
 		if (path.startsWith("/screen/")) {
-			//return smodel.getProperty(path.substring(8));
 			return smodel.getProperty(path);
+		} else if (path.startsWith("/browser/")) {
+				return browsermodel.getProperty(path);
 		} else  if (path.startsWith("/shared/")) {
 				return sharedmodel.getProperty(path);
 		} else if (path.startsWith("/app/")) {
@@ -363,6 +386,8 @@ public class Model {
 			return sharedmodel.getNode(path);
 		} else if (path.startsWith("/screen/")) { 
 			return smodel.getNode(path);
+		} else if (path.startsWith("/browser/")) { 
+			return browsermodel.getNode(path);
 		} else if (path.startsWith("/domain/")) { 
 			return dmodel.getNode(path);
 		}
@@ -574,6 +599,11 @@ public class Model {
 	
 	private String getScreenPath(String path) {
 		return "/screen/"+smodel.hashCode()+path.substring(7);
+	}
+	
+	private String getBrowserPath(String path) {
+		System.out.println("GETBROWSERPATH="+"/browser/"+smodel.getScreen().getBrowserId()+path.substring(8));
+		return "/browser/"+smodel.getScreen().getBrowserId()+path.substring(8);
 	}
 	
 	public static void destroy() {

@@ -1022,6 +1022,10 @@ public class Screen {
 		return false;
 	}
 	
+	public String getBrowserId() {
+		return capabilities.getCapability("smt_sessionid");
+	}
+	
     public Html5Element get(String s) {
     	Html5Element e = html5elements.get(s);
     	if (e!=null) return e;

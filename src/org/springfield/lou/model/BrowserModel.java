@@ -24,34 +24,10 @@ import org.springfield.lou.homer.LazyHomer;
 import org.springfield.lou.screen.Screen;
 import org.springfield.marge.*;
 
-public class ScreenModel extends MemoryModel {
+public class BrowserModel extends MemoryModel {
 	
-	String recoverykey;
-	ArrayList<String> recoverylist;
-	Screen screen;
-	
-	public ScreenModel(Screen s) {
-		screen = s;
+
+	public BrowserModel() {
 	}
 	
-	public Screen getScreen() {
-		return screen;
-	}
-	
-	public void setRecoveryList(ArrayList<String> l) {
-		recoverylist = l;
-	}
-	
-	public void setRecoveryKey(String r) {
-		recoverykey = r;
-	}
-	
-	public boolean setProperty(String path,String value) {
-		if (recoverylist.contains(path.substring(8))) {
-			String spath = path.replace("/","_");
-			// ok we need to store this for now just works for Strings
-			Fs.setProperty(recoverykey,spath.substring(8), value);
-		}
-		return super.setProperty(path, value);
-	}
 }
