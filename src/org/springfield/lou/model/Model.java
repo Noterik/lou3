@@ -146,6 +146,7 @@ public class Model {
 			path=xpathToFs(path);
 		}
 		if (path.startsWith("/screen/")) {
+			
 			eventmanager.notify(getScreenPath(path),node);
 		} else {
 			eventmanager.notify(path,node);	
@@ -288,7 +289,6 @@ public class Model {
 				browsermodel.setProperty(path,value);
 		   	 	eventmanager.setProperty(getBrowserPath(path), value); // signal the others new code
 		   	 	return true;
-
 		} else if (path.startsWith("/shared/"))  {
 				sharedmodel.setProperty(path,value);
 		   	 	eventmanager.setProperty(path, value); // signal the others new code

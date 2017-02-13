@@ -93,7 +93,7 @@ public class Screen {
 		this.app = a;
 		this.properties = new HashMap<String, Object>();
 	    model = new Model(this);
-	    System.out.println("daniel test");
+
 
 		
 		// so some session recovery, only allow sessions per user !!!
@@ -293,12 +293,11 @@ public class Screen {
 	}
 	
 	public void put(String from,String content) {
-		System.out.println("FROM="+from+" C2="+content);
+		System.out.println("HTTP FROM="+from+" C2="+content);
 		app.putOnScreen(this,from, content);
 	}
 	
 	public void webSocketPut(String from,String content) {
-		System.out.println("WEB FROM="+from+" C3="+content);
 		app.putOnScreen(this,from, content);
 	}
 	
@@ -321,7 +320,6 @@ public class Screen {
 	 */
 	public void setContent(String t,String c){
 		if (websocketconnection!=null) {
-			System.out.println("send websocket");
 			websocketconnection.send("set("+t+")="+c);
 		} else {
 			if (data==null) {
@@ -337,7 +335,6 @@ public class Screen {
 	
 	public void setDiv(String t,String p) {
 		if (websocketconnection!=null) {
-			System.out.println("send websocket");
 			websocketconnection.send("sdiv("+t+")="+p);
 		} else {
 			if (data==null) {
@@ -371,7 +368,6 @@ public class Screen {
 	 */
 	public void addContent(String t,String c){
 		if (websocketconnection!=null) {
-			System.out.println("send websocket");
 			websocketconnection.send("add("+t+")="+c);
 		} else {
 			if (data==null) {
@@ -387,7 +383,6 @@ public class Screen {
 	
 	public void setScript(String t,String c){
 		if (websocketconnection!=null) {
-			System.out.println("send websocket");
 			websocketconnection.send("setscript("+t+")="+c);
 		} else {
 			if (data==null) {
@@ -419,7 +414,6 @@ public class Screen {
 	
 	public void removeContent(String t, boolean leaveElement, Html5ApplicationInterface app){
 		if (websocketconnection!=null) {
-			System.out.println("send websocket");
 			websocketconnection.send("remove("+t+"," + leaveElement + ")");
 		} else {
 			if (data==null) {
@@ -446,7 +440,6 @@ public class Screen {
 	
 	public void putMsg(String t,String f,String c) {
 		if (websocketconnection!=null) {
-			System.out.println("send websocket");
 			websocketconnection.send("put("+t+")="+c);
 		} else {
 		if (data==null) {
@@ -503,7 +496,6 @@ public class Screen {
 		if(stylename.contains("_")) stylename = stylename.substring(0, stylename.indexOf("_"));
 		
 		if (websocketconnection!=null) {
-			System.out.println("send websocket");
 			websocketconnection.send("setstyle(head)=" + stylename +"style,"+body);
 		} else {
 			if (data==null) {
@@ -595,7 +587,6 @@ public class Screen {
 		
 		
 		if (websocketconnection!=null) {
-			System.out.println("send websocket");
 			websocketconnection.send("setstyle(head)=" + stylename +"style,"+body);
 		} else {
 		if (data==null) {
@@ -653,7 +644,6 @@ public class Screen {
 		if(stylename.contains("_")) stylename = stylename.substring(0, stylename.indexOf("_"));
 		
 		if (websocketconnection!=null) {
-			System.out.println("send websocket");
 			websocketconnection.send("setstyle(head)=" + stylename +"style,"+body);
 		} else {
 		if (data==null) {
@@ -672,7 +662,6 @@ public class Screen {
 
 	public void removeStyle(String style){
 		if (websocketconnection!=null) {
-			System.out.println("send websocket");
 			websocketconnection.send("removestyle("+style+"style)");
 		} else {
 		if (data==null) {
@@ -945,7 +934,6 @@ public class Screen {
 		
 		if (!eventtype.equals("client") && selector.indexOf("/controller/")==-1 && !override) {
 			if (websocketconnection!=null) {
-				System.out.println("send websocket");
 				if (eventpadding.equals("")) {
 					websocketconnection.send("bind("+selector.substring(1)+")="+eventtype);
 				} else {
@@ -1045,10 +1033,8 @@ public class Screen {
 	
 	public boolean send(String msg) {
 		if (websocketconnection!=null) {
-			System.out.println("send websocket");
 			websocketconnection.send(msg);
 		} else {
-			System.out.println("send http");
 			if (data==null) {
 				data = msg;
 			} else {
@@ -1066,7 +1052,6 @@ public class Screen {
     
 	public void append(String selector,String elementtype,String attributes,String content) {
 		if (websocketconnection!=null) {
-			System.out.println("send websocket");
 			websocketconnection.send("append("+selector+" "+elementtype+" "+attributes+")="+content);
 		} else {
 		
@@ -1103,6 +1088,16 @@ public class Screen {
 	
 	public void setWebSocketConnection(LouWebSocketConnection wc) {
 		websocketconnection = wc;
+		// send a message over http to close the http connection and flush all messages still underway
+		System.out.println("SENDING TERMINATE HTTP WORKER");
+		if (data==null) {
+			data = "terminate(httpworker)";
+		} else {
+			data += "($end$)terminate(httpworker)";
+		}
+		synchronized (this) {
+			this.notify();
+		}
 	}
 	
 

@@ -44,7 +44,6 @@ var Eddie = function(options){
 		interval = setInterval(function () {
 		nowdate = new Date().getTime();
 		delaydate = nowdate-responsetime;
-		console.log('d='+delaydate);
 		if (delaydate>(delayresettime)) {
 			clearInterval(interval);
 			window.location.href=window.location.href;
@@ -243,7 +242,7 @@ var Eddie = function(options){
 			'async': !sync
 			});
 		} else {
-			console.log("send ws data");
+			//console.log("send ws data");
 			websocket.send(postData);
 		}
 
@@ -260,7 +259,7 @@ var Eddie = function(options){
 			settings.screenId = $(response).find('screenid').first().text();
 			var servertime = parseInt($(response).find('servertime').first().text());
 			settings.timeoffset = new Date().getTime() - servertime;
-			console.log("timedelay="+settings.timeoffset);
+			//console.log("timedelay="+settings.timeoffset);
 			$(self).trigger('register-success');
 		};
 		self.doRequest({
@@ -342,7 +341,6 @@ var Eddie = function(options){
             		if(pos!=-1) {
             				content = content.substring(0,pos);
             			}
-            			System.out.println("LOCATION CALLED");
                     	window.location.href = content;
             		break;
             	case "translateXY":
@@ -477,6 +475,10 @@ var Eddie = function(options){
 				case "remove":
 					remove(targetid);
 					break;
+				case "terminate":
+					console.log("terminate command");
+					doTerminate(targetid);
+					break;
 				case "setcss":
 					content = result.substring(pos+2);
 					pos = content.indexOf("($end$)");
@@ -537,6 +539,14 @@ var Eddie = function(options){
 
 		removeScript(targetid);
 		removeInstance(targetid);
+	}
+	
+	function doTerminate(what){
+		if (what==="httpworker") {
+			settings.worker.terminate()
+			settings.worker = null;
+			console.log("STOPPED HTTPWORKER");
+		}
 	}
 
 	function removeDiv(targetid) {
@@ -603,10 +613,7 @@ var Eddie = function(options){
   		console.log("WS OPEN "+settings.worker);
   		wsactive = true;
   		delayresettime = 60000;
-		settings.worker.terminate()
-		settings.worker = null;
-		console.log("WS OPEN3 "+settings.worker);
-  	  }
+	  }
 	  
 	  function onWSClose(evt) {
   		console.log("WS CLOSE");
@@ -618,7 +625,6 @@ var Eddie = function(options){
 	  }
 	  
 	  function onWSMessage(evt) {
-  		console.log("WS Message2 "+wsactive);
   		parseResponse(evt.data);
 	  }
 
@@ -773,7 +779,7 @@ var Eddie = function(options){
         function doUpdate(targetid,content) {
            	var data =  JSON.parse(content);
 		data['targetid'] = targetid;
-		console.log("targetid="+targetid);
+		//console.log("targetid="+targetid);
 		callers[targetid].update(callvars[targetid],data);
 	}
 
@@ -862,7 +868,7 @@ var Eddie = function(options){
 				});
 			} else if (content.indexOf('track/mousemove')===0) {
 				// tricky since we need to track it
-				console.log('track');
+				//console.log('track');
 				$("#"+targetid).mousemove(function() {
 					// set these already in the tracker to be send
                     var oldvalue = trackervalues[targetid+"/mousemove"];
@@ -959,7 +965,7 @@ var Eddie = function(options){
 					if (nt!==undefined) {
     						map[name] = nt;
                 			} else if (p.prop("tagName")==="INPUT") {
-						console.log('type='+p.prop("type"));
+						//console.log('type='+p.prop("type"));
 						if (p.prop("type")==="file") {
 							var $i = $("#"+name);
 							input = $i[0];
