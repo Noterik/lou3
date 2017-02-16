@@ -173,7 +173,7 @@ public class LouServlet extends HttpServlet {
 			//params = triggerParams;
 
 		}
-		//System.out.println("BODYJUMPER="+body);
+		System.out.println("BODYJUMPER="+body);
 
 		int pos = body.indexOf("/html5application/");
 		if (pos!=-1) {
@@ -260,9 +260,9 @@ public class LouServlet extends HttpServlet {
 					body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/apps/"+l[i]+"\"></script>\n";
 				}
 			}
-			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/jquery-ui.js\"></script>\n";
+			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/jquery-ui.min.js\"></script>\n";
 			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/jquery.ui.touch-punch.min.js\"></script>\n";
-			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/mustache.js\"></script>\n";
+			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/mustache.min.js\"></script>\n";
 
 			// check if the domain has a special eddie script (for devel use)
 			String domain = fullappname.substring(8);
@@ -275,20 +275,12 @@ public class LouServlet extends HttpServlet {
 
 			//System.out.println("USER-AGENT="+request.getHeader("user-agent"));
 			String agent = request.getHeader("user-agent");
-			if (agent != null && agent.indexOf("HbbTV/1.1.1")==-1) {
-				body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/eddie.js?cache="+new Date().getTime()+"\"></script>\n";
-				body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/main.js\"></script>\n";
-				body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/stacktrace.js\"></script>\n";
-			} else {
-				body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/eddie_hbbtv.js?cache\"></script>\n";
-				body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/main_hbbtv.js\"></script>\n";
-				body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/stacktrace_hbbtv.js\"></script>\n";	
-			}
+			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/eddie.min.js?cache="+new Date().getTime()+"\"></script>\n";
+			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/main.min.js\"></script>\n";
+			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/stacktrace.min.js\"></script>\n";
 			body+="<title></title>\n";
 			body+="</head>\n";
 
-			// CWI / AngularJS compatible
-			//body+="<body ng-view>\n";
 			body+="<body>\n";
 
 			body+="<div id=\"screen\" />\n";

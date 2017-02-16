@@ -303,7 +303,6 @@ public class ModelEventManager {
      
     
     public void setProperty(String path,String value) {
-    	System.out.println("EVENT SETPROPERTY="+path+" "+value);
     	eventqueue.push(new ModelBindEvent(ModelBindEvent.PROPERTY,path,value));
     	if (eventqueue.size()>0) {
     		normalthread.check();

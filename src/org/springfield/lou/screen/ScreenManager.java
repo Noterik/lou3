@@ -69,6 +69,9 @@ public class ScreenManager {
     	return screengroups.get(name);
     }
     
+    
+    
+    
     public void setScreenGroup(String name,ScreenGroup sg) {
     	screengroups.put(name,sg);
     }
@@ -89,6 +92,22 @@ public class ScreenManager {
     
     public Map<String, Screen> getScreens(){
     	return this.openscreens;
+    }
+    
+    	
+    public Iterator getAllScreensIterator() {
+    	List all = new ArrayList();
+		for (int i=0;i<managers.size();i++) {
+			ScreenManager m = managers.get(i);
+			Set<String> keys = m.getScreens().keySet();
+			Iterator<String> it = keys.iterator();
+			while(it.hasNext()){
+				String next = it.next();
+				Screen screen = m.get(next);
+				all.add(screen);
+			}
+		}
+    	return all.iterator();
     }
     
     public int size(){

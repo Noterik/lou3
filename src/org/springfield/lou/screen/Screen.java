@@ -1086,6 +1086,10 @@ public class Screen {
 		}
 	}
 	
+	public LouWebSocketConnection getWebSocketConnection() {
+		return websocketconnection;
+	}
+	
 	public void setWebSocketConnection(LouWebSocketConnection wc) {
 		websocketconnection = wc;
 		// send a message over http to close the http connection and flush all messages still underway
