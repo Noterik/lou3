@@ -85,7 +85,7 @@ public class LouWebSocketConnection implements MessageHandler.Partial<String> {
 			senddata+=message.length();
 			sendtime+=new Date().getTime()-st;
 			sendcount++;
-			//System.out.println("ws send ("+this.hashCode()+")"+(sendcount++)+" s="+message.length());
+			//System.out.println("ws send ("+this.hashCode()+")"+(sendcount++)+" s="+message);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

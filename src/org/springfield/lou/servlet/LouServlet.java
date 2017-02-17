@@ -269,9 +269,7 @@ public class LouServlet extends HttpServlet {
 			domain = domain.substring(0,domain.indexOf("/"));
 			String basepath = "/springfield/tomcat/webapps/ROOT/eddie/";
 			if (LazyHomer.isWindows()) basepath = "C:\\springfield\\tomcat\\webapps\\ROOT\\eddie\\";
-			//			System.out.println(basepath+"domain"+File.separator+domain+File.separator+"js"+File.separator+"eddie.js");
 
-			//Added by David to test
 
 			//System.out.println("USER-AGENT="+request.getHeader("user-agent"));
 			String agent = request.getHeader("user-agent");

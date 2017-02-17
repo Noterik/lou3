@@ -194,27 +194,34 @@ public class Html5Element {
 				template = "/springfield/tomcat/webapps/ROOT/eddie/apps/"+part+"/components/"+template;	
 		    }
 			if (template!=null && !template.equals("")) {
-				
-				
-				StringBuffer str = null;
-				try {
-					str = new StringBuffer();
-					BufferedReader br;
-					br = new BufferedReader(new FileReader(template));
-					String line = br.readLine();
-					while (line != null) {
-						str.append(line);
-						str.append("\n");
-						line = br.readLine();
-					 }
-					br.close();
-				} catch (FileNotFoundException e) {
-					System.out.println("COULD NOT FIND TEMPLATE ("+selector+") : "+template);
-				} catch (IOException e) {
-					e.printStackTrace();
+				// did we already send this one before ?
+				if(screen.alreadySendTemplate(template)) {
+					json.put("tmpcrc", template.hashCode());
+					screen.send("parsehtml("+selector.substring(1)+")="+json);
+				} else {
+					StringBuffer str = null;
+					try {
+						str = new StringBuffer();
+						BufferedReader br;
+						br = new BufferedReader(new FileReader(template));
+						String line = br.readLine();
+						while (line != null) {
+							str.append(line);
+							str.append("\n");
+							line = br.readLine();
+						}
+						br.close();
+					} catch (FileNotFoundException e) {
+						System.out.println("COULD NOT FIND TEMPLATE ("+selector+") : "+template);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					json.put("template", str.toString());
+					json.put("newcrc",template.hashCode());
+					screen.send("parsehtml("+selector.substring(1)+")="+json);
+					screen.setSendTemplate(template);
+					System.out.println("NEW TEMPLATE SEND="+template);
 				}
-				json.put("template", str.toString());
-				screen.send("parsehtml("+selector.substring(1)+")="+json);
 				return true;
 			} else {
 				html("NO TEMPLATE IN VIEW NODE "+selector+" DEFINED");

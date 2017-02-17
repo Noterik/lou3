@@ -6,6 +6,7 @@ var Eddie = function(options){
 	var trackers = {};
 	var trackervalues = {};
 	var scripttypes = {};
+	var templatecache  = {};
 	var websocket = null;
 	var wsactive = false;
 	var delayresettime = 5000;
@@ -767,8 +768,15 @@ var Eddie = function(options){
 
 	function parseHtml(targetid,data) {
            var pdata =  JSON.parse(data);
-           var parsed = Mustache.render(pdata.template,pdata);
-           $('#'+targetid).html(parsed);
+        	if (pdata.tmpcrc!==undefined) {
+        		console.log("OLD TEMPLATE="+pdata.tmpcrc);
+        		var parsed = Mustache.render(templatecache[pdata.tmpcrc],pdata);
+          	 	$('#'+targetid).html(parsed);
+        	} else {
+           		var parsed = Mustache.render(pdata.template,pdata);
+           		templatecache[pdata.newcrc] = pdata.template;
+          	 	$('#'+targetid).html(parsed);
+           }
 	}
 
         function setTemplate(targetid,content) {

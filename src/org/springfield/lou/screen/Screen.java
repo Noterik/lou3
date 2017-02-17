@@ -76,6 +76,7 @@ public class Screen {
     private Map<String, HashMap<String,PathBindObject>> pathbindobjects = new HashMap<String, HashMap<String,PathBindObject>>();
     protected Map<String, ArrayList<String>> bindoverrides = new HashMap<String, ArrayList<String>>();
     private Model model;
+    private List<String> sendtemplates = new ArrayList<String>();
     private LouWebSocketConnection websocketconnection;
     
     protected Map<String, ArrayList<PropertyBindObject>> propertybindobjects = new HashMap<String, ArrayList<PropertyBindObject>>();
@@ -507,6 +508,15 @@ public class Screen {
 				this.notify();
 			}
 		}
+	}
+	
+	public boolean alreadySendTemplate(String template) {
+		if (sendtemplates.contains(template)) return true;
+		return false;
+	}
+	
+	public void setSendTemplate(String template) {
+		sendtemplates.add(template);
 	}
 	
 	
