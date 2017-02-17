@@ -45,6 +45,12 @@ var Eddie = function(options){
 		interval = setInterval(function () {
 		nowdate = new Date().getTime();
 		delaydate = nowdate-responsetime;
+		if (websocket!==null) {
+			if (websocket.readyState===3) {
+					clearInterval(interval);
+					window.location.href=window.location.href;
+			}
+		}
 		if (delaydate>(delayresettime)) {
 			clearInterval(interval);
 			window.location.href=window.location.href;
@@ -613,7 +619,7 @@ var Eddie = function(options){
 	  function onWSOpen(evt) {
   		console.log("WS OPEN "+settings.worker);
   		wsactive = true;
-  		delayresettime = 60000;
+  		delayresettime = 25000;
 	  }
 	  
 	  function onWSClose(evt) {
@@ -769,7 +775,6 @@ var Eddie = function(options){
 	function parseHtml(targetid,data) {
            var pdata =  JSON.parse(data);
         	if (pdata.tmpcrc!==undefined) {
-        		console.log("OLD TEMPLATE="+pdata.tmpcrc);
         		var parsed = Mustache.render(templatecache[pdata.tmpcrc],pdata);
           	 	$('#'+targetid).html(parsed);
         	} else {
