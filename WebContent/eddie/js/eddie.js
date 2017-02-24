@@ -10,6 +10,9 @@ var Eddie = function(options){
 	var websocket = null;
 	var wsactive = false;
 	var delayresettime = 5000;
+	var performancetestcounter=-1;
+	var performancedata ='';
+	var performancetestcount=0;
 
 	var settings = {
 		lou_ip: "",
@@ -49,6 +52,13 @@ var Eddie = function(options){
 			if (websocket.readyState===3) {
 					clearInterval(interval);
 					window.location.href=window.location.href;
+			}
+			if (performancetestcounter!==-1) {
+				performancetestcount++;
+				if (performancetestcount===performancetestcounter) {
+					websocket.send('ping('+performancedata+')');
+					performancetestcount=0;
+				}
 			}
 		}
 		if (delaydate>(delayresettime)) {
@@ -373,7 +383,17 @@ var Eddie = function(options){
                                  {
                                  	content = content.substring(0,pos);
                                  }
-				parseHtml(targetid,content);
+							parseHtml(targetid,content);
+                        break;
+                case "pingsettings":
+                	
+                        content = result.substring(pos+2);
+                        pos = content.indexOf("($end$)");
+                        if(pos!=-1)
+                                 {
+                                 	content = content.substring(0,pos);
+                                 }
+							pingSettings(targetid,content);
                         break;
             	case "show":
             		content = result.substring(pos+2);
@@ -783,6 +803,33 @@ var Eddie = function(options){
           	 	$('#'+targetid).html(parsed);
            }
 	}
+	
+	
+	
+		function pingSettings(size,callsec) {
+			console.log("size="+size+" call="+callsec);
+			var i=-1;
+			if (size==='off') {
+				performancetestcounter=-1;
+				return;
+			} else if (size==='10 bytes') { i=10;}
+			else if (size==='100 bytes') { i=100;}
+			else if (size==='1 kilobyte') { i=1024;}
+			else if (size==='10 kilobyte') { i=1024*1024;}
+			performancedata="";
+			for (j=0;j<i;j++) {
+				performancedata+=" ";
+			}
+			if (callsec==='33call/sec') {
+				performancetestcounter=1;
+			} else if (callsec==='16call/sec') { performancetestcounter=2; }
+			else if (callsec==='11call/sec') { performancetestcounter=3;}
+			else if (callsec==='8call/sec') { performancetestcounter=4;}
+			else if (callsec==='4call/sec') { performancetestcounter=7;}
+			else if (callsec==='2call/sec') { performancetestcounter=12;}
+			else if (callsec==='1call/sec') { performancetestcounter=33;}
+			performancetestcount=0;
+		}
 
         function setTemplate(targetid,content) {
            	var data =  JSON.parse(content);

@@ -1103,7 +1103,6 @@ public class Screen {
 	public void setWebSocketConnection(LouWebSocketConnection wc) {
 		websocketconnection = wc;
 		// send a message over http to close the http connection and flush all messages still underway
-		System.out.println("SENDING TERMINATE HTTP WORKER");
 		if (data==null) {
 			data = "terminate(httpworker)";
 		} else {

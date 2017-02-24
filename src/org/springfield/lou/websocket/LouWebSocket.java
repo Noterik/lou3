@@ -45,7 +45,6 @@ public class LouWebSocket {
 
 	@OnOpen
 	public void open(Session session){
-		System.out.println("Websocket opened!");
 		RemoteEndpoint.Basic remoteEndpointBasic = session.getBasicRemote();
 
 
@@ -56,7 +55,6 @@ public class LouWebSocket {
 		String tappname = screenid.substring(0,screenid.indexOf("/1/screen/"));
 		Html5ApplicationInterface app = ApplicationManager.instance().getApplication(tappname);
 		Screen screen = app.getScreen(screenid);
-		System.out.println("SCREEN="+screen);
 		if (screen!=null) {
 			LouWebSocketConnection wc = new LouWebSocketConnection(session,screen);
 			session.addMessageHandler(wc);
@@ -66,12 +64,12 @@ public class LouWebSocket {
 
 	@OnClose
 	public void close(Session session){
-		System.out.println("Websocket closed!");
+		//System.out.println("Websocket closed!");
 	}
 	
 	@OnError
 	public void onError(Session session, Throwable thr) {
-		System.out.println("Websocket error (closed?)");
+		//System.out.println("Websocket error (closed?)");
 	}
 	
 	

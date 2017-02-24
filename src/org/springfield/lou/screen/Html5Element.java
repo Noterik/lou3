@@ -220,7 +220,6 @@ public class Html5Element {
 					json.put("newcrc",template.hashCode());
 					screen.send("parsehtml("+selector.substring(1)+")="+json);
 					screen.setSendTemplate(template);
-					System.out.println("NEW TEMPLATE SEND="+template);
 				}
 				return true;
 			} else {
@@ -238,7 +237,6 @@ public class Html5Element {
 		//Model model = screen.getApplication().getModel();
 		//System.out.println("SELECTOR="+selector);
 		FsNode node = screen.getModel().getNode("/app/component/view/"+selector+"/controller/"+controller.getControllerName());
-		System.out.println("JSNODE="+node.asXML());
 		if (node!=null) {
 			String scriptname = node.getProperty("javascript");
 			if (scriptname==null || scriptname.equals("")) {

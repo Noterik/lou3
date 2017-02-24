@@ -200,7 +200,7 @@ public class LouServlet extends HttpServlet {
 			response.setContentType("text/html; charset=UTF-8");
 			OutputStream out = response.getOutputStream();
 			//PrintWriter out = response.getWriter();
-			//System.out.println("INDEX REQ="+request.getRequestURI());
+			System.out.println("INDEX REQ="+uri);
 			//String params = request.getQueryString();
 			String user = null;
 			String nameapp = "test";
@@ -273,7 +273,7 @@ public class LouServlet extends HttpServlet {
 
 			//System.out.println("USER-AGENT="+request.getHeader("user-agent"));
 			String agent = request.getHeader("user-agent");
-			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/eddie.min.js?cache="+new Date().getTime()+"\"></script>\n";
+			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/eddie.js?cache="+new Date().getTime()+"\"></script>\n";
 			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/main.min.js\"></script>\n";
 			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/stacktrace.min.js\"></script>\n";
 			body+="<title></title>\n";

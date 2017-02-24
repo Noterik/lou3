@@ -372,14 +372,24 @@ public class Model {
 	}
 	
 	public FsNode getNode(String path) {
+		if (debug) System.out.println("getNode path in = "+path);
 		if (path.startsWith("@")) {
 			// its a model mapping
-			path = getModelMapping(path.substring(1));
+			//path = getModelMapping(path.substring(1));
 			//System.out.println("GET NODE @ PATH="+path);
+			int pos=path.indexOf("/"); // not sure if i can move tis in getModeMapping will try later
+			if (pos==-1) {
+				path = getModelMapping(path.substring(1));
+			} else {
+				String n = getModelMapping(path.substring(1,pos));
+				path = n+path.substring(pos);
+			}
 		}
+		if (debug) System.out.println("getNode path middle "+path);
 		if (path.indexOf("[")!=-1) {
 			path=xpathToFs(path);
 		}
+		if (debug) System.out.println("getNode path out = "+path);
 		if (path.startsWith("/app/")) { 
 			return amodel.getNode(path);
 		} else if (path.startsWith("/shared/")) { 
