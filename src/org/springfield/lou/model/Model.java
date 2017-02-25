@@ -176,6 +176,16 @@ public class Model {
 	
  	
  	public void onPropertyUpdate(String path,String methodname,Html5Controller callbackobject) {
+	    	if (path.startsWith("@")) {
+	    	    // its a model mapping
+	    	    int pos=path.indexOf("/"); // not sure if i can move tis in getModeMapping will try later
+	    	    if (pos==-1) {
+	    		path = getModelMapping(path.substring(1));
+	    	    } else {
+	    		String n = getModelMapping(path.substring(1,pos));
+	    		path = n+path.substring(pos);
+	    	    }
+	    	}
 		if (path.indexOf("[")!=-1) {
 			path=xpathToFs(path);
 		}

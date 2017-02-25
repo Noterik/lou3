@@ -462,6 +462,7 @@ public class ModelEventManager {
     
     public void deliverNotify(String path,FsNode node) {	
  //   	System.out.println("PATH="+path+" N="+node.asXML());
+		long starttime = new Date().getTime();
 		ArrayList<ModelBindObject> binds = notifybinds.get(path); // direct hit
 		if (binds!=null) {
 			ModelEvent event = new ModelEvent();
@@ -479,6 +480,8 @@ public class ModelEventManager {
 				}
 			}
 		}
+		long time = new Date().getTime()-starttime;
+		if (time>0) System.out.println("notify delivertime="+path+" "+time);
     }
     
     
