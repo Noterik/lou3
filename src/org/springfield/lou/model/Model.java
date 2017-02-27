@@ -41,6 +41,7 @@ public class Model {
 	private static ModelEventManager eventmanager;
 	private boolean debug = false;
 	private static ModelTimer modeltimer = null;
+	private static ModelTimerMilliseconds modeltimerms = null;
 
 	
 	public Model(Screen s) {
@@ -52,6 +53,7 @@ public class Model {
 		if (dmodel==null) dmodel = new DomainModel(); // answers the /domain/ calls
 		if (eventmanager==null) eventmanager = new ModelEventManager();
 		if (modeltimer==null) modeltimer = new ModelTimer(eventmanager);
+		if (modeltimerms==null) modeltimerms = new ModelTimerMilliseconds(eventmanager);
 		
 	}
 	
@@ -260,7 +262,7 @@ public class Model {
 		   	 	eventmanager.setProperties(getScreenPath(path), properties); // signal the others new code
 		   	 	return true;
 		} else if (path.startsWith("/browser/")) {
-			browsermodel.setProperties(path.substring(6),properties);
+			browsermodel.setProperties(getBrowserPath(path),properties);
 	   	 	eventmanager.setProperties(getBrowserPath(path), properties); // signal the others new code
 	   	 	return true;
 		} else 	if (path.startsWith("/shared/")) {
@@ -296,7 +298,7 @@ public class Model {
 	   	 	eventmanager.setProperty(getScreenPath(path), value); // signal the others new code
 	   	 	return true;
 		} else if (path.startsWith("/browser/"))  {
-				browsermodel.setProperty(path,value);
+				browsermodel.setProperty(getBrowserPath(path),value);
 		   	 	eventmanager.setProperty(getBrowserPath(path), value); // signal the others new code
 		   	 	return true;
 		} else if (path.startsWith("/shared/"))  {
@@ -341,7 +343,8 @@ public class Model {
 		if (path.startsWith("/screen/")) {
 			return smodel.getProperty(path);
 		} else if (path.startsWith("/browser/")) {
-				return browsermodel.getProperty(path);
+				System.out.println("GET BROWSER PROPERTY="+getBrowserPath(path));
+				return browsermodel.getProperty(getBrowserPath(path));
 		} else  if (path.startsWith("/shared/")) {
 				return sharedmodel.getProperty(path);
 		} else if (path.startsWith("/app/")) {
@@ -630,6 +633,10 @@ public class Model {
 		if (modeltimer!=null) {
 			modeltimer.destroy();
 			modeltimer=null;
+		}
+		if (modeltimerms!=null) {
+			modeltimerms.destroy();
+			modeltimerms=null;
 		}
 	}
 }
