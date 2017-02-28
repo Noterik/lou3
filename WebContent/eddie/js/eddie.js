@@ -10,6 +10,7 @@ var Eddie = function(options){
 	var websocket = null;
 	var wsactive = false;
 	var delayresettime = 5000;
+	var delaycounter = 0;
 	var performancetestcounter=-1;
 	var performancedata ='';
 	var performancetestcount=0;
@@ -49,7 +50,8 @@ var Eddie = function(options){
 		nowdate = new Date().getTime();
 		delaydate = nowdate-responsetime;
 		if (websocket!==null) {
-			if (websocket.readyState===3) {
+		    delaycounter++;
+            if (websocket.readyState===3 && delaycounter>30) {
 					clearInterval(interval);
 					window.location.href=window.location.href;
 			}

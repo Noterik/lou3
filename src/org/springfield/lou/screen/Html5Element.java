@@ -45,7 +45,7 @@ public class Html5Element {
 		if (controller!=null) {
 			screen.getApplication().removeEvents(controller);
 		} else {
-			System.out.println("remove called on null controller "+selector);
+			//System.out.println("remove called on null controller "+selector);
 		}
 		return true;
 	}

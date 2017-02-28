@@ -69,7 +69,7 @@ public class LouWebSocket {
 	
 	@OnError
 	public void onError(Session session, Throwable thr) {
-		//System.out.println("Websocket error (closed?)");
+		System.out.println("Websocket error (closed?)"+thr.getMessage());
 	}
 	
 	

@@ -343,7 +343,6 @@ public class Model {
 		if (path.startsWith("/screen/")) {
 			return smodel.getProperty(path);
 		} else if (path.startsWith("/browser/")) {
-				System.out.println("GET BROWSER PROPERTY="+getBrowserPath(path));
 				return browsermodel.getProperty(getBrowserPath(path));
 		} else  if (path.startsWith("/shared/")) {
 				return sharedmodel.getProperty(path);
@@ -437,10 +436,11 @@ public class Model {
 			System.out.println("APP DELETE NODE NOT IMPLEMENTED YET");
 		} else if (uri.startsWith("/shared")) { 
 			//return sharedmodel.putNode(uri,node);
-			System.out.println("SHARED DELETE NODE NOT IMPLEMENTED YET");
+			//System.out.println("SHARED DELETE NODE NOT IMPLEMENTED YET");
+			return sharedmodel.deleteNode(uri);
 		} else if (uri.startsWith("/screen")) {
-			System.out.println("SHARED DELETE NODE NOT IMPLEMENTED YET");
-			//return smodel.putNode(uri,node);
+			//System.out.println("SHARED DELETE NODE NOT IMPLEMENTED YET");
+			return smodel.deleteNode(uri);
 		} else if (uri.startsWith("/domain/")) { 
 			System.out.println("NODE DELETE WANTED ON "+uri);
 			return Fs.deleteNode(uri);
@@ -625,7 +625,6 @@ public class Model {
 	}
 	
 	private String getBrowserPath(String path) {
-		System.out.println("GETBROWSERPATH="+"/browser/"+smodel.getScreen().getBrowserId()+path.substring(8));
 		return "/browser/"+smodel.getScreen().getBrowserId()+path.substring(8);
 	}
 	

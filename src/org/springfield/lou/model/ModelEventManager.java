@@ -481,7 +481,7 @@ public class ModelEventManager {
 			}
 		}
 		long time = new Date().getTime()-starttime;
-		if (time>0) System.out.println("notify delivertime="+path+" "+time);
+		if (time>90) System.out.println("notify delivertime="+path+" "+time);
     }
     
     

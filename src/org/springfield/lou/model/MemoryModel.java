@@ -146,6 +146,31 @@ public class MemoryModel  {
 		return true; // needs work
 	}
 	
+	public boolean deleteNode(String path) {
+		String[] steps = path.substring(1).split("/");
+		int stepc = 0;
+		int stept = steps.length;
+		FsNode current = root;
+		FsNode parent=null;
+		FsNode lastchild=null;
+		
+		while ((stepc+1)<stept) {
+			FsNode snode = current.getChild(steps[stepc+1]);
+			if (snode==null) { // create the node in its path if needed ( like mkdirs() )
+				snode = new FsNode(steps[stepc],steps[stepc+1]);
+				current.addNode(snode);
+			} 
+			stepc=stepc+2;
+			parent = current;
+			lastchild = snode;
+			current = snode;
+		}
+		if (parent!=null && lastchild!=null) {
+			parent.removeChild(lastchild);
+			return true;
+		}
+		return false;
+	}
 
 	
 	public FsNode getNode(String path) {
