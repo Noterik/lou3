@@ -24,6 +24,7 @@ public class ImageManager {
 	
 	private static ImageManager instance;
 	private static HashMap<String, String> scriptcommands = null;
+	private static HashMap<String, String> positivecache = new HashMap<String, String>();
 
 	private ImageManager() {
 		if (scriptcommands == null) {
@@ -36,7 +37,16 @@ public class ImageManager {
     	return instance;
     }
     
-    public String getAmazonS3Path(String image,String predir,String script) {
+    
+     public String getAmazonS3Path(String image,String predir,String script) {
+	   	 // do we have this in positivecache ?
+ 		String cimage = image;
+		String cr = positivecache.get(cimage+","+predir+","+script);
+		if (cr!=null) {
+   		 	return cr;
+   	 	}
+		
+		
 		String commands[] = null;
 		String eext = null;
 		
@@ -52,7 +62,7 @@ public class ImageManager {
 			image = image.substring(0,pos);
 		}
 		
-		System.out.println("SCRIPT="+script);
+		
     	if (script!=null) {
     		commands = applyScript(script);
     	}
@@ -87,6 +97,7 @@ public class ImageManager {
 
 		AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withCredentials(new EnvironmentVariableCredentialsProvider()).build();
 		if (s3Client.doesObjectExist("springfield-storage", cleanresult)) {
+	    	positivecache.put(cimage+","+predir+","+script,result);
 	    	return result;
 		} else {
 			return null;
