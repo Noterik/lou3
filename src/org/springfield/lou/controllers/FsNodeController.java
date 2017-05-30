@@ -36,6 +36,6 @@ public class FsNodeController extends Html5Controller {
 		FsNode fsnode = Fs.getNode(nodepath);
 		JSONObject data = fsnode.toJSONObject(screen.getLanguageCode(),fields);
 		data.put("nodepath",nodepath);
-		screen.get(selector).parsehtml(data);
+		screen.get(selector).parsehtml(data,"");
 	}
 }

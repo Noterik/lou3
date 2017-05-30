@@ -174,14 +174,22 @@ public class Html5Element {
 	}
 	
 	public boolean render() {
-		return parsehtml(new JSONObject());
+		return parsehtml(new JSONObject(),"");
 	}
 	
 	public boolean render(JSONObject json) {
-		return parsehtml(json);
+		return parsehtml(json,"");
+	}
+	
+	public boolean render(JSONObject json,String tagname) {
+		return parsehtml(json,tagname);
 	}
 	
 	public boolean parsehtml(JSONObject json) {
+		return parsehtml(json,"");
+	}
+	
+	public boolean parsehtml(JSONObject json,String tagname) {
 		FsNode node = screen.getModel().getNode("/app/component/view/"+selector);
 		if (node!=null) {
 			String template = node.getProperty("template");
@@ -197,6 +205,7 @@ public class Html5Element {
 				// did we already send this one before ?
 				if(screen.alreadySendTemplate(template)) {
 					json.put("tmpcrc", template.hashCode());
+					json.put("tagname", tagname);
 					screen.send("parsehtml("+selector.substring(1)+")="+json);
 				} else {
 					StringBuffer str = null;
@@ -218,6 +227,7 @@ public class Html5Element {
 					}
 					json.put("template", str.toString());
 					json.put("newcrc",template.hashCode());
+					json.put("tagname", tagname);
 					screen.send("parsehtml("+selector.substring(1)+")="+json);
 					screen.setSendTemplate(template);
 				}

@@ -794,17 +794,33 @@ var Eddie = function(options){
 		}
 	}
 
-	function parseHtml(targetid,data) {
+        function parseHtml(targetid,data) {
            var pdata =  JSON.parse(data);
-        	if (pdata.tmpcrc!==undefined) {
-        		var parsed = Mustache.render(templatecache[pdata.tmpcrc],pdata);
-          	 	$('#'+targetid).html(parsed);
-        	} else {
-           		var parsed = Mustache.render(pdata.template,pdata);
-           		templatecache[pdata.newcrc] = pdata.template;
-          	 	$('#'+targetid).html(parsed);
-           }
-	}
+                var tagname = pdata.tagname;
+                if (pdata.tmpcrc!==undefined) {
+                        if (tagname!="") {
+                                var newtemplate = templatecache[pdata.tmpcrc];
+                                var htmlsub =  $(newtemplate).find("#"+tagname).prop("outerHTML");
+                                var parsed = Mustache.render(htmlsub,pdata);
+                                $('#'+tagname).html(parsed);
+                        } else {
+                                var parsed = Mustache.render(templatecache[pdata.tmpcrc],pdata);
+                                $('#'+targetid).html(parsed);
+                        }
+                } else {
+                        if (tagname!="") {
+                                var newtemplate = templatecache[pdata.tmpcrc];
+                                var htmlsub =  $(newtemplate).find("#"+tagname).prop("outerHTML");
+                                var parsed = Mustache.render(pdata.template,pdata);
+                                templatecache[pdata.newcrc] = pdata.template;
+                                $('#'+tagname).html(parsed);
+                        } else {
+                                var parsed = Mustache.render(pdata.template,pdata);
+                                templatecache[pdata.newcrc] = pdata.template;
+                                $('#'+targetid).html(parsed);
+                        }
+                }
+        }
 	
 	
 	

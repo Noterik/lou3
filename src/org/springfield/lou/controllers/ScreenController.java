@@ -33,6 +33,6 @@ public class ScreenController extends Html5Controller {
 			}
 		}
 		data.put("screengroups",sg);
-		screen.get(selector).parsehtml(data);
+		screen.get(selector).parsehtml(data,"");
 	}
 }

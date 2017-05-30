@@ -18,7 +18,7 @@ public class ConfirmController extends Html5Controller {
 			//String template = node.getProperty("template");
 			//screen.get(selector).template(template);
 			JSONObject data = node.toJSONObject("en","question,answer1,answer2");
-			screen.get(selector).parsehtml(data);
+			screen.get(selector).parsehtml(data,"");
 			screen.get(selector).show();
 		}
 	}
