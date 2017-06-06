@@ -148,9 +148,9 @@ public class ApplicationManager extends Thread implements MargeObserver {
 			String fromscreen = from.substring(pos+8);
 			pos = fromapp.lastIndexOf("/");
 			fromapp = fromapp.substring(0,pos);
-			System.out.println("APP="+fromapp+" SCR="+fromscreen);
+			//System.out.println("APP="+fromapp+" SCR="+fromscreen);
 			Html5ApplicationInterface ca = ApplicationManager.instance().getApplication(fromapp);
-			System.out.println("CA="+ca);
+			//System.out.println("CA="+ca);
 			Screen client = ca.getScreenManager().get(from);  
 			return client;
 		}

@@ -173,7 +173,6 @@ public class LouServlet extends HttpServlet {
 			//params = triggerParams;
 
 		}
-		System.out.println("BODYJUMPER="+body);
 
 		int pos = body.indexOf("/html5application/");
 		if (pos!=-1) {
@@ -200,7 +199,6 @@ public class LouServlet extends HttpServlet {
 			response.setContentType("text/html; charset=UTF-8");
 			OutputStream out = response.getOutputStream();
 			//PrintWriter out = response.getWriter();
-			System.out.println("INDEX REQ="+uri);
 			//String params = request.getQueryString();
 			String user = null;
 			String nameapp = "test";

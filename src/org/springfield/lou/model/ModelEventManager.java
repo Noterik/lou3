@@ -391,7 +391,7 @@ public class ModelEventManager {
 				}
 			}
 			long endtime = new Date().getTime();
-			System.out.println("property delivertime="+path+" "+(endtime-starttime));
+			//System.out.println("property delivertime="+path+" "+(endtime-starttime));
 		}
 		deliverPath(path,node,ModelBindEvent.PROPERTY);
     }
