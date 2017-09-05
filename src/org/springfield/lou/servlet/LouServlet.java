@@ -85,6 +85,7 @@ public class LouServlet extends HttpServlet {
 
 	private static final Logger logger = Logger.getLogger(LouServlet.class);
 	private static final String password = "password";
+	private String alloworigin = "*";
 	private static final long serialVersionUID = 42L;
 	private static Map<String, String> urlmappings = new HashMap<String, String>();
 
@@ -108,7 +109,7 @@ public class LouServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.addHeader("Access-Control-Allow-Origin", "*");  
+		response.addHeader("Access-Control-Allow-Origin", alloworigin);  
 		response.addHeader("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS");
 		response.addHeader("Access-Control-Allow-Headers", "Content-Type,Range,If-None-Match,Accept-Ranges");
 		response.addHeader("Access-Control-Expose-Headers", "Content-Range");
@@ -118,7 +119,7 @@ public class LouServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.addHeader("Access-Control-Allow-Origin", "*");  
+		response.addHeader("Access-Control-Allow-Origin", alloworigin);  
 		response.addHeader("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS");
 		response.addHeader("Access-Control-Allow-Headers", "Content-Type,Range,If-None-Match,Accept-Ranges");
 		response.addHeader("Access-Control-Expose-Headers", "Content-Range");
@@ -144,11 +145,13 @@ public class LouServlet extends HttpServlet {
 			return;
 		}
 
+
 		// need to move to be faster
 		String params = request.getQueryString();
 		String hostname = request.getHeader("host");
 		String[] paths = urlMappingPerApplication(hostname,body);
 		//System.out.println("PATHS="+paths+" HOST="+hostname);
+		//System.out.println("LOU REFER="+request.getHeader("Referer"));
 
 		if (paths!=null) {
 			//check if url trigger also contains params
@@ -191,7 +194,7 @@ public class LouServlet extends HttpServlet {
 
 	private void doIndexRequest(String uri,HttpServletRequest request, HttpServletResponse response,String params) {
 		try {	
-			response.addHeader("Access-Control-Allow-Origin", "*");  
+			response.addHeader("Access-Control-Allow-Origin",alloworigin);  
 			response.addHeader("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS");
 			response.addHeader("Access-Control-Allow-Headers", "Content-Type,Range,If-None-Match,Accept-Ranges");
 			response.addHeader("Access-Control-Expose-Headers", "Content-Range");
@@ -329,7 +332,7 @@ public class LouServlet extends HttpServlet {
 	}
 
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.addHeader("Access-Control-Allow-Origin", "*");  
+		response.addHeader("Access-Control-Allow-Origin", alloworigin);  
 		response.addHeader("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS");
 		response.addHeader("Access-Control-Allow-Headers", "Content-Type,Range,If-None-Match,Accept-Ranges");
 		response.addHeader("Access-Control-Expose-Headers", "Content-Range");
@@ -456,6 +459,13 @@ public class LouServlet extends HttpServlet {
 					// extend this with Location info 
 					caps.addCapability("ipnumber", request.getRemoteAddr());
 					caps.addCapability("servername", request.getServerName());
+					String ref = request.getHeader("Referer");
+					System.out.println("REF="+ref);
+					if (ref!=null) {
+						caps.addCapability("referer", ref);
+					} else {
+						caps.addCapability("referer","");	
+					}
 
 					Screen screen = app.getNewScreen(caps,params);
 					//System.out.println("PARAMSET="+params);
