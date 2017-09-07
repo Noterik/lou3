@@ -346,6 +346,10 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 		s.loadStyleSheet(getApplicationCSS(sname) , this);
 	}
 	
+	public void loadMstStyleSheet(Screen s,String sname) {
+		s.loadMstStyleSheet(getApplicationCSS(sname) , this);
+	}
+	
 	public void loadStyleSheet(Screen s,String dstyle,String sname) {
 		String fs = getDeviceCSS(dstyle);
 		if (LazyHomer.isWindows()) {

@@ -520,10 +520,100 @@ public class Screen {
 	}
 	
 	
-	public void loadStyleSheet(String style, Html5ApplicationInterface app) {
+	public void loadMstStyleSheet(String style, Html5ApplicationInterface app) {
 		//TODO: make this at least windows compatible or configurable
 		String stylepath ="/springfield/tomcat/webapps/ROOT/eddie/"+style;
 		// ugly but works
+
+		System.out.println("TRYING MST CSS : "+stylepath);
+		
+		String packagepath = app.getHtmlPath();
+		if (packagepath!=null) {
+			int pos = style.indexOf("/css/");
+			if (pos!=-1) {
+				stylepath = packagepath + style.substring(pos+1);
+			}
+		}
+		
+
+		int pos = stylepath.indexOf(".css");
+		if (pos!=-1) {
+			stylepath = stylepath.substring(0,pos)+".mst";
+		}
+		System.out.println("TRYING MST2 CSS : "+stylepath);
+		StringBuffer str = null;
+		try {
+			str = new StringBuffer();
+			BufferedReader br;
+			br = new BufferedReader(new FileReader(stylepath));
+			String line = br.readLine();
+			while (line != null) {
+				str.append(line);
+				str.append("\n");
+				line = br.readLine();
+			 }
+			br.close();
+			
+			
+			String body = ""+ str.toString();
+			
+			System.out.println("BODY="+body);
+			
+			String stylename = stylepath.substring(stylepath.lastIndexOf("/")+1, stylepath.indexOf(".mst"));
+			if(stylename.contains("_")) stylename = stylename.substring(0, stylename.indexOf("_"));
+			stylename+="-mst";
+			
+			body = doMstReplace(body);
+			
+			if (websocketconnection!=null) {
+				websocketconnection.send("setstyle(head)=" + stylename +"style,"+body);
+			} else {
+			if (data==null) {
+				data = "setstyle(head)=" + stylename +"style,"+body;
+			} else {
+				data += "($end$)setstyle(head)="+ stylename +"style,"+body;
+			}
+			synchronized (this) {
+			    this.notify();
+			}
+			}
+			
+		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+	}
+	
+	private String  doMstReplace(String body) {
+		String newbody = "";
+		int pos = body.indexOf("{{");
+		if (pos!=-1) {
+			while (pos!=-1) {
+				newbody += body.substring(0,pos);
+				body = body.substring(pos+2);
+				pos = body.indexOf("}}");
+				if (pos!=-1) {
+					String token = body.substring(0,pos);
+					System.out.println("TOKEN="+token);
+					String part = getModel().getProperty(token);
+					System.out.println("PART="+part);
+					newbody += part;	
+					body = body.substring(pos+2);
+				}
+				pos = body.indexOf("{{");
+			}
+			return newbody;
+		} else {
+			return body;
+		}
+	}
+	
+	public void loadStyleSheet(String style, Html5ApplicationInterface app) {
+
+		//TODO: make this at least windows compatible or configurable
+		String stylepath ="/springfield/tomcat/webapps/ROOT/eddie/"+style;
+		// ugly but works
+		System.out.println("TRYING CSS : "+stylepath);
 		
 		String packagepath = app.getHtmlPath();
 		if (packagepath!=null) {
@@ -539,7 +629,6 @@ public class Screen {
 			stylepath="/springfield/tomcat/webapps/ROOT/eddie/apps/dashboard/css/generic.css";
 		}
 		Boolean failed = false;
-//		stylepath ="C:\\\\springfield\\tomcat\\webapps\\ROOT\\eddie\\"+stylepath;
 		StringBuffer str = null;
 		try {
 			str = new StringBuffer();
@@ -554,7 +643,7 @@ public class Screen {
 			br.close();
 		} catch (FileNotFoundException e) {
 			failed=true;
-			//System.out.println("COULD NOT FIND : "+stylepath);
+			System.out.println("COULD NOT FIND : "+stylepath);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
