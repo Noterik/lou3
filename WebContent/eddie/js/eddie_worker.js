@@ -13,7 +13,7 @@ var Requester = function(){
                 var putData = "<fsxml><screen><properties><screenId>" + args.screenId + "</screenId></properties></screen></fsxml>";
                 var xhr = new XMLHttpRequest();
                 var appId = args.screenId.substring(0, args.screenId.indexOf("/1/screen"));
-        xhr.open("PUT","http://" + args.lou_ip + ":" + args.lou_port + "/lou/LouServlet" + appId, false);
+        xhr.open("PUT","//" + args.lou_ip + ":" + args.lou_port + "/lou/LouServlet" + appId, false);
                 xhr.send(putData);
                 result = xhr.responseText;
                 if(result !== ""){

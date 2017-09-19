@@ -8,7 +8,7 @@ var Requester = function(){
         };
 
         var request = function(args){
-			var uri = "ws://beta.mupop.net/lou/ws";			
+			var uri = ((window.location.protocol === "https:") ? "wss://" : "ws://") + "beta.mupop.net/lou/ws";			
         	function openConnection() {
             	websocket = new WebSocket(uri);
           	  	websocket.onmessage = function (event) {
