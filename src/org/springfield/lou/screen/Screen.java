@@ -525,7 +525,6 @@ public class Screen {
 		String stylepath ="/springfield/tomcat/webapps/ROOT/eddie/"+style;
 		// ugly but works
 
-		System.out.println("TRYING MST CSS : "+stylepath);
 		
 		String packagepath = app.getHtmlPath();
 		if (packagepath!=null) {
@@ -540,7 +539,6 @@ public class Screen {
 		if (pos!=-1) {
 			stylepath = stylepath.substring(0,pos)+".mst";
 		}
-		System.out.println("TRYING MST2 CSS : "+stylepath);
 		StringBuffer str = null;
 		try {
 			str = new StringBuffer();
@@ -594,9 +592,9 @@ public class Screen {
 				pos = body.indexOf("}}");
 				if (pos!=-1) {
 					String token = body.substring(0,pos);
-					System.out.println("TOKEN="+token);
+					//System.out.println("TOKEN="+token);
 					String part = getModel().getProperty(token);
-					System.out.println("PART="+part);
+					//System.out.println("PART="+part);
 					newbody += part;	
 					body = body.substring(pos+2);
 				}

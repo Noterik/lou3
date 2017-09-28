@@ -460,7 +460,7 @@ public class LouServlet extends HttpServlet {
 					caps.addCapability("ipnumber", request.getRemoteAddr());
 					caps.addCapability("servername", request.getServerName());
 					String ref = request.getHeader("Referer");
-					System.out.println("REF="+ref);
+					//System.out.println("REF="+ref);
 					if (ref!=null) {
 						caps.addCapability("referer", ref);
 					} else {
