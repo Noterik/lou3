@@ -32,7 +32,11 @@ var Eddie = function(options){
 	};
 	$.extend(settings, options);
 
-	settings.lou_port = (window.location.port === "") ? '80' : window.location.port;
+	if (window.location.protocol === 'https:') {
+        settings.lou_port = (window.location.port == "") ? '443' : window.location.port;
+	} else {
+	        settings.lou_port = (window.location.port == "") ? '80' : window.location.port;
+	}
 
 	self.init = function(){
 		responsetime = new Date().getTime();
@@ -181,7 +185,7 @@ var Eddie = function(options){
 		var args =
 		self.doRequest({
 			'type': 'POST',
-			'url': "http://" + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp,
+			'url': "//" + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp,
 			'data': postData,
 			'dataType': 'text',
 			'async': false
@@ -254,7 +258,7 @@ var Eddie = function(options){
 			console.log("send http data");
 			self.doRequest({
 			'type': 'POST',
-			'url': 'http://' + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp,
+			'url': '//' + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp,
 			'contentType': 'text/plain',
 			'data': postData,
 			'dataType': 'text',
@@ -283,7 +287,7 @@ var Eddie = function(options){
 		};
 		self.doRequest({
 			'type': 'POST',
-			'url': 'http://' + settings.lou_ip +":"+ settings.lou_port + '/lou/LouServlet' + settings.fullapp+"?"+settings.appparams,
+			'url': '//' + settings.lou_ip +":"+ settings.lou_port + '/lou/LouServlet' + settings.fullapp+"?"+settings.appparams,
 			'data': settings.postData,
 			'success': parseRegisterResponse
 		});
@@ -295,7 +299,7 @@ var Eddie = function(options){
 
 		self.doRequest({
 			'type': 'POST',
-			'url': 'http://' + settings.lou_ip + ':' + settings.lou_port + '/lou/LouServlet' + appId,
+			'url': '//' + settings.lou_ip + ':' + settings.lou_port + '/lou/LouServlet' + appId,
 			'data': putData,
 			'dataType': 'text',
 			'contentType': 'text/plain',
@@ -313,7 +317,7 @@ var Eddie = function(options){
 		}
 		// so we have a correct connection recheck and init websocket if needed
 		if (websocket===null) {
-			var uri = "ws://" + settings.lou_ip + ":" + settings.lou_port+"/lou/ws?screenid="+settings.screenId;
+			var uri = ((window.location.protocol === "https:") ? "wss://" : "ws://") + settings.lou_ip + ":" + settings.lou_port+"/lou/ws?screenid="+settings.screenId;
   			 websocket = new WebSocket(uri);
     		websocket.onopen = function(evt) { onWSOpen(evt) };
     	    websocket.onclose = function(evt) { onWSClose(evt) };
@@ -1055,7 +1059,7 @@ var Eddie = function(options){
 								file.data = event.target.result;
 								self.doRequest({
 									'type': 'POST',
-									'url': "http://" + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp+fileparams,
+									'url': "//" + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp+fileparams,
 									'data': file.data,
 									'dataType': 'data',
 									'processData': false,
