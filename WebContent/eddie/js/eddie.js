@@ -26,9 +26,7 @@ var Eddie = function(options){
 		active: true,
 		appparams: null,
 		worker_location: '/eddie/js/eddie_worker.js',
-		worker: null,
-		wsworker_location: '/eddie/js/eddie_wsworker.js',
-		wsworker: null
+		worker: null
 	};
 	$.extend(settings, options);
 

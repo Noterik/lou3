@@ -426,6 +426,7 @@ public class Screen {
 			this.notify();
 			}
 		}
+    	html5elements.remove("#"+t);
 	}
 		
 	/**
@@ -555,7 +556,6 @@ public class Screen {
 			
 			String body = ""+ str.toString();
 			
-			System.out.println("BODY="+body);
 			
 			String stylename = stylepath.substring(stylepath.lastIndexOf("/")+1, stylepath.indexOf(".mst"));
 			if(stylename.contains("_")) stylename = stylename.substring(0, stylename.indexOf("_"));
@@ -611,7 +611,6 @@ public class Screen {
 		//TODO: make this at least windows compatible or configurable
 		String stylepath ="/springfield/tomcat/webapps/ROOT/eddie/"+style;
 		// ugly but works
-		System.out.println("TRYING CSS : "+stylepath);
 		
 		String packagepath = app.getHtmlPath();
 		if (packagepath!=null) {
@@ -1117,6 +1116,15 @@ public class Screen {
     	e  = new Html5Element(this,s);
     	html5elements.put(s,e);
     	return e;
+    }
+    
+    public boolean exists(String s) {
+    	Html5Element e = html5elements.get(s);
+    	if (e!=null) {
+    		return true;
+    	} else {
+    		return false;
+    	}
     }
     
     public void snapshot(String s,String moment) {
