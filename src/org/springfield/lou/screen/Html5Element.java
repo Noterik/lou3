@@ -71,6 +71,11 @@ public class Html5Element {
 		return true;
 	}
 	
+	public boolean scrollTop(int offset) {
+		screen.send("scrolltop("+selector.substring(1)+")="+offset);
+		return true;
+	}
+	
 	public boolean translate(String x,String y) {
 		screen.send("translateXY("+selector.substring(1)+")="+x+","+y);
 		return true;

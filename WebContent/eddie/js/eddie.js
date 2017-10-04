@@ -88,6 +88,14 @@ var Eddie = function(options){
                                                               map[tname] = newvalue;
                                                         }
 							break;
+							    case "scrollTop":
+                                     var newvalue = $('#'+tid).scrollTop();
+                                     var oldvalue = trackervalues[tid+"/"+track];
+                                     if (oldvalue!=newvalue) {
+                                   	 trackervalues[tid+"/"+track] = newvalue;
+                                     map['scrollTop'] = newvalue;
+                                    }
+                                  break;
             					case "screenXPerc":
 					    		var position = $('#'+tid).position();
                                 			var oldvalue = trackervalues[tid+"/"+track];
@@ -356,6 +364,14 @@ var Eddie = function(options){
             			}
                     	$('#'+targetid).html(content);
             		break;
+                case "scrolltop":
+                        content = result.substring(pos+2);
+                        pos = content.indexOf("($end$)");
+                        if(pos!=-1) {
+                                        content = content.substring(0,pos);
+                                }
+                        $('#'+targetid).scrollTop(content);
+                        break;
             	case "location":
             		content = result.substring(pos+2);
             		pos = content.indexOf("($end$)");
