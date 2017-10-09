@@ -965,7 +965,7 @@ var Eddie = function(options){
 			} else if (content.indexOf('track/mousemove')===0) {
 				// tricky since we need to track it
 				//console.log('track');
-				$("#"+targetid).mousemove(function() {
+				$("#"+targetid).mousemove(function(event) {
 					// set these already in the tracker to be send
                     var oldvalue = trackervalues[targetid+"/mousemove"];
         			var xp = (event.layerX/event.target.offsetWidth)*100;
