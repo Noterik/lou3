@@ -908,7 +908,7 @@ var Eddie = function(options){
          var div = document.getElementById(targetid);
  		if (content.indexOf('keypress')===0) {
                 	$(document).keydown(function(e) {
-                    	if (event.which==9) {
+                    	if (e.which==9) {
                       	  e.preventDefault();
 							e.stopPropagation();
 						}
@@ -917,8 +917,8 @@ var Eddie = function(options){
                 	$(document).keyup(function(e) {
                         map = {};
                         map["targetid"] = targetid;
-                        map["which"] = event.which;
-                        map["id"] = event.target.id;
+                        map["which"] = e.which;
+                        map["id"] = e.target.id;
 
                         var padding = content.split(",");
                         if (padding.length>1) {
