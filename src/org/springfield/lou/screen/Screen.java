@@ -163,16 +163,18 @@ public class Screen {
 					if (el!=null) {
 						Object object = el.getController();
 						//System.out.println("methodname="+methodname+" object="+object+" selector="+bind.selector);
-						try {
-							Method method = object.getClass().getMethod(methodname,Screen.class,JSONObject.class);
-							if (method!=null) {	
-								Screen fs = app.getScreen(from);
-								method.invoke(object,fs,data);
-							} else {
-								System.out.println("MISSING METHOD IN APP ="+method);
+						if (object!=null) {
+							try {
+								Method method = object.getClass().getMethod(methodname,Screen.class,JSONObject.class);
+								if (method!=null) {	
+									Screen fs = app.getScreen(from);
+									method.invoke(object,fs,data);
+								} else {
+									System.out.println("MISSING METHOD IN APP ="+method);
+								}
+							} catch(Exception e) {
+								e.printStackTrace();
 							}
-						} catch(Exception e) {
-							e.printStackTrace();
 						}
 					}
 				}
