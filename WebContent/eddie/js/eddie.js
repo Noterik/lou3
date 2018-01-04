@@ -9,6 +9,7 @@ var Eddie = function(options){
 	var templatecache  = {};
 	var websocket = null;
 	var wsactive = false;
+	var hadwsactive = false;
 	var delayresettime = 5000;
 	var delaycounter = 0;
 	var performancetestcounter=-1;
@@ -54,8 +55,10 @@ var Eddie = function(options){
 		if (websocket!==null) {
 		    delaycounter++;
             if (websocket.readyState===3 && delaycounter>30) {
-					clearInterval(interval);
-					window.location.href=window.location.href;
+                	if (hadwsactive) {
+						clearInterval(interval);
+						window.location.href=window.location.href;
+					}
 			}
 			if (performancetestcounter!==-1) {
 				performancetestcount++;
@@ -66,8 +69,10 @@ var Eddie = function(options){
 			}
 		}
 		if (delaydate>(delayresettime)) {
-			clearInterval(interval);
-			window.location.href=window.location.href;
+		    if (hadwsactive) {
+				clearInterval(interval);
+				window.location.href=window.location.href;
+			}
 		}
             for (var data in trackers){
    				var map = {};
@@ -659,6 +664,7 @@ var Eddie = function(options){
 	  function onWSOpen(evt) {
   		console.log("WS OPEN "+settings.worker);
   		wsactive = true;
+  		hadwsactive = true;
   		delayresettime = 25000;
 	  }
 	  

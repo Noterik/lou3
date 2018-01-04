@@ -65,6 +65,7 @@ public class Screen {
 	private String language = null;
 	private String data = null;
 	private long lastseen = -1;
+	private int messagecount = 0;
 	private String username = null;
 	private Map<String, String[]> params;
 	private Map<String, Object> properties;
@@ -322,6 +323,7 @@ public class Screen {
 	 * @param data the data to be sent
 	 */
 	public void setContent(String t,String c){
+		messagecount++;
 		if (websocketconnection!=null) {
 			websocketconnection.send("set("+t+")="+c);
 		} else {
@@ -337,6 +339,7 @@ public class Screen {
 	}
 	
 	public void setDiv(String t,String p) {
+		messagecount++;
 		if (websocketconnection!=null) {
 			websocketconnection.send("sdiv("+t+")="+p);
 		} else {
@@ -370,6 +373,7 @@ public class Screen {
 	 * @param data the data to be sent
 	 */
 	public void addContent(String t,String c){
+		messagecount++;
 		if (websocketconnection!=null) {
 			websocketconnection.send("add("+t+")="+c);
 		} else {
@@ -385,6 +389,7 @@ public class Screen {
 	}
 	
 	public void setScript(String t,String c){
+		messagecount++;
 		if (websocketconnection!=null) {
 			websocketconnection.send("setscript("+t+")="+c);
 		} else {
@@ -416,6 +421,7 @@ public class Screen {
 	}
 	
 	public void removeContent(String t, boolean leaveElement, Html5ApplicationInterface app){
+		messagecount++;
 		if (websocketconnection!=null) {
 			websocketconnection.send("remove("+t+"," + leaveElement + ")");
 		} else {
@@ -443,6 +449,7 @@ public class Screen {
 	}
 	
 	public void putMsg(String t,String f,String c) {
+		messagecount++;
 		if (websocketconnection!=null) {
 			websocketconnection.send("put("+t+")="+c);
 		} else {
@@ -498,7 +505,7 @@ public class Screen {
 		String body = ""+ str.toString();
 		String stylename = stylepath.substring(stylepath.lastIndexOf("/")+1, stylepath.indexOf(".css"));
 		if(stylename.contains("_")) stylename = stylename.substring(0, stylename.indexOf("_"));
-		
+		messagecount++;
 		if (websocketconnection!=null) {
 			websocketconnection.send("setstyle(head)=" + stylename +"style,"+body);
 		} else {
@@ -564,7 +571,7 @@ public class Screen {
 			stylename+="-mst";
 			
 			body = doMstReplace(body);
-			
+			messagecount++;
 			if (websocketconnection!=null) {
 				websocketconnection.send("setstyle(head)=" + stylename +"style,"+body);
 			} else {
@@ -683,7 +690,7 @@ public class Screen {
 		String stylename = stylepath.substring(stylepath.lastIndexOf("/")+1, stylepath.indexOf(".css"));
 		if(stylename.contains("_")) stylename = stylename.substring(0, stylename.indexOf("_"));
 		
-		
+		messagecount++;
 		if (websocketconnection!=null) {
 			websocketconnection.send("setstyle(head)=" + stylename +"style,"+body);
 		} else {
@@ -740,7 +747,7 @@ public class Screen {
 		String body = ""+ str.toString();
 		String stylename = stylepath.substring(stylepath.lastIndexOf("/")+1, stylepath.indexOf(".css"));
 		if(stylename.contains("_")) stylename = stylename.substring(0, stylename.indexOf("_"));
-		
+		messagecount++;
 		if (websocketconnection!=null) {
 			websocketconnection.send("setstyle(head)=" + stylename +"style,"+body);
 		} else {
@@ -759,6 +766,7 @@ public class Screen {
 	
 
 	public void removeStyle(String style){
+		messagecount++;
 		if (websocketconnection!=null) {
 			websocketconnection.send("removestyle("+style+"style)");
 		} else {
@@ -1031,6 +1039,7 @@ public class Screen {
 		}
 		
 		if (!eventtype.equals("client") && selector.indexOf("/controller/")==-1 && !override) {
+			messagecount++;
 			if (websocketconnection!=null) {
 				if (eventpadding.equals("")) {
 					websocketconnection.send("bind("+selector.substring(1)+")="+eventtype);
@@ -1137,8 +1146,20 @@ public class Screen {
     	// send client command to recover snapshot
     }
     
+    public String getConnectionType() {
+		if (websocketconnection!=null) {
+			return("websocket");
+		} else {
+			return("http");
+		}
+    }
+    
+    public int getMessageCount() {
+    		return messagecount;
+    }
 	
 	public boolean send(String msg) {
+		messagecount++;
 		if (websocketconnection!=null) {
 			websocketconnection.send(msg);
 		} else {
@@ -1158,6 +1179,7 @@ public class Screen {
 	
     
 	public void append(String selector,String elementtype,String attributes,String content) {
+		messagecount++;
 		if (websocketconnection!=null) {
 			websocketconnection.send("append("+selector+" "+elementtype+" "+attributes+")="+content);
 		} else {
@@ -1199,6 +1221,7 @@ public class Screen {
 	
 	public void setWebSocketConnection(LouWebSocketConnection wc) {
 		websocketconnection = wc;
+		messagecount++;
 		// send a message over http to close the http connection and flush all messages still underway
 		if (data==null) {
 			data = "terminate(httpworker)";

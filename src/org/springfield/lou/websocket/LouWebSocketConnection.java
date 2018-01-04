@@ -94,7 +94,7 @@ public class LouWebSocketConnection implements MessageHandler.Partial<String> {
 		}
 	}
 	
-	public void send(String message) {
+	public synchronized void send(String message) {
 		if (!session.isOpen()) return;
 		long st = new Date().getTime();
 		try {
