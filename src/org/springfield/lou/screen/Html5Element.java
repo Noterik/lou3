@@ -380,6 +380,12 @@ public class Html5Element {
 		return true;
 	}
 	
+	public boolean append(String elementname, String elementid, String classes, Html5Controller c) {
+		append("<"+elementname+" id=\""+elementid+"\" class=\""+classes+"\"></"+elementname+">");
+		screen.get("#"+elementid).attach(c);
+		return true;
+	}
+	
 	
 	public Object getVariable(String name) {
 		return variables.get(name);
