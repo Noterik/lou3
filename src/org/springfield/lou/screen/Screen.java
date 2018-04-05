@@ -297,7 +297,6 @@ public class Screen {
 	}
 	
 	public void put(String from,String content) {
-		System.out.println("HTTP FROM="+from+" C2="+content);
 		app.putOnScreen(this,from, content);
 	}
 	
@@ -474,7 +473,7 @@ public class Screen {
 	
 	public void loadStyleSheet(String style,Boolean allowcache) {
 		if (allowcache && csscache.contains(style)) {
-			System.out.println("cached css="+style+" "+allowcache);
+			//System.out.println("cached css="+style+" "+allowcache);
 			return;
 		}	
 		loadStyleSheet(style);

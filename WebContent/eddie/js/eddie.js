@@ -1072,6 +1072,10 @@ var Eddie = function(options){
 							var $i = $("#"+name);
 							input = $i[0];
 							file = input.files[0];
+                            if (file===undefined) {
+                                file=window.dropfile;
+                            }							
+							
 							var fileparams = "?targetid="+name+"&screenid="+settings.screenId+"&cfilename="+file.name;							
 							reader = new FileReader();
 							reader.readAsDataURL(file);
