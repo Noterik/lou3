@@ -73,6 +73,21 @@ public class Model {
 		return eventmanager;
 	}
 	
+	public  String getPathValue(String path) {
+		if (path.startsWith("@")) {
+			// its a model mapping
+			//path = getModelMapping(path.substring(1));
+			//System.out.println("GET NODE @ PATH="+path);
+			int pos=path.indexOf("/"); // not sure if i can move tis in getModeMapping will try later
+			if (pos==-1) {
+				path = getModelMapping(path.substring(1));
+			} else {
+				String n = getModelMapping(path.substring(1,pos));
+				path = n+path.substring(pos);
+			}
+		}
+		return path;
+	}
 	
  	public void onNotify(String path,String methodname,Html5Controller callbackobject) {
  	    	if (path.startsWith("@")) {
