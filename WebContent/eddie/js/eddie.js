@@ -1076,7 +1076,7 @@ var Eddie = function(options){
                                 file=window.dropfile;
                             }							
 							
-							var fileparams = "?targetid="+name+"&screenid="+settings.screenId+"&cfilename="+file.name;							
+							var fileparams = "?targetid="+name+"&screenid="+settings.screenId+"&cfilename="+file.name+"&cfilesize="+file.size;								
 							reader = new FileReader();
 							reader.readAsDataURL(file);
 							reader.onload = function(event) {  
@@ -1105,7 +1105,7 @@ var Eddie = function(options){
 							var file = {};
 							file.name = inp.data("filename");
 							file.data = inp.val();
-							var fileparams = "?targetid="+name+"&screenid="+settings.screenId+"&cfilename="+file.name;							
+							var fileparams = "?targetid="+name+"&screenid="+settings.screenId+"&cfilename="+file.name+"&cfilesize="+file.size;							
 							
 							self.doRequest({
 								'type': 'POST',

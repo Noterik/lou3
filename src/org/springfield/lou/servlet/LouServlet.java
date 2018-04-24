@@ -41,6 +41,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.log4j.Logger;
 import org.springfield.fs.FsNode;
@@ -67,6 +68,9 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.event.ProgressEvent;
+import com.amazonaws.event.ProgressListener;
+
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
@@ -508,6 +512,8 @@ public class LouServlet extends HttpServlet {
 			String screenid = request.getParameter("screenid");
 			String cfilename = request.getParameter("cfilename");
 			System.out.println("CFILENAME="+cfilename);
+			String cfilesize = request.getParameter("cfilesize");
+			System.out.println("CFILESIZE="+cfilesize);
 			
 
 			Html5ApplicationInterface app = null;
@@ -554,17 +560,14 @@ public class LouServlet extends HttpServlet {
 			// here we can check if its a valid upload based on filename and other specs and kill if needed, also map real extension 
 			
 			fileext = getValidExtension(fileext,cfilename);
-			System.out.println("EXT2="+fileext);
 			if (fileext==null) return null; // kill the request its not a valid format
 			
 			if (method.equals("s3amazon")) {
-				System.out.println("S3 CHECK");
 				String bucketname = eventscreen.getModel().getProperty("/screen['upload']/target['"+targetid+"']/bucketname");
 				if (bucketname==null || bucketname.equals("")) { setUploadError(eventscreen,targetid,"bucketname not set");return null;}
 
 
 				AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withCredentials(new EnvironmentVariableCredentialsProvider()).build();
-				System.out.println("S3 AMAZON="+s3Client);
 				String filename = "unknown";
 				int storageport = 22;
 
@@ -589,15 +592,21 @@ public class LouServlet extends HttpServlet {
 					while ((b = inst.read())!=44) {
 						// skip the base64 tagline, not sure how todo this better
 					}	
+					
 					Base64InputStream b64i = new Base64InputStream(inst);
 
-					System.out.println("Uploading a new object to S3 from a stream "+bucketname+"/"+filename+"."+fileext);
+					//System.out.println("Uploading a new object to S3 from a stream "+bucketname+"/"+filename+"."+fileext);
 
 					ObjectMetadata metadata = new ObjectMetadata();
 					metadata.setContentType(filetype+"/"+fileext);
 
+					
 					PutObjectRequest or = new PutObjectRequest(bucketname,filename+"."+fileext, b64i, metadata);
+
+					
+			        or.setGeneralProgressListener(new UploadProgressListener(eventscreen.getModel(),publicurl,cfilename,cfilesize,targetid));
 					s3Client.putObject(or);
+			
 
 				} catch (AmazonServiceException ase) {
 					ase.printStackTrace();
