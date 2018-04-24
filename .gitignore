@@ -101,3 +101,5 @@ dist/lou.war
 *.jar
 *.war
 *.war
+*.jar
+*.jar

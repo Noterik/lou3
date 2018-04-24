@@ -107,9 +107,6 @@ public class Html5Element {
 		return true;
 	}
 	
-	
-	
-	
 	public boolean append(String html) {
 		screen.send("append("+selector.substring(1)+")="+html);
 		return true;
@@ -386,6 +383,11 @@ public class Html5Element {
 		return true;
 	}
 	
+	public boolean append(String elementname, String parentid, String childid, String classes, Html5Controller c) {
+		append("<"+elementname+" id=\""+childid+"\" class=\""+classes+"\"></"+elementname+">");
+		screen.get("#"+parentid).attach(c);
+		return true;
+	}
 	
 	public Object getVariable(String name) {
 		return variables.get(name);

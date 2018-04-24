@@ -1066,7 +1066,7 @@ var Eddie = function(options){
 					var nt=$('input[name='+name+']:checked').val();
 					if (nt!==undefined) {
     						map[name] = nt;
-                			} else if (p.prop("tagName")==="INPUT") {
+                	} else if (p.prop("tagName")==="INPUT") {
 						//console.log('type='+p.prop("type"));
 						if (p.prop("type")==="file") {
 							var $i = $("#"+name);
@@ -1084,13 +1084,45 @@ var Eddie = function(options){
 								self.doRequest({
 									'type': 'POST',
 									'url': "//" + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp+fileparams,
+									xhr: function() {
+										myXhr = $.ajaxSettings.xhr();
+										if(myXhr.upload){
+											myXhr.upload.addEventListener('progress',progressHandlerFunction, false);
+								        }
+								        return myXhr;
+								    },
 									'data': file.data,
 									'dataType': 'data',
 									'processData': false,
-					                        	'contentType': 'application/data',
+					                'contentType': 'application/data',
 									'async': true
 								});
 							};
+							map['filename'] = file.name;
+							map[name] = "filehandle";
+						} else if (p.prop("type") === "hidden" && p.prop("name") === "fileupload") {
+							var inp = $("#"+name);
+							var file = {};
+							file.name = inp.data("filename");
+							file.data = inp.val();
+							var fileparams = "?targetid="+name+"&screenid="+settings.screenId+"&cfilename="+file.name;							
+							
+							self.doRequest({
+								'type': 'POST',
+								'url': "//" + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp+fileparams,
+								xhr: function() {
+							        myXhr = $.ajaxSettings.xhr();
+							        if(myXhr.upload){
+							            myXhr.upload.addEventListener('progress',progressHandlerFunction, false);
+							        }
+							        return myXhr;
+							    },
+								'data': file.data,
+								'dataType': 'data',
+								'processData': false,
+								'contentType': 'application/data',
+								'async': true
+							});
 							map['filename'] = file.name;
 							map[name] = "filehandle";
 						} else {
@@ -1224,18 +1256,23 @@ var Eddie = function(options){
     	return null;
 	}
 
-function getPosition(position) {
-    trackervalues["screen/location"]=""+position.coords.latitude+","+position.coords.longitude;
-}
-
-function eraseCookie(name) {
-    createCookie(name, "", -1);
-}
-	function addGestureEvents() {
-		window.addEventListener("orientationchange", function() {
-  			self.putLou('','orientationchange('+window.orientation+')');
-		}, false);
+	function getPosition(position) {
+	    trackervalues["screen/location"]=""+position.coords.latitude+","+position.coords.longitude;
 	}
-
-	return self;
-};
+	
+	function eraseCookie(name) {
+	    createCookie(name, "", -1);
+	}
+		function addGestureEvents() {
+			window.addEventListener("orientationchange", function() {
+	  			self.putLou('','orientationchange('+window.orientation+')');
+			}, false);
+		}
+	
+		return self;
+	};
+	
+	function progressHandlerFunction(e) {
+		var percent=Math.round((event.loaded/event.total) * 100);
+		console.log(percent+"%");
+	}
