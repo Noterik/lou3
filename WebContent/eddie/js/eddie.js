@@ -1084,13 +1084,6 @@ var Eddie = function(options){
 								self.doRequest({
 									'type': 'POST',
 									'url': "//" + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp+fileparams,
-									xhr: function() {
-										myXhr = $.ajaxSettings.xhr();
-										if(myXhr.upload){
-											myXhr.upload.addEventListener('progress',progressHandlerFunction, false);
-								        }
-								        return myXhr;
-								    },
 									'data': file.data,
 									'dataType': 'data',
 									'processData': false,
@@ -1110,13 +1103,6 @@ var Eddie = function(options){
 							self.doRequest({
 								'type': 'POST',
 								'url': "//" + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp+fileparams,
-								xhr: function() {
-							        myXhr = $.ajaxSettings.xhr();
-							        if(myXhr.upload){
-							            myXhr.upload.addEventListener('progress',progressHandlerFunction, false);
-							        }
-							        return myXhr;
-							    },
 								'data': file.data,
 								'dataType': 'data',
 								'processData': false,
@@ -1271,8 +1257,3 @@ var Eddie = function(options){
 	
 		return self;
 	};
-	
-	function progressHandlerFunction(e) {
-		var percent=Math.round((event.loaded/event.total) * 100);
-		console.log(percent+"%");
-	}
