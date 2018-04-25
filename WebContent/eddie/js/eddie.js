@@ -1098,7 +1098,7 @@ var Eddie = function(options){
 							var file = {};
 							file.name = inp.data("filename");
 							file.data = inp.val();
-							var fileparams = "?targetid="+name+"&screenid="+settings.screenId+"&cfilename="+file.name+"&cfilesize="+file.size;							
+							var fileparams = "?targetid="+name+"&screenid="+settings.screenId+"&cfilename="+file.name+"&cfilesize="+file.data.length;							
 							
 							self.doRequest({
 								'type': 'POST',
