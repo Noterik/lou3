@@ -410,6 +410,22 @@ var Eddie = function(options){
                                  }
 							parseHtml(targetid,content);
                         break;
+                case "radarping":
+                    content = result.substring(pos+2);
+                    pos = content.indexOf("($end$)");
+                    if(pos!=-1)
+                             {
+                             	content = content.substring(0,pos);
+                             }
+                    console.log('radarping='+targetid+" "+content);
+            		var splits = content.split(",");
+                    var map = {};
+                    map["input"] = content;
+                    map["hits"] = splits[1];
+                    map["dest"] = splits[0];
+                    map["targetid"] = targetid;
+                    self.putLou("","event(notify,"+JSON.stringify(map)+")");
+                    break;
                 case "pingsettings":
                 	
                         content = result.substring(pos+2);

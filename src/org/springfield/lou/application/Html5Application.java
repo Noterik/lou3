@@ -373,9 +373,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	public void putOnScreen(Screen s,String from,String content) {
 		String component = content.substring(content.indexOf("(")+1, content.indexOf(")"));
 		if(content.indexOf("load(")==0)	{
-			System.out.println("LOAD CALLED!!");
 		} else if(content.indexOf("add(")==0) {
-			System.out.println("ADD PUT CALLED");
 		} else if(content.indexOf("remove(")==0) {
 			removeContent(s, component);
 		} else if(content.indexOf("event(")==0) {
@@ -383,8 +381,12 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     			int pos = component.indexOf(",");
     			String lookup = component.substring(0,pos);
     			component = component.substring(pos+1);
-    			JSONObject data = (JSONObject)new JSONParser().parse(component);
-    			s.event(from,lookup,data);
+    			if (lookup.equals("notify")){
+    				rerouteNotify(s,component);
+    			} else {
+    				JSONObject data = (JSONObject)new JSONParser().parse(component);
+    				s.event(from,lookup,data);
+    			}
     		} catch(Exception e) {
     			e.printStackTrace();
     		}
@@ -398,7 +400,19 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	public void removeContent(Screen s, String comp){
 		s.removeContent(comp, this);	
 	}
-	
+
+	private void rerouteNotify(Screen s,String command) {
+		try {
+		JSONObject data = (JSONObject)new JSONParser().parse(command);
+		
+		 FsNode msg = new FsNode("msg","1");
+		 msg.setProperty("hits",(String)data.get("hits")); 
+		 msg.setProperty("targetid",(String)data.get("targetid"));
+		s.getModel().notify((String)data.get("dest"),msg);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	public void removeScreen(String id,String username){
 		Screen screen = this.screenmanager.get(id);

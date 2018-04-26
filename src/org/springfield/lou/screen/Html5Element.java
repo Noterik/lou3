@@ -50,6 +50,11 @@ public class Html5Element {
 		return true;
 	}
 	
+	public boolean radarping(String pingtargets,String receiver) {
+		screen.send("radarping("+selector.substring(1)+")="+receiver+","+pingtargets);
+		return true;
+	}
+	
 
 	public boolean draggable() {
 		screen.send("draggable("+selector+")");
