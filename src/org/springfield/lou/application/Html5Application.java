@@ -371,7 +371,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	}
 	
 	public void putOnScreen(Screen s,String from,String content) {
-		String component = content.substring(content.indexOf("(")+1, content.indexOf(")"));
+		String component = content.substring(content.indexOf("(")+1, content.lastIndexOf(")"));
 		if(content.indexOf("load(")==0)	{
 		} else if(content.indexOf("add(")==0) {
 		} else if(content.indexOf("remove(")==0) {
@@ -403,7 +403,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 
 	private void rerouteNotify(Screen s,String command) {
 		try {
-		JSONObject data = (JSONObject)new JSONParser().parse(command);
+			JSONObject data = (JSONObject)new JSONParser().parse(command);
 		
 		 FsNode msg = new FsNode("msg","1");
 		 msg.setProperty("hits",(String)data.get("hits")); 

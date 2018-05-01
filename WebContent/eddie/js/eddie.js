@@ -341,109 +341,86 @@ var Eddie = function(options){
 		while (pos!=-1) {
 			var command = result.substring(0,pos);
 			result = result.substring(pos+1);
-			pos = result.indexOf(")");
-
-            var targetid = result.substring(0,pos);
+			
+			pos = result.indexOf("($end$)");
+			var content = result;
+			var targetid;
+			if (pos != -1) {
+				content = content.substring(0,pos);
+			}
+			
+			var pos2 = content.indexOf("=");
+			if (pos2 != -1) {
+				targetid = content.substring(0, pos2-1);
+				content = content.substring(pos2+1);
+			} else {				
+				targetid = content.substring(0, content.length-1);
+				content = "";
+			}
+			
             switch(command){
             	case "set":
-            		var content = result.substring(pos+2);
-            		pos = content.indexOf("($end$)");
-            		if(pos!=-1) {
-            				content = content.substring(0,pos);
-            			}
-            			setDiv(targetid,content);
+            		setDiv(targetid,content);
             		break;
             	case "val":
-            		content = result.substring(pos+2);
-            		pos = content.indexOf("($end$)");
-            		if(pos!=-1) {
-            			content = content.substring(0,pos);
-            		}
                     $('#'+targetid).val(content);
             		break;
             	case "html":
-            		content = result.substring(pos+2);
-            		pos = content.indexOf("($end$)");
-            		if(pos!=-1) {
-            				content = content.substring(0,pos);
-            			}
-                    	$('#'+targetid).html(content);
+            		$('#'+targetid).html(content);
             		break;
                 case "scrolltop":
-                        content = result.substring(pos+2);
-                        pos = content.indexOf("($end$)");
-                        if(pos!=-1) {
-                                        content = content.substring(0,pos);
-                                }
-                        $('#'+targetid).scrollTop(content);
-                        break;
+                	$('#'+targetid).scrollTop(content);
+                    break;
             	case "location":
-            		content = result.substring(pos+2);
-            		pos = content.indexOf("($end$)");
-            		if(pos!=-1) {
-            				content = content.substring(0,pos);
-            			}
-                    	window.location.href = content;
+            		window.location.href = content;
             		break;
             	case "translateXY":
-            		content = result.substring(pos+2);
-            		pos = content.indexOf("($end$)");
-            		if(pos!=-1) {
-            				content = content.substring(0,pos);
-            			}
-                    	doTranslateXY(targetid,content);
+            		doTranslateXY(targetid,content);
             		break;
                 case "append":
-                        content = result.substring(pos+2);
-                        pos = content.indexOf("($end$)");
-                        if(pos!=-1) {
-                                        content = content.substring(0,pos);
-                                }
-                        $('#'+targetid).append(content);
-                        break;
+                	$('#'+targetid).append(content);
+                    break;
                 case "parsehtml":
-                        content = result.substring(pos+2);
-                        pos = content.indexOf("($end$)");
-                        if(pos!=-1)
-                                 {
-                                 	content = content.substring(0,pos);
-                                 }
-							parseHtml(targetid,content);
-                        break;
+                	parseHtml(targetid,content);
+                    break;
                 case "radarping":
-                    content = result.substring(pos+2);
-                    pos = content.indexOf("($end$)");
-                    if(pos!=-1)
-                             {
-                             	content = content.substring(0,pos);
-                             }
             		var splits = content.split(",");
                     var hits = "";
-                    for(i = 1; i < splits.length; i++){
+                    for(var i = 1; i < splits.length; i++) {
                         var tdiv = splits[i];
-			if (tdiv.startsWith(".")) {
-				console.log("CLASS COLLISION WANTED");
-				$( "div"+tdiv ).each(function() {
-					var tid = (this).id;
-					var hit = collision("#"+targetid,"#"+tid);
+                        if (tdiv.startsWith(".")) {
+                        	$( tdiv ).each(function(index, value) {
+                        		var tid = (this).id;
+                        		if (tid != "") {
+                        			var hit = collision("#"+targetid,"#"+tid);
                                 	if (hit) {
-                                        	if (hits==="") {
-                                                	hits=tid;
-                                        	} else {
-                                                	hits+=","+tid;
-                                        	}
+                                        if (hits==="") {
+                                        	hits=tid;
+                                        } else {
+                                        	hits+=","+tid;
+                                        }
                                 	}
-				});
-			} else {
+                        		} else {
+                        			var hit = collision("#"+targetid, tdiv+":eq("+index+")");
+                        			if (hit) {
+                        				if (hits==="") {
+                        					hits="."+tdiv+":eq("+index+")";
+                        				} else {
+                        					hits+=","+"."+tdiv+":eq\("+index+"\)";
+                        				}
+                        			}
+                        		}
+                        	});
+                        } else {
                         	var hit = collision("#"+targetid,tdiv);
                         	if (hit) {
-                                	if (hits==="") {
-                                        	hits=tdiv;
-                                	} else {
-                                        	hits+=","+tdiv;
-                                	}
+                                if (hits==="") {
+                                   	hits=tdiv;
+                                } else {
+                                   	hits+=","+tdiv;
+                                }
                         	} 
-			}
+                        }
                     }
                     var map = {};
                     map["input"] = content;
@@ -453,118 +430,49 @@ var Eddie = function(options){
                     self.putLou("","event(notify,"+JSON.stringify(map)+")");
                     break;
                 case "pingsettings":
-                	
-                        content = result.substring(pos+2);
-                        pos = content.indexOf("($end$)");
-                        if(pos!=-1)
-                                 {
-                                 	content = content.substring(0,pos);
-                                 }
-							pingSettings(targetid,content);
-                        break;
+                	pingSettings(targetid,content);
+                	break;
             	case "show":
-            		content = result.substring(pos+2);
-            		pos = content.indexOf("($end$)");
-            		if(pos!=-1) {
-            				content = content.substring(0,pos);
-            			}
-                    	$(targetid).show();
+            		$(targetid).show();
             		break;
                 case "play":
-                        content = result.substring(pos+2);
-                        pos = content.indexOf("($end$)");
-                        if(pos!=-1) {
-                                content = content.substring(0,pos);
-                               }
-						$("#"+targetid)[0].play();
-                        break;
+                	$("#"+targetid)[0].play();
+                    break;
                 case "pause":
-                        content = result.substring(pos+2);
-                        pos = content.indexOf("($end$)");
-                        if(pos!=-1) {
-                                content = content.substring(0,pos);
-                        }
-						$("#"+targetid)[0].pause();
-                        break;
+                	$("#"+targetid)[0].pause();
+                    break;
                 case "autoplay":
-            		content = result.substring(pos+2);
-            		pos = content.indexOf("($end$)");
-            		if(pos!=-1) {
-            				content = content.substring(0,pos);
-            			}
-                    	$("#"+targetid)[0].autoplay=content;
+            		$("#"+targetid)[0].autoplay=content;
             		break;
                 case "volume":
-            		content = result.substring(pos+2);
-            		pos = content.indexOf("($end$)");
-            		if(pos!=-1) {
-            				content = content.substring(0,pos);
-            			}
-                    	$("#"+targetid)[0].volume=content;
+            		$("#"+targetid)[0].volume=content;
             		break;
                 case "loop":
-            		content = result.substring(pos+2);
-            		pos = content.indexOf("($end$)");
-            		if(pos!=-1) {
-            				content = content.substring(0,pos);
-            			}
-                    	$("#"+targetid)[0].loop=content;
+            		$("#"+targetid)[0].loop=content;
             		break;
             	case "hide":
-            		content = result.substring(pos+2);
-            		pos = content.indexOf("($end$)");
-            		if(pos!=-1) {
-            				content = content.substring(0,pos);
-            			}
-                    	$(targetid).hide(content);
+            		$(targetid).hide(content);
             		break;
             	case "draggable":
-            		content = result.substring(pos+2);
-            		pos = content.indexOf("($end$)");
-            		if(pos!=-1) {
-            				content = content.substring(0,pos);
-            			}
-                    	$(targetid).draggable();
+            		$(targetid).draggable();
             		break;
             	case "bind":
-            		content = result.substring(pos+2);
-            		pos = content.indexOf("($end$)");
-            		if(pos!=-1) { content = content.substring(0,pos); }
                    	setBind(targetid,content);
-			break;
+                   	break;
             	case "template":
-            		content = result.substring(pos+2);
-            		pos = content.indexOf("($end$)");
-            		if(pos!=-1) { content = content.substring(0,pos); }
-                   	setTemplate(targetid,content);
-			break;
+            		setTemplate(targetid,content);
+            		break;
             	case "syncvars":
-            		content = result.substring(pos+2);
-            		pos = content.indexOf("($end$)");
-            		if(pos!=-1) { content = content.substring(0,pos); }
-                   	setSyncvars(targetid,content);
-			break;
+            		setSyncvars(targetid,content);
+            		break;
             	case "update":
-            	 	content = result.substring(pos+2);
-            		pos = content.indexOf("($end$)");
-            		if(pos!=-1) { content = content.substring(0,pos); }
-                   	doUpdate(targetid,content);
-			break;
+            		doUpdate(targetid,content);
+            		break;
              	case "add":
-            	    content = result.substring(pos+2);
-            		pos = content.indexOf("($end$)");
-            		if(pos!=-1) {
-            				content = content.substring(0,pos);
-            			}
-            			addToDiv(targetid,content);
+            	    addToDiv(targetid,content);
             		break;
             	case "put":
-            		content = result.substring(pos+2);
-            		pos = content.indexOf("($end$)");
-            		if(pos!=-1) {
-            				content = content.substring(0,pos);
-            			}
-						putMsg(targetid,content);
+            		putMsg(targetid,content);
 					break;
 				case "remove":
 					remove(targetid);
@@ -574,42 +482,25 @@ var Eddie = function(options){
 					doTerminate(targetid);
 					break;
 				case "setcss":
-					content = result.substring(pos+2);
-					pos = content.indexOf("($end$)");
-					if (pos!=-1) { content = content.substring(0,pos); }
-                    	setCSS(content);
+					setCSS(content);
                     break;
                 case "setstyle":
-					content = result.substring(pos+2);
-					pos = content.indexOf("($end$)");
-					if (pos!=-1) {
-							content = content.substring(0,pos);
-						}
-                    	setStyle(content);
+					setStyle(content);
                     break;
             	case "setscript":
-            		content = result.substring(pos+2);
-					pos = content.indexOf("($end$)");
-					if (pos!=-1) {
-							content = content.substring(0,pos);
-						}
                 	setScript(targetid,content);
                 	break;
                 case "removestyle":
-            		content = result.substring(result.substring(result.indexOf("("))+1, result.indexOf(")"));
-					removeStyle(content);
+   					removeStyle(targetid);
                 	break;
                 case "sdiv":
-                        content = result.substring(pos+2);
-                        pos = content.indexOf("($end$)");
-                        if (pos!=-1) { content = content.substring(0,pos); }
-                        setDivProperty(targetid,content);
-                        break;
+                	setDivProperty(targetid,content);
+                	break;
                default:
-                		break;
+                	break;
             }
 
-            // lets check if there are move messages
+            // lets check if there are more messages
 			pos = result.indexOf("($end$)");
 			if (pos!=-1) {
 				result = result.substring(pos+7);
@@ -793,34 +684,51 @@ var Eddie = function(options){
 
 
 	function setDivProperty(targetid,content) {
-                var div = document.getElementById(targetid);
-                if (div!==null) {
+		var div = document.getElementById(targetid);
+		//check if element also doesn't exist in jQuery syntax
+        if (div !== null || $(targetid).length) {
 			var commands = content.split(",");
 			for(i = 0; i < commands.length; i++){
 				var command = commands[i];
 				var eventtargets = command.split(":");
 				command = eventtargets[0];
-            			switch(command){
-               			case "draggable":
+            	switch(command){
+               	case "draggable":
 					if (eventtargets.length>1) {
 						var data = eval('(' + content.substring(10)+ ')');
-                    				$('#'+targetid).draggable(data);
+						if (targetid.startsWith(".")) {
+							$(targetid).draggable(data);
+						} else {
+							$('#'+targetid).draggable(data);
+						}
 					} else {
-                    				$('#'+targetid).draggable();
+						if (targetid.startsWith(".")) {
+							$(targetid).draggable();
+						} else {
+							$('#'+targetid).draggable();
+						}
 					}
 					break;
-               			case "undraggable":
-                    			$('#'+targetid).draggable('disable');
+               	case "undraggable":
+               		if (targetid.startsWith(".")) {
+               			$(targetid).draggable('disable');
+               		} else {
+               			$('#'+targetid).draggable('disable');
+               		}
 					break;
-               			case "style":
-					$('#'+targetid).css(eventtargets[1],eventtargets[2]);
+               	case "style":
+               		if (targetid.startsWith(".")) {
+               			$(targetid).css(eventtargets[1],eventtargets[2]);
+               		} else {
+               			$('#'+targetid).css(eventtargets[1],eventtargets[2]);
+               		}
 					break;
-               			case "sound":
+               	case "sound":
 					self.makesound(content.substring(6));
 					break;
-               			case "bind":
-                        		for(j = 1; j < eventtargets.length; j++){
-                    				$('#'+targetid).bind(eventtargets[j], {etarget: eventtargets[j]}, function(event) {
+               	case "bind":
+                        for(var j = 1; j < eventtargets.length; j++){
+                    		$('#'+targetid).bind(eventtargets[j], {etarget: eventtargets[j]}, function(event) {
 							var data = event.data;
 							if (this.tagName=="INPUT") {
 								var edata = targetid+".value="+this.value;
@@ -853,7 +761,7 @@ var Eddie = function(options){
 						});
 					}
 					break;
-					default:
+				default:
 					break;
 				}
 			}
