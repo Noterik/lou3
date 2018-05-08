@@ -689,7 +689,7 @@ public class LouServlet extends HttpServlet {
 		Iterator it = urlmappings.keySet().iterator();
 		while(it.hasNext()){
 			String mapurl = (String) it.next();
-			//	System.out.println("MMM="+mapurl);
+			//System.out.println("MMM="+mapurl);
 			String lmapurl = mapurl;
 			int pos = mapurl.indexOf("@");
 			if (pos!=-1) {
@@ -700,10 +700,18 @@ public class LouServlet extends HttpServlet {
 					return paths;
 				}
 			} else {
-				//	System.out.println("I="+inurl+" M="+mapurl);
+				//System.out.println("I="+inurl+" M="+mapurl);
 				if (inurl.equals(mapurl)) {
 					String[] paths = urlmappings.get(mapurl).split(",");
 					return paths;
+				}
+				if (mapurl.endsWith("/*")) {
+					if (inurl.startsWith(mapurl.substring(0,mapurl.length()-2))) {
+						String res = urlmappings.get(mapurl);
+						res = res.replace("$resturl",inurl.substring(mapurl.length()-1));
+						String[] paths = res.split(",");
+						return paths;
+					}
 				}
 			}
 		}

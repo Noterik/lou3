@@ -1112,7 +1112,7 @@ public class ApplicationManager extends Thread implements MargeObserver {
     
     
     private void readJumpersForApp(String filename) {
- //   	System.out.println("SCANPATH="+filename);
+//   	System.out.println("SCANPATH="+filename);
 //		String filename = basepath+File.separator+"apps"+File.separator+part+File.separator+"components"+File.separator+"app.xml";
 		File file = new File(filename);
 		if (file.exists()) {
@@ -1142,7 +1142,7 @@ public class ApplicationManager extends Thread implements MargeObserver {
 							Node child2 = (Node)iter2.next();
 							String id = child2.getName();
 							if(id!=null) {
-								System.out.println("JUMPER="+sid+" "+id+" "+child2.getText());
+								//System.out.println("JUMPER="+sid+" "+id+" "+child2.getText());
 								LouServlet.addUrlTrigger(sid+","+child2.getText(),"newscreen");
 
 							}
