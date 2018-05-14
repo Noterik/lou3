@@ -49,7 +49,7 @@ var Eddie = function(options){
 		register();
 		addGestureEvents();
 
-		interval = setInterval(function () {
+		var interval = setInterval(function () {
 		nowdate = new Date().getTime();
 		delaydate = nowdate-responsetime;
 		if (websocket!==null) {
