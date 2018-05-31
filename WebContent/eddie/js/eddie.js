@@ -15,6 +15,7 @@ var Eddie = function(options){
 	var performancetestcounter=-1;
 	var performancedata ='';
 	var performancetestcount=0;
+    var externalprogram = false;
 
 	var settings = {
 		lou_ip: "",
@@ -71,7 +72,9 @@ var Eddie = function(options){
 		if (delaydate>(delayresettime)) {
 		    if (hadwsactive) {
 				clearInterval(interval);
-				window.location.href=window.location.href;
+                if (!externalprogram) {
+                    window.location.href=window.location.href;
+                }
 			}
 		}
             for (var data in trackers){
@@ -459,6 +462,13 @@ var Eddie = function(options){
             	case "bind":
                    	setBind(targetid,content);
                    	break;
+               	case "externalprogram":
+					externalprogram = true;
+					break;
+               	case "internalprogram":
+                    responsetime = new Date().getTime();
+					externalprogram = false;
+					break;
             	case "template":
             		setTemplate(targetid,content);
             		break;

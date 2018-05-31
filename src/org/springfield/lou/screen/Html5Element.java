@@ -55,6 +55,16 @@ public class Html5Element {
 		return true;
 	}
 	
+	public boolean externalprogram() {
+		screen.send("externalprogram("+selector+")");
+		return true;
+	}
+	
+	public boolean internalprogram() {
+		screen.send("internalprogram("+selector+")");
+		return true;
+	}
+	
 
 	public boolean draggable() {
 		screen.send("draggable("+selector+")");
