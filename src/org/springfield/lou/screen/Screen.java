@@ -568,7 +568,6 @@ public class Screen {
 			String stylename = stylepath.substring(stylepath.lastIndexOf("/")+1, stylepath.indexOf(".mst"));
 			if(stylename.contains("_")) stylename = stylename.substring(0, stylename.indexOf("_"));
 			stylename+="-mst";
-			
 			body = doMstReplace(body);
 			messagecount++;
 			if (websocketconnection!=null) {
@@ -608,6 +607,7 @@ public class Screen {
 				}
 				pos = body.indexOf("{{");
 			}
+			newbody +=body; // add the last part of the body
 			return newbody;
 		} else {
 			return body;
