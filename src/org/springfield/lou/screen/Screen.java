@@ -412,6 +412,8 @@ public class Screen {
 	}
 	
 	public void remove(String t) {
+		Html5Element e = get(t);
+		if (e!=null) e.remove();
 		removeContent(t.substring(1));
 	}
 	
