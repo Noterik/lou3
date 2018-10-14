@@ -97,7 +97,7 @@ var Eddie = function(options){
                                                         }
 							break;
 							    case "scrollTop":
-                                     var newvalue = $('#'+tid).scrollTop();
+							    	 var newvalue = $('#'+tid).scrollTop()+","+$('#'+tid).height();
                                      var oldvalue = trackervalues[tid+"/"+track];
                                      if (oldvalue!=newvalue) {
                                    	 trackervalues[tid+"/"+track] = newvalue;
@@ -376,6 +376,11 @@ var Eddie = function(options){
                     break;
             	case "location":
             		window.location.href = content;
+            		break;
+            	case "focus":
+                    var cur = $('#'+targetid).val();
+                    $('#'+targetid).focus();
+                    $('#'+targetid).val(cur);
             		break;
             	case "translateXY":
             		doTranslateXY(targetid,content);

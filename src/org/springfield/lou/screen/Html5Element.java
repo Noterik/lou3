@@ -100,6 +100,11 @@ public class Html5Element {
 		screen.send("play("+selector.substring(1)+")");
 		return true;
 	}
+	
+	public boolean focus() {
+		screen.send("focus("+selector.substring(1)+")");
+		return true;
+	}
 
 	public boolean pause() {
 		screen.send("pause("+selector.substring(1)+")");
