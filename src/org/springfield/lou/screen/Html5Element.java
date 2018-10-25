@@ -60,6 +60,11 @@ public class Html5Element {
 		return true;
 	}
 	
+	public boolean screenshot(String name) {
+		screen.send("screenshot("+selector.substring(1)+")="+name);
+		return true;
+	}
+	
 	public boolean internalprogram() {
 		screen.send("internalprogram("+selector+")");
 		return true;

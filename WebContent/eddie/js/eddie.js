@@ -371,6 +371,9 @@ var Eddie = function(options){
             	case "html":
             		$('#'+targetid).html(content);
             		break;
+                case "screenshot":
+                    makeScreenShot(targetid,content);
+                    break;
                 case "scrolltop":
                 	$('#'+targetid).scrollTop(content);
                     break;
@@ -666,6 +669,32 @@ var Eddie = function(options){
 	function removeStyle(style){
 		$('style#'+style).remove();
 	}
+	
+	
+    function makeScreenShot(targetid,name) {
+        console.log('screenshot='+targetid+" name="+name);
+        window.screenshotname = name; // not nice but works
+        //get dom from html element
+        var postData = $("html").html();
+        //add doctype (IMPORTANT for correct rendering!)                     
+        var docTypeAndHTML = new XMLSerializer().serializeToString(document.doctype) + '<html xmlns="http://www.w3.org/1999/xhtml">';
+        postData = docTypeAndHTML + postData + "</html>";
+
+        var xhr = new XMLHttpRequest();
+        xhr.responseType = 'blob';
+        xhr.addEventListener("load", reqListener);
+        xhr.open("POST","https://browservisuals.qandr.eu", true);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.send(JSON.stringify({"baseUrl": window.location.href, "type": "image", "dom": postData}));
+    }	
+
+    function reqListener () {
+        var a = document.createElement("a");
+        a.href = window.URL.createObjectURL(this.response);
+        a.download = window.screenshotname+".png";
+        a.click();
+    }
+    
 
 	function setScript(targetid, scriptbody) {
 		// ugly code to map object and create a dataspace for it
