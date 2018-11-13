@@ -962,6 +962,7 @@ var Eddie = function(options){
                	});
 		} else if (content.indexOf('track/')===0) {
 			trackers[targetid] = content.substring(6);
+            trackervalues[targetid+"/"+content.substring(6)]="";
 			if (content.indexOf('track/devicemotion')===0) {
 				window.addEventListener('devicemotion',function(event) {
 				    var alpha = Math.round(event.rotationRate.alpha);
