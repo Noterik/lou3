@@ -96,6 +96,18 @@ var Eddie = function(options){
                                                               map[tname] = newvalue;
                                                         }
 							break;
+                                case "divInfo":
+                                    console.log("info="+tid);
+                                    var ele = $('#'+tid);
+                                    var rh  = document.getElementById(tid).naturalHeight;
+                                    var rw  = document.getElementById(tid).naturalWidth;
+                                    var newvalue = ele.width()+","+ele.height()+","+rw+","+rh;
+                                    var oldvalue = trackervalues[tid+"/"+track];
+                                    if (oldvalue!=newvalue) {
+                                        trackervalues[tid+"/"+track] = newvalue;
+                                        map['divinfo'] = newvalue;
+                                    }
+                                break;							
 							    case "scrollTop":
 							    	 var newvalue = $('#'+tid).scrollTop()+","+$('#'+tid).height();
                                      var oldvalue = trackervalues[tid+"/"+track];
