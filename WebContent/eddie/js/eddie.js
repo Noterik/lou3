@@ -923,6 +923,13 @@ var Eddie = function(options){
                     	if (e.which==9) {
                       	  e.preventDefault();
 							e.stopPropagation();
+                        } else if (e.which==16) {
+                            map = {};
+                            map["targetid"] = targetid;
+                            map["which"] = e.which+1000;
+                            map["id"] = e.target.id;
+                           self.putLou("","event("+targetid+"/keypress,"+JSON.stringify(map)+"):w" +
+                           		"");
 						}
 
                 	});
