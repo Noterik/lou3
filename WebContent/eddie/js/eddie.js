@@ -681,25 +681,26 @@ var Eddie = function(options){
 	function removeStyle(style){
 		$('style#'+style).remove();
 	}
-	
+
     function makeScreenShot(targetid,name) {
         var nw  = window.innerWidth;
         var nh  = window.innerHeight;
+        var mf = 1;
         if (nw<1920 && nh<1080) {
                 var mfw = 1920/nw;
                 var mfh = 1080/nh;
                 if (mfw>mfh) {
                         nw = nw * mfh;
                         nh = nh * mfh;
+                        mf = mfh;
                 } else {
                         nw = nw * mfw;
                         nh = nh * mfw;
+                        mf = mfw;
                 }
         }
 
         window.screenshotname = name; // not nice but works
-
-        console.log('screenshot='+targetid+" name="+name+" width="+nw+" ("+window.innerWidth+") height="+nh+" ("+window.innerHeight+")");
 
         //get dom from html element
         var postData = $("html").html();
@@ -712,7 +713,7 @@ var Eddie = function(options){
         xhr.addEventListener("load", reqListener);
         xhr.open("POST","https://browservisuals.qandr.eu", true);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        xhr.send(JSON.stringify({"width": nw,"height":nh,"baseUrl": window.location.href, "type": "image", "dom": postData}));
+        xhr.send(JSON.stringify({"oheight": window.innerHeight,"owidth": window.innerWidth,"scale": mf,"width": nw,"height":nh,"baseUrl": window.location.href, "type": "image", "dom": postData}));
     }	
 
     function reqListener () {
