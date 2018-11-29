@@ -148,7 +148,7 @@ var Eddie = function(options){
 											map['clientXY'] = trackervalues[tid+"/"+track];
 											map['width'] = $('#'+tid).width();
 											map['height'] = $('#'+tid).height();
-								
+											map['value'] = parts.length > 6 ? parts[6] : "null";								
 									}	
             						break;
             					case "devicemotion":
@@ -1007,12 +1007,18 @@ var Eddie = function(options){
         			var xp = (event.layerX/event.target.offsetWidth)*100;
             		var yp = (event.layerY/event.target.offsetHeight)*100;
             		var newvalue = event.offsetX+','+event.offsetY+','+event.layerX+','+event.layerY+','+xp+','+yp;
-                    if (oldvalue!=newvalue) {
+            		
+            		//keep track of input type range element
+            		if (event.target.tagName==="INPUT") {
+						newvalue += ","+ event.target.value;
+					}
+            		
+            		if (oldvalue!=newvalue) {
                         	trackervalues[targetid+"/mousemove"] = newvalue;
                             trackervalues[targetid+"/mousemove_send"] = "true";
 					}
 				});
-				$("#"+targetid).on('touchmove', function() {
+				$("#"+targetid).on('touchmove', function(ev) {
 					// set these already in the tracker to be send
           			var oldvalue = trackervalues[targetid+"/mousemove"];
 					var newvalue = '';
@@ -1031,12 +1037,19 @@ var Eddie = function(options){
 					  	} else {
 							newvalue += ','+left+','+top+','+left+','+top+','+xp+','+yp;
 					  	}
+            			
+            			//keep track of input type range element
+                		if (ev.target.tagName==="INPUT") {
+    						newvalue += ","+ ev.target.value;
+    					}
 					}
-          if (oldvalue!=newvalue) {
-               trackervalues[targetid+"/mousemove"] = newvalue;
-               trackervalues[targetid+"/mousemove_send"] = "true";
+					if (oldvalue!=newvalue) {
+						trackervalues[targetid+"/mousemove"] = newvalue;
+						trackervalues[targetid+"/mousemove_send"] = "true";
 					}
-					event.preventDefault();
+					if (ev.target.tagName!=="INPUT") {
+						event.preventDefault();
+					}
 				});
 			}
 		} else if (div!==null) {
