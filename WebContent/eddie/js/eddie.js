@@ -719,7 +719,7 @@ var Eddie = function(options){
     function reqListener () {
         var a = document.createElement("a");
         a.href = window.URL.createObjectURL(this.response);
-        a.download = window.screenshotname+".png";
+        a.download = window.screenshotname+".jpg";
         a.click();
     }
     
