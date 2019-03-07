@@ -76,6 +76,16 @@ public class Html5Element {
 		return true;
 	}
 	
+	public boolean fullscreen() {
+		screen.send("fullscreen("+selector+")");
+		return true;
+	}
+	
+	public boolean exitfullscreen() {
+		screen.send("exitfullscreen("+selector+")");
+		return true;
+	}
+	
 	public boolean css(String elementname,String value) {
 		screen.setDiv(selector.substring(1),"style:"+elementname+":"+value);
 		return true;

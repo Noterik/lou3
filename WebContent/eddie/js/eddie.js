@@ -479,6 +479,12 @@ var Eddie = function(options){
             	case "draggable":
             		$(targetid).draggable();
             		break;
+                case "fullscreen":
+                    window.fullscreenwanted = true;
+                    break;
+                case "exitfullscreen":
+                    window.fullscreenwanted = false;
+                    break;
             	case "bind":
                    	setBind(targetid,content);
                    	break;
