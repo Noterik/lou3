@@ -484,6 +484,7 @@ var Eddie = function(options){
                     break;
                 case "exitfullscreen":
                     window.fullscreenwanted = false;
+                    document.exitFullscreen();
                     break;
             	case "bind":
                    	setBind(targetid,content);

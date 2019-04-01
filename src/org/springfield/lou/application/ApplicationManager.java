@@ -382,10 +382,8 @@ public class ApplicationManager extends Thread implements MargeObserver {
     				if (pos!=-1) {
     					filename = filename.substring(pos+4);
     					pos = filename.indexOf("app.war");
-        				//System.out.println("POS2="+pos);
     					if (pos!=-1) {
     						filename = filename.substring(0,pos);
-    						//System.out.println("APPNAME FILE="+filename);
     						createNewAppEntry(filename);
     						processUploadedWar(uploadfile,filename);
     					}
