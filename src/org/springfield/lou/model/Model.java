@@ -388,6 +388,7 @@ public class Model {
 			dirtygets.remove(path);
 		}
 		
+		
 		if (path.startsWith("@")) {
 			// its a model mapping
 			int pos=path.indexOf("/"); // not sure if i can move tis in getModeMapping will try later
