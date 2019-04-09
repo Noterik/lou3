@@ -42,6 +42,7 @@ public class Model {
 	private boolean debug = false;
 	private static ModelTimer modeltimer = null;
 	private static ModelTimerMilliseconds modeltimerms = null;
+	private static ArrayList<String> dirtygets = new ArrayList<String>();
 
 	
 	public Model(Screen s) {
@@ -71,6 +72,13 @@ public class Model {
 	
 	public static ModelEventManager getEventManager() {
 		return eventmanager;
+	}
+	
+	public static void dirtyGetList(String path) {
+		System.out.println("SIGNAL DIRTY CACHE="+path);
+		if (!dirtygets.contains(path)) {
+			dirtygets.add(path);
+		}
 	}
 	
 	public  String getPathValue(String path) {
@@ -368,9 +376,18 @@ public class Model {
 		}
 		return null;
 	}
-
+	
 	public FSList getList(String path) {
+		return getList(path,false);
+	}
+
+	public FSList getList(String path,boolean cache) {
 		if (debug) System.out.println("getlist path in = "+path);
+		if (dirtygets.contains(path)) {
+			cache = false;
+			dirtygets.remove(path);
+		}
+		
 		if (path.startsWith("@")) {
 			// its a model mapping
 			int pos=path.indexOf("/"); // not sure if i can move tis in getModeMapping will try later
@@ -393,7 +410,7 @@ public class Model {
 		} else if (path.startsWith("/app")) { 
 			return amodel.getList(path);
 		} else if (path.startsWith("/domain/")) { 
-			return FSListManager.get(path,false); // need to support cache calls
+			return FSListManager.get(path,cache); // need to support cache calls
 		}
 		return null;
 	}
