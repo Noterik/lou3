@@ -1110,62 +1110,66 @@ var Eddie = function(options){
 			
 	
 			if (padding.length>1) {
-        			for (var i = 1; i < padding.length; i++) {
-                			var name = padding[i];
-					var p = $("#"+name);
-					var nt=$('input[name='+name+']:checked').val();
-					if (nt!==undefined) {
-    						map[name] = nt;
-                	} else if (p.prop("tagName")==="INPUT") {
-						//console.log('type='+p.prop("type"));
-						if (p.prop("type")==="file") {
-							var $i = $("#"+name);
-							input = $i[0];
-							file = input.files[0];
-                            if (file===undefined) {
-                                file=window.dropfile;
-                            }							
-							
-							var fileparams = "?targetid="+name+"&screenid="+settings.screenId+"&cfilename="+file.name+"&cfilesize="+file.size;								
-							reader = new FileReader();
-							reader.readAsDataURL(file);
-							reader.onload = function(event) {  
-								file.data = event.target.result;
+        		for (var i = 1; i < padding.length; i++) {
+                	var name = padding[i];
+					var p = name.startsWith("[") ? $(name) : $("#"+name);
+					
+					for(var j = 0; j < p.length; j++) {
+						name = p[j].id;
+						var nt=$('input[name='+name+']:checked').val();
+						if (nt!==undefined) {
+	    						map[name] = nt;
+	                	} else if (p.prop("tagName")==="INPUT") {
+							//console.log('type='+p.prop("type"));
+							if (p.prop("type")==="file") {
+								var $i = $("#"+name);
+								input = $i[0];
+								file = input.files[0];
+	                            if (file===undefined) {
+	                                file=window.dropfile;
+	                            }							
+								
+								var fileparams = "?targetid="+name+"&screenid="+settings.screenId+"&cfilename="+file.name+"&cfilesize="+file.size;								
+								reader = new FileReader();
+								reader.readAsDataURL(file);
+								reader.onload = function(event) {  
+									file.data = event.target.result;
+									self.doRequest({
+										'type': 'POST',
+										'url': "//" + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp+fileparams,
+										'data': file.data,
+										'dataType': 'data',
+										'processData': false,
+						                'contentType': 'application/data',
+										'async': true
+									});
+								};
+								map['filename'] = file.name;
+								map[name] = "filehandle";
+							} else if (p.prop("type") === "hidden" && p.prop("name") === "fileupload") {
+								var inp = $("#"+name);
+								var file = {};
+								file.name = inp.data("filename");
+								file.data = inp.val();
+								var fileparams = "?targetid="+name+"&screenid="+settings.screenId+"&cfilename="+file.name+"&cfilesize="+file.data.length;							
+								
 								self.doRequest({
 									'type': 'POST',
 									'url': "//" + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp+fileparams,
 									'data': file.data,
 									'dataType': 'data',
 									'processData': false,
-					                'contentType': 'application/data',
+									'contentType': 'application/data',
 									'async': true
 								});
-							};
-							map['filename'] = file.name;
-							map[name] = "filehandle";
-						} else if (p.prop("type") === "hidden" && p.prop("name") === "fileupload") {
-							var inp = $("#"+name);
-							var file = {};
-							file.name = inp.data("filename");
-							file.data = inp.val();
-							var fileparams = "?targetid="+name+"&screenid="+settings.screenId+"&cfilename="+file.name+"&cfilesize="+file.data.length;							
-							
-							self.doRequest({
-								'type': 'POST',
-								'url': "//" + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp+fileparams,
-								'data': file.data,
-								'dataType': 'data',
-								'processData': false,
-								'contentType': 'application/data',
-								'async': true
-							});
-							map['filename'] = file.name;
-							map[name] = "filehandle";
+								map['filename'] = file.name;
+								map[name] = "filehandle";
+							} else {
+	    							map[name] = $("#"+name).val(); 
+							}
 						} else {
-    							map[name] = $("#"+name).val(); 
+	    						map[name] = $("#"+name).val();
 						}
-					} else {
-    						map[name] = $("#"+name).val();
 					}
 				}
 			}
