@@ -258,6 +258,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 			String[] tmp = wantremove.get(i).split(",");
 			//System.out.println("S="+tmp[0]+" U="+tmp[1]);
 			removeScreen(tmp[0],tmp[1]);
+	
 		}
 	}
 	
@@ -417,7 +418,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	public void removeScreen(String id,String username){
 		Screen screen = this.screenmanager.get(id);
 		if (screen!=null) {
-			//System.out.println("REQUEST SCREEN REMOVE ID="+id+"");
+			System.out.println("REQUEST SCREEN REMOVE ID="+id+"");
 			screen.getModel().getEventManager().removeScreenBinds(id);
 			username = screen.getUserName();
 		}

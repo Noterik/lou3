@@ -346,6 +346,7 @@ public class LouServlet extends HttpServlet {
 
 
 		String mt = request.getContentType();
+		//System.out.println("MT="+mt);
 		if (mt.equals("application/data")) {
 			handleFileUpload(request);
 			return;
