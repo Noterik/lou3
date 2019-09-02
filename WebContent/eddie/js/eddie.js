@@ -92,12 +92,11 @@ var Eddie = function(options){
 							var oldvalue = trackervalues[tid+"/"+track];
 							var newvalue = v[tname];
 							if (oldvalue!=newvalue) {
-                                                              trackervalues[tid+"/"+track] = newvalue;
-                                                              map[tname] = newvalue;
-                                                        }
+								trackervalues[tid+"/"+track] = newvalue;
+                                 map[tname] = newvalue;
+                            }
 							break;
                                 case "divInfo":
-                                    console.log("info="+tid);
                                     var ele = $('#'+tid);
                                     var rh  = document.getElementById(tid).naturalHeight;
                                     var rw  = document.getElementById(tid).naturalWidth;
@@ -105,7 +104,7 @@ var Eddie = function(options){
                                     var oldvalue = trackervalues[tid+"/"+track];
                                     if (oldvalue!=newvalue) {
                                         trackervalues[tid+"/"+track] = newvalue;
-                                        map['divinfo'] = newvalue;
+                                        map['divInfo'] = newvalue;
                                     }
                                 break;							
 							    case "scrollTop":
@@ -116,6 +115,33 @@ var Eddie = function(options){
                                      map['scrollTop'] = newvalue;
                                     }
                                   break;
+                                case "divXYPerc":
+                                    var top = $('#'+tid).position().top;
+                                    var left = $('#'+tid).position().left;
+
+                                    var height = $('#'+tid).parent().height();
+                                    var width = $('#'+tid).parent().width();
+
+                                    var oldvalue = trackervalues[tid+"/"+track];
+                                    var newvalue = ""+(left/width)*100;
+                                    newvalue += ","+((top/height)*100);
+                                    if (oldvalue!=newvalue) {
+                                                    console.log("xy="+newvalue+" T="+top+" H="+height);
+                                                    trackervalues[tid+"/"+track] = newvalue;
+                                                    map['divXYPerc'] = newvalue;
+                                    }
+                                    break;
+                                case "screenXYPerc":
+                                    var position = $('#'+tid).position();
+                                    var oldvalue = trackervalues[tid+"/"+track];
+                                    var newvalue = ""+(position.left/window.innerWidth)*100;
+                                    newvalue += ","+((position.top/window.innerHeight)*100);
+                                    if (oldvalue!=newvalue) {
+                                                    console.log("xy="+newvalue);
+                                                    trackervalues[tid+"/"+track] = newvalue;
+                                                    map['screenXYPerc'] = newvalue;
+                                    }
+                                    break;
             					case "screenXPerc":
 					    		var position = $('#'+tid).position();
                                 			var oldvalue = trackervalues[tid+"/"+track];
