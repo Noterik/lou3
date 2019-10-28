@@ -53,22 +53,8 @@ public class ServiceHandler implements ServiceInterface{
 			if (command.equals("notify")) {
 				ModelEventManager em = Model.getEventManager();
 				FsNode msg = json2msg(value);
-				System.out.println("MSG2="+value);
-				/*
-				FsNode msg = new FsNode("msg","1");
-				
-				
-				String[] list = value.split(",");
-				if (list.length>0) {
-					for (int i=0;i<list.length;i++) {
-						pos = list[i].indexOf("=");
-						if (pos!=-1) {
-							msg.setProperty(list[i].substring(0,pos),list[i].substring(pos+1));
-						}
-					}
-				}		
-				*/
-				System.out.println("EM="+em+" P="+path);
+				SharedModel sm = Model.getSharedModel();
+				sm.putNode(path, msg);
 				em.notify(path,msg);
 			}
 		}
@@ -108,14 +94,16 @@ public class ServiceHandler implements ServiceInterface{
 			JSONObject jo = (JSONObject) parser.parse(value);
 			for (Object key : jo.keySet()) {
 				String keyname = (String)key;
-				System.out.println("KEYNAME="+keyname);
+				//System.out.println("KEYNAME2="+keyname);
 				
 				Object o = jo.get(keyname); 
 				if (o instanceof String) {
-					//String value = (String)o;
-					System.out.println("KEYNAME="+keyname+" VALUE="+value);
+					String kvalue = (String)o;
+					//System.out.println("KEYNAME="+keyname+" VALUE="+kvalue);
+					msg.setProperty(keyname,kvalue);
 				} else {
-					System.out.println("KEYNAME="+keyname+" OBJECT?");
+					msg.setProperty(keyname,""+o);
+					//System.out.println("KEYNAME="+keyname+" O="+o);
 				}
 		
 			}

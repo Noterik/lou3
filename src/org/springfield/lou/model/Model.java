@@ -75,7 +75,7 @@ public class Model {
 	}
 	
 	public static void dirtyGetList(String path) {
-		System.out.println("SIGNAL DIRTY CACHE="+path);
+	//	System.out.println("SIGNAL DIRTY CACHE="+path);
 		if (!dirtygets.contains(path)) {
 			dirtygets.add(path);
 		}
@@ -198,6 +198,10 @@ public class Model {
  		node.setProperty("methodname",methodname);
  		notify("/shared/internal",node);
 	}
+ 	
+ 	public static SharedModel getSharedModel() {
+ 		return sharedmodel;
+ 	}
 	
  	
  	public void onPropertyUpdate(String path,String methodname,Html5Controller callbackobject) {

@@ -461,6 +461,7 @@ public class ModelEventManager {
     
     public void deliverNotify(String path,FsNode node) {	
  //   	System.out.println("PATH="+path+" N="+node.asXML());
+    	String dstring="";
 		long starttime = new Date().getTime();
 		ArrayList<ModelBindObject> binds = notifybinds.get(path); // direct hit
 		if (binds!=null) {
@@ -470,8 +471,9 @@ public class ModelEventManager {
 			event.eventtype = ModelBindEvent.NOTIFY;
 			for (int i=binds.size()-1;i>-1;i--) {
 				ModelBindObject bind  = binds.get(i);
-				try {							
+				try {	
 					bind.methodcall.invoke(bind.obj,event);
+					dstring += ""+bind.obj+"/"+bind.method+"("+(new Date().getTime()-starttime)+") ";
 				} catch(Exception e) {
 					System.out.println("Error during nofity delivery : "+bind.selector+" "+bind.method+" "+bind.obj);
 
@@ -480,7 +482,7 @@ public class ModelEventManager {
 			}
 		}
 		long time = new Date().getTime()-starttime;
-		if (time>90) System.out.println("notify delivertime="+path+" "+time);
+		if (time>10) System.out.println("notify delivertime="+path+" "+time+" trace="+dstring);
     }
     
     

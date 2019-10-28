@@ -76,6 +76,8 @@ public class Html5Element {
 		return true;
 	}
 	
+	
+	
 	public boolean fullscreen() {
 		screen.send("fullscreen("+selector+")");
 		return true;

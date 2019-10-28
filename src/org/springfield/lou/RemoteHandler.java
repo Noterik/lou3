@@ -11,7 +11,7 @@ public class RemoteHandler extends HtmlController {
 		System.out.println("REEEEEEMOTE HANDLER CREATED !!!!! SO WE CAN TALK TO JIMMY");
 		
 		ModelEventManager em = Model.getEventManager();
-		System.out.println("EM="+em);
+		//System.out.println("EM="+em);
 		em.onNotify("/shared[app]/remote","onRemoteMessage",this);	
 	}
 	
