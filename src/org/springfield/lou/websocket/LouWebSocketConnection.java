@@ -1,6 +1,8 @@
 package org.springfield.lou.websocket;
 
+import java.lang.StringBuffer;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
@@ -25,6 +27,8 @@ public class LouWebSocketConnection implements MessageHandler.Partial<String> {
 	private int loadtask = -1;
 	
 	private boolean debug=false;
+	
+	private HashMap<Session, StringBuffer> partialMessages = new HashMap<Session, StringBuffer>();
 	
 	public LouWebSocketConnection(Session s,Screen sc) {
 		session = s;
@@ -57,39 +61,64 @@ public class LouWebSocketConnection implements MessageHandler.Partial<String> {
 	}
 	
 	@Override
-	public void onMessage(String data, boolean arg1) {
+	public void onMessage(String data, boolean lastMessage) {
 		long st = new Date().getTime();
 		screen.setSeen();
-		int pos = data.indexOf("put(");
-		if (pos!=-1) {
-			data = data.substring(pos+4);
-			int pos2 = data.indexOf(")");
-			if (pos2!=-1) {
-				String target = data.substring(0,pos2);
-				int pos3 = target.indexOf(",");
-				String from = target.substring(0,pos3);
-				target = target.substring(pos3+1);
-				String content = data.substring(pos2+2);
-				screen.webSocketPut(from,content);
+		//check if this is a partial message, in that case store
+		//untill we have the complete message available
+		if (!lastMessage) {
+			StringBuffer message;
+			
+			if (partialMessages.containsKey(session)) {
+				message = partialMessages.get(session);
+			} else {
+				message = new StringBuffer();
+			}
+			
+			message.append(data);
+			
+			partialMessages.put(session, message);
+		} else {
+			//If we have earlier partial messages combine them together
+			if (partialMessages.containsKey(session)) {
+				StringBuffer message = partialMessages.get(session);
+				message.append(data);
+				data = message.toString();
+				//clear partial message cache
+				partialMessages.remove(session);
+			}
+			
+			int pos = data.indexOf("put(");
+			if (pos!=-1) {
+				data = data.substring(pos+4);
+				int pos2 = data.indexOf(")");
+				if (pos2!=-1) {
+					String target = data.substring(0,pos2);
+					int pos3 = target.indexOf(",");
+					String from = target.substring(0,pos3);
+					target = target.substring(pos3+1);
+					String content = data.substring(pos2+2);
+					screen.webSocketPut(from,content);
+					receivedata+=data.length();
+					receivetime+=new Date().getTime()-st;
+					receivecount++;
+					//if (debug) System.out.println("ws receive ("+this.hashCode()+")"+(receivecount++)+" s="+receivedata);
+				}
+			} else if (data.startsWith("ping(")) {
 				receivedata+=data.length();
 				receivetime+=new Date().getTime()-st;
 				receivecount++;
-				//if (debug) System.out.println("ws receive ("+this.hashCode()+")"+(receivecount++)+" s="+receivedata);
-			}
-		} else if (data.startsWith("ping(")) {
-			receivedata+=data.length();
-			receivetime+=new Date().getTime()-st;
-			receivecount++;
-			if (pong) {
-				// do pong task
-				if (loadtask!=-1) {
-					int j = 0;
-					for (int i=0;i<loadtask;i++) {
-						j++;
+				if (pong) {
+					// do pong task
+					if (loadtask!=-1) {
+						int j = 0;
+						for (int i=0;i<loadtask;i++) {
+							j++;
+						}
+						System.out.print(" "+j);
 					}
-					System.out.print(" "+j);
+					send(pongdata);
 				}
-				send(pongdata);
 			}
 		}
 	}

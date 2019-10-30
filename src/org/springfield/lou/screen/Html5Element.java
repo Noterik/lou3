@@ -457,5 +457,10 @@ public class Html5Element {
 		return controller;
 	}
 	
+	public boolean gethtml() {
+		screen.send("gethtml("+selector.substring(1)+")");
+		return true;
+	}
+	
 	
 }
