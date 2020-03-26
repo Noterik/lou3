@@ -482,7 +482,7 @@ public class ModelEventManager {
 			}
 		}
 		long time = new Date().getTime()-starttime;
-		if (time>10) System.out.println("notify delivertime="+path+" "+time+" trace="+dstring);
+		if (time>200) System.out.println("notify delivertime="+path+" "+time+" trace="+dstring);
     }
     
     

@@ -1331,7 +1331,7 @@ var Eddie = function(options){
 	}
 		function addGestureEvents() {
 			window.addEventListener("orientationchange", function() {
-	  			self.putLou('','orientationchange('+window.orientation+')');
+	  			//self.putLou('','orientationchange('+window.orientation+')');
 			}, false);
 		}
 	
