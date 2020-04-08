@@ -16,6 +16,7 @@ import org.springfield.fs.FsNode;
 import org.springfield.lou.application.Html5ApplicationInterface;
 import org.springfield.lou.controllers.Html5Controller;
 import org.springfield.lou.model.Model;
+import org.apache.commons.codec.binary.Base64;
 
 public class Html5Element {
 	private String selector;
@@ -90,6 +91,13 @@ public class Html5Element {
 	
 	public boolean css(String elementname,String value) {
 		screen.setDiv(selector.substring(1),"style:"+elementname+":"+value);
+		return true;
+	}
+	
+	public boolean image(byte[] blob) {
+    	String encoded = new String(Base64.encodeBase64(blob));
+    	System.out.println("SIZE="+blob.length+" S="+encoded.length());
+		screen.send("image("+selector.substring(1)+")="+encoded);
 		return true;
 	}
 	
@@ -455,6 +463,11 @@ public class Html5Element {
 	
 	public Html5Controller getController() {
 		return controller;
+	}
+	
+	public boolean gethtml() {
+		screen.send("gethtml("+selector.substring(1)+")");
+		return true;
 	}
 	
 	

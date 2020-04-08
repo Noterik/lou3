@@ -508,6 +508,16 @@ var Eddie = function(options){
                 case "fullscreen":
                     window.fullscreenwanted = true;
                     break;
+                case "image":
+                    var binary = atob(content);
+                    var array = new Uint8Array(binary.length);
+                    for( var i = 0; i < binary.length; i++ ) { array[i] = binary.charCodeAt(i) }
+                    blob = new Blob([array]);
+                    let img = new Image();
+                    img.src = URL.createObjectURL(blob)
+                    document.body.appendChild(img)
+                    document.getElementById(targetid).appendChild(img);
+                break;
                 case "exitfullscreen":
                     window.fullscreenwanted = false;
                     document.exitFullscreen();
@@ -558,6 +568,9 @@ var Eddie = function(options){
                 	break;
                 case "sdiv":
                 	setDivProperty(targetid,content);
+                	break;
+                case "gethtml":
+                	getHtml(targetid);
                 	break;
                default:
                 	break;
@@ -755,7 +768,6 @@ var Eddie = function(options){
         a.download = window.screenshotname+".jpg";
         a.click();
     }
-    
 
 	function setScript(targetid, scriptbody) {
 		// ugly code to map object and create a dataspace for it
@@ -1329,12 +1341,53 @@ var Eddie = function(options){
 	function eraseCookie(name) {
 	    createCookie(name, "", -1);
 	}
-		function addGestureEvents() {
 
+	function addGestureEvents() {
+		window.addEventListener("orientationchange", function() {
 	  	//self.putLou('','orientationchange('+window.orientation+')');
+		}, false);
+	}
+
 	
-		return self;
-	};
+	return self;
+	
+	function getHtml(targetid) {
+		//get dom from html element
+        var postData = $("html").html();
+        //add doctype (IMPORTANT for correct rendering!)                     
+        var docTypeAndHTML = new XMLSerializer().serializeToString(document.doctype) + '<html xmlns="http://www.w3.org/1999/xhtml">';
+        postData = docTypeAndHTML + postData + "</html>";
+        
+        data = {};
+        data['dom'] = postData;
+        data['baseurl'] = window.location.href;    
+        data['width'] = window.innerWidth;
+        data['height'] = window.innerHeight;
+        
+		self.putLou("","event("+targetid+"/client,"+JSON.stringify(data)+")");
+	}
+};
+	
+function collision(div1, div2) {
+	var x1 = $(div1).offset().left;
+	var y1 = $(div1).offset().top;
+	var h1 = $(div1).outerHeight();
+	var w1 = $(div1).outerWidth();
+	var b1 = y1 + h1;
+	var r1 = x1 + w1;
+	var x2 = $(div2).offset().left;
+	var y2 = $(div2).offset().top;
+	var h2 = $(div2).outerHeight();
+	var w2 = $(div2).outerWidth();
+	var b2 = y2 + h2;
+	var r2 = x2 + w2;
+
+	if (r1>x2 && x1<r2) {
+		if (b1>y2 && y1<b2) {
+			return true;
+		}
+	}
+	return false;
 };
 	    
 	

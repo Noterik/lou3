@@ -1,8 +1,8 @@
 package org.springfield.lou.image;
 
-import java.io.File;
+import java.io.*;
 import java.net.URLEncoder;
-import java.util.HashMap;
+import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -15,8 +15,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+
+
 import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.*;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
 
@@ -35,6 +38,30 @@ public class ImageManager {
     public static ImageManager instance(){
     	if(instance==null) instance = new ImageManager();
     	return instance;
+    }
+    
+    public List<AmazonImage> getAmazonS3Dir(String path) {
+    	System.out.println("AM PATH="+path);
+    	String bucket = "springfield-private-storage";
+    	//String result = "https://s3-eu-west-1.amazonaws.com/springfield-storage/"+path+"/";
+		AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withCredentials(new EnvironmentVariableCredentialsProvider()).build();
+        System.out.println("LOU AM Downloading an object");
+        ObjectListing images = s3Client.listObjects(bucket,path); 
+        
+
+        List<S3ObjectSummary> list = images.getObjectSummaries();
+        List<AmazonImage> results = new ArrayList<AmazonImage>();
+        for(S3ObjectSummary image: list) {
+            S3Object obj = s3Client.getObject(bucket, image.getKey());
+            S3ObjectInputStream stream = obj.getObjectContent();
+            String key=obj.getKey();
+            if (key.indexOf(".")!=-1) {
+            	ByteArrayOutputStream byteStream = new ByteArrayOutputStream();  
+            	AmazonImage ni = new AmazonImage(key,stream);
+            	results.add(ni);
+            }
+        }
+    	return results;
     }
     
     
