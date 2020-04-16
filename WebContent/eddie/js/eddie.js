@@ -415,6 +415,20 @@ var Eddie = function(options){
                 case "scrolltop":
                 	$('#'+targetid).scrollTop(content);
                     break;
+                case "click":
+                    $('#'+targetid).click();
+                    break;
+                case "download":
+                        var splits = content.split(",");
+                        var a = document.createElement("a");
+                        a.href = splits[0];
+                        a.download = splits[1];
+                        a.click();
+                    break;
+                case "watch":
+                    var splits = content.split(",");
+                    window.open(splits[0],splits[1]);
+                    break;
             	case "location":
             		window.location.href = content;
             		break;
@@ -570,7 +584,7 @@ var Eddie = function(options){
                 	setDivProperty(targetid,content);
                 	break;
                 case "gethtml":
-                	getHtml(targetid);
+                	getHtml(targetid); 
                 	break;
                default:
                 	break;

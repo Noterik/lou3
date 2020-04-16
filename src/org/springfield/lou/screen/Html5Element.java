@@ -96,7 +96,6 @@ public class Html5Element {
 	
 	public boolean image(byte[] blob) {
     	String encoded = new String(Base64.encodeBase64(blob));
-    	System.out.println("SIZE="+blob.length+" S="+encoded.length());
 		screen.send("image("+selector.substring(1)+")="+encoded);
 		return true;
 	}
@@ -108,6 +107,21 @@ public class Html5Element {
 	
 	public boolean location(String url) {
 		screen.send("location("+selector.substring(1)+")="+url);
+		return true;
+	}
+	
+	public boolean click() {
+		screen.send("click("+selector.substring(1)+")");
+		return true;
+	}
+	
+	public boolean download(String url,String filename) {
+		screen.send("download("+selector.substring(1)+")="+url+","+filename);
+		return true;
+	}
+	
+	public boolean watch(String url,String target) {
+		screen.send("watch("+selector.substring(1)+")="+url+","+target);
 		return true;
 	}
 	

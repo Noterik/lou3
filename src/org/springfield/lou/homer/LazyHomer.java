@@ -79,6 +79,10 @@ public class LazyHomer implements MargeObserver {
 	public static boolean local = true;
 	private int retryCounter;
 	static String role = "production";
+	public static String emailType = "direct";
+	public static String emailSMTPHost = "";
+	public static String emailSMTPAccount = "";
+	public static String emailSMTPPassword = "";
 	
 	/**
 	 * Initializes the configuration
@@ -484,6 +488,18 @@ public class LazyHomer implements MargeObserver {
 		role = props.getProperty("role");
 		if (role==null) role = "production";
 		System.out.println("SERVER ROLE="+role);
+		
+		emailType = props.getProperty("email-type");
+		if (emailType==null) emailType = "direct";
+		
+		emailSMTPHost = props.getProperty("email-smtp-host");
+		if (emailSMTPHost==null) emailSMTPHost = "";
+		
+		emailSMTPAccount = props.getProperty("email-smtp-account");
+		if (emailSMTPAccount==null) emailSMTPAccount = "";
+		
+		emailSMTPPassword = props.getProperty("email-smtp-password");
+		if (emailSMTPPassword==null) emailSMTPPassword = "";
 	}
 
     /**
