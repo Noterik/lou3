@@ -1342,7 +1342,7 @@ var Eddie = function(options){
     	} else {
         	expires = "";
     	}
-   	 	document.cookie = escape(name) + "=" + escape(value) + expires + "; domain=.mupop.net;path=/";
+   	 	document.cookie = escape(name) + "=" + escape(value) + expires + "; domain=.qandr.eu;path=/";
 	}
 
 	function readCookie(name) {
