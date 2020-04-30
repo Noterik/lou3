@@ -43,7 +43,6 @@ public class ImageManager {
     public List<AmazonImage> getAmazonS3Dir(String path) {
     	System.out.println("AM PATH="+path);
     	String bucket = "springfield-private-storage";
-    	//String result = "https://s3-eu-west-1.amazonaws.com/springfield-storage/"+path+"/";
 		AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withCredentials(new EnvironmentVariableCredentialsProvider()).build();
         System.out.println("LOU AM Downloading an object");
         ObjectListing images = s3Client.listObjects(bucket,path); 
@@ -57,7 +56,7 @@ public class ImageManager {
             String key=obj.getKey();
             if (key.indexOf(".")!=-1) {
             	ByteArrayOutputStream byteStream = new ByteArrayOutputStream();  
-            	AmazonImage ni = new AmazonImage(key,stream);
+            	AmazonImage ni = new AmazonImage(s3Client,bucket,key,stream);
             	results.add(ni);
             }
         }

@@ -120,6 +120,12 @@ public class Html5Element {
 		return true;
 	}
 	
+	public boolean download(byte[] blob,String filename) {
+    	String encoded = new String(Base64.encodeBase64(blob));
+		screen.send("downloadblob("+selector.substring(1)+")="+filename+","+encoded);
+		return true;
+	}
+	
 	public boolean watch(String url,String target) {
 		screen.send("watch("+selector.substring(1)+")="+url+","+target);
 		return true;

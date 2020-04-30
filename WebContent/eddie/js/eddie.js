@@ -418,6 +418,18 @@ var Eddie = function(options){
                 case "click":
                     $('#'+targetid).click();
                     break;
+                case "downloadblob":
+                    var splits = content.split(",");
+                    var binary = atob(splits[1]);
+                    var array = new Uint8Array(binary.length);
+                    for( var i = 0; i < binary.length; i++ ) { array[i] = binary.charCodeAt(i) }
+                    blob = new Blob([array]);
+                    var a = document.createElement('a');
+                    document.body.appendChild(a)
+                    a.href = window.URL.createObjectURL(blob);
+                    a.download = splits[0];
+                    a.click();
+                    break;
                 case "download":
                         var splits = content.split(",");
                         var a = document.createElement("a");
