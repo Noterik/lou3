@@ -490,5 +490,10 @@ public class Html5Element {
 		return true;
 	}
 	
+	public boolean requesthtml(String method) {
+		screen.send("requesthtml("+selector.substring(1)+")="+method);
+		return true;
+	}
+	
 	
 }

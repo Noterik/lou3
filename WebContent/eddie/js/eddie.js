@@ -15,209 +15,209 @@ var Eddie = function(options){
 	var performancetestcounter=-1;
 	var performancedata ='';
 	var performancetestcount=0;
-    var externalprogram = false;
+	var externalprogram = false;
 
 	var settings = {
-		lou_ip: "",
-		lou_port: "",
-		app: "",
-		fullapp: "",
-		postData: "<fsxml><screen><properties><screenId>-1</screenId></properties><capabilities id=\"1\"><properties>"+getCapabilities()+"</properties></capabilities></screen></fsxml>",
-		screenId: "",
-		timeoffset: -1,
-		active: true,
-		appparams: null,
-		worker_location: '/eddie/js/eddie_worker.js',
-		worker: null
+			lou_ip: "",
+			lou_port: "",
+			app: "",
+			fullapp: "",
+			postData: "<fsxml><screen><properties><screenId>-1</screenId></properties><capabilities id=\"1\"><properties>"+getCapabilities()+"</properties></capabilities></screen></fsxml>",
+			screenId: "",
+			timeoffset: -1,
+			active: true,
+			appparams: null,
+			worker_location: '/eddie/js/eddie_worker.js',
+			worker: null
 	};
 	$.extend(settings, options);
 
 	if (window.location.protocol === 'https:') {
-        settings.lou_port = (window.location.port == "") ? '443' : window.location.port;
+		settings.lou_port = (window.location.port == "") ? '443' : window.location.port;
 	} else {
-	        settings.lou_port = (window.location.port == "") ? '80' : window.location.port;
+		settings.lou_port = (window.location.port == "") ? '80' : window.location.port;
 	}
 
 	self.init = function(){
 		responsetime = new Date().getTime();
 		if(typeof(Worker) != "undefined"){
 			settings.worker = new Worker(settings.worker_location);
-  		}else{
-  			console.log("Worker not supported");
-  		}
+		}else{
+			console.log("Worker not supported");
+		}
 
 		$(self).on('register-success', self.listen);
 		register();
 		addGestureEvents();
 
 		var interval = setInterval(function () {
-		nowdate = new Date().getTime();
-		delaydate = nowdate-responsetime;
-		if (websocket!==null) {
-		    delaycounter++;
-            if (websocket.readyState===3 && delaycounter>30) {
-                	if (hadwsactive) {
+			nowdate = new Date().getTime();
+			delaydate = nowdate-responsetime;
+			if (websocket!==null) {
+				delaycounter++;
+				if (websocket.readyState===3 && delaycounter>30) {
+					if (hadwsactive) {
 						clearInterval(interval);
 						window.location.href=window.location.href;
 					}
-			}
-			if (performancetestcounter!==-1) {
-				performancetestcount++;
-				if (performancetestcount===performancetestcounter) {
-					websocket.send('ping('+performancedata+')');
-					performancetestcount=0;
+				}
+				if (performancetestcounter!==-1) {
+					performancetestcount++;
+					if (performancetestcount===performancetestcounter) {
+						websocket.send('ping('+performancedata+')');
+						performancetestcount=0;
+					}
 				}
 			}
-		}
-		if (delaydate>(delayresettime)) {
-		    if (hadwsactive) {
-				clearInterval(interval);
-                if (!externalprogram) {
-                    window.location.href=window.location.href;
-                }
+			if (delaydate>(delayresettime)) {
+				if (hadwsactive) {
+					clearInterval(interval);
+					if (!externalprogram) {
+						window.location.href=window.location.href;
+					}
+				}
 			}
-		}
-            for (var data in trackers){
-   				var map = {};
+			for (var data in trackers){
+				var map = {};
 				var tid = data;
 				var tracks = trackers[data].split(",");
 				for(i = 0; i < tracks.length; i++){
 					var track = tracks[i];
 					var trackp = track.split('(');
 					if ($('#'+tid).length) {
-            			   	    switch(trackp[0]){
-            					case "vars":
+						switch(trackp[0]){
+						case "vars":
 							var tname = trackp[1].substring(0,trackp[1].length-1);
 							var v = callvars[tid];
 							var oldvalue = trackervalues[tid+"/"+track];
 							var newvalue = v[tname];
 							if (oldvalue!=newvalue) {
 								trackervalues[tid+"/"+track] = newvalue;
-                                 map[tname] = newvalue;
-                            }
+								map[tname] = newvalue;
+							}
 							break;
-                                case "divInfo":
-                                    var ele = $('#'+tid);
-                                    var rh  = document.getElementById(tid).naturalHeight;
-                                    var rw  = document.getElementById(tid).naturalWidth;
-                                    var newvalue = ele.width()+","+ele.height()+","+rw+","+rh;
-                                    var oldvalue = trackervalues[tid+"/"+track];
-                                    if (oldvalue!=newvalue) {
-                                        trackervalues[tid+"/"+track] = newvalue;
-                                        map['divInfo'] = newvalue;
-                                    }
-                                break;							
-							    case "scrollTop":
-							    	 var newvalue = $('#'+tid).scrollTop()+","+$('#'+tid).height();
-                                     var oldvalue = trackervalues[tid+"/"+track];
-                                     if (oldvalue!=newvalue) {
-                                   	 trackervalues[tid+"/"+track] = newvalue;
-                                     map['scrollTop'] = newvalue;
-                                    }
-                                  break;
-                                case "divXYPerc":
-                                    var top = $('#'+tid).position().top;
-                                    var left = $('#'+tid).position().left;
+						case "divInfo":
+							var ele = $('#'+tid);
+							var rh  = document.getElementById(tid).naturalHeight;
+							var rw  = document.getElementById(tid).naturalWidth;
+							var newvalue = ele.width()+","+ele.height()+","+rw+","+rh;
+							var oldvalue = trackervalues[tid+"/"+track];
+							if (oldvalue!=newvalue) {
+								trackervalues[tid+"/"+track] = newvalue;
+								map['divInfo'] = newvalue;
+							}
+							break;							
+						case "scrollTop":
+							var newvalue = $('#'+tid).scrollTop()+","+$('#'+tid).height();
+							var oldvalue = trackervalues[tid+"/"+track];
+							if (oldvalue!=newvalue) {
+								trackervalues[tid+"/"+track] = newvalue;
+								map['scrollTop'] = newvalue;
+							}
+							break;
+						case "divXYPerc":
+							var top = $('#'+tid).position().top;
+							var left = $('#'+tid).position().left;
 
-                                    var height = $('#'+tid).parent().height();
-                                    var width = $('#'+tid).parent().width();
+							var height = $('#'+tid).parent().height();
+							var width = $('#'+tid).parent().width();
 
-                                    var oldvalue = trackervalues[tid+"/"+track];
-                                    var newvalue = ""+(left/width)*100;
-                                    newvalue += ","+((top/height)*100);
-                                    if (oldvalue!=newvalue) {
-                                                    console.log("xy="+newvalue+" T="+top+" H="+height);
-                                                    trackervalues[tid+"/"+track] = newvalue;
-                                                    map['divXYPerc'] = newvalue;
-                                    }
-                                    break;
-                                case "screenXYPerc":
-                                    var position = $('#'+tid).position();
-                                    var oldvalue = trackervalues[tid+"/"+track];
-                                    var newvalue = ""+(position.left/window.innerWidth)*100;
-                                    newvalue += ","+((position.top/window.innerHeight)*100);
-                                    if (oldvalue!=newvalue) {
-                                                    console.log("xy="+newvalue);
-                                                    trackervalues[tid+"/"+track] = newvalue;
-                                                    map['screenXYPerc'] = newvalue;
-                                    }
-                                    break;
-            					case "screenXPerc":
-					    		var position = $('#'+tid).position();
-                                			var oldvalue = trackervalues[tid+"/"+track];
-                                			var newvalue = (position.left/window.innerWidth)*100;
-					    		if (oldvalue!=newvalue) {
-									trackervalues[tid+"/"+track] = newvalue;
-									map['screenXPerc'] = newvalue;
-					    		}
-            				    		break;
-            					case "screenYPerc":
-					    		position = $('#'+tid).position();
-                                			oldvalue = trackervalues[tid+"/"+track];
-                             				newvalue = (position.top/window.innerHeight)*100;
-					    		if (oldvalue!=newvalue) {
-									trackervalues[tid+"/"+track] = newvalue;
-									map['screenYPerc'] = newvalue;
-					    		}
-            						break;
-            					case "mousemove":
-                                	var send = trackervalues[tid+"/"+track+"_send"];
-									if (send === 'true') {
-											trackervalues[tid+"/"+track+"_send"] = 'false';
-											parts = trackervalues[tid+"/"+track].split(',');
-											map['screenX'] = parseFloat(parts[0]);
-											map['screenY'] = parseFloat(parts[1]);
-											map['clientX'] = parseFloat(parts[2]);
-											map['clientY'] = parseFloat(parts[3]);																		
-											map['screenXP'] = parseFloat(parts[4]);
-											map['screenYP'] = parseFloat(parts[5]);
-											map['clientXY'] = trackervalues[tid+"/"+track];
-											map['width'] = $('#'+tid).width();
-											map['height'] = $('#'+tid).height();
-											map['value'] = parts.length > 6 ? parts[6] : "null";								
-									}	
-            						break;
-            					case "devicemotion":
-                                			var send = trackervalues["screen/devicemotion_send"];
+							var oldvalue = trackervalues[tid+"/"+track];
+							var newvalue = ""+(left/width)*100;
+							newvalue += ","+((top/height)*100);
+							if (oldvalue!=newvalue) {
+								console.log("xy="+newvalue+" T="+top+" H="+height);
+								trackervalues[tid+"/"+track] = newvalue;
+								map['divXYPerc'] = newvalue;
+							}
+							break;
+						case "screenXYPerc":
+							var position = $('#'+tid).position();
+							var oldvalue = trackervalues[tid+"/"+track];
+							var newvalue = ""+(position.left/window.innerWidth)*100;
+							newvalue += ","+((position.top/window.innerHeight)*100);
+							if (oldvalue!=newvalue) {
+								console.log("xy="+newvalue);
+								trackervalues[tid+"/"+track] = newvalue;
+								map['screenXYPerc'] = newvalue;
+							}
+							break;
+						case "screenXPerc":
+							var position = $('#'+tid).position();
+							var oldvalue = trackervalues[tid+"/"+track];
+							var newvalue = (position.left/window.innerWidth)*100;
+							if (oldvalue!=newvalue) {
+								trackervalues[tid+"/"+track] = newvalue;
+								map['screenXPerc'] = newvalue;
+							}
+							break;
+						case "screenYPerc":
+							position = $('#'+tid).position();
+							oldvalue = trackervalues[tid+"/"+track];
+							newvalue = (position.top/window.innerHeight)*100;
+							if (oldvalue!=newvalue) {
+								trackervalues[tid+"/"+track] = newvalue;
+								map['screenYPerc'] = newvalue;
+							}
+							break;
+						case "mousemove":
+							var send = trackervalues[tid+"/"+track+"_send"];
+							if (send === 'true') {
+								trackervalues[tid+"/"+track+"_send"] = 'false';
+								parts = trackervalues[tid+"/"+track].split(',');
+								map['screenX'] = parseFloat(parts[0]);
+								map['screenY'] = parseFloat(parts[1]);
+								map['clientX'] = parseFloat(parts[2]);
+								map['clientY'] = parseFloat(parts[3]);																		
+								map['screenXP'] = parseFloat(parts[4]);
+								map['screenYP'] = parseFloat(parts[5]);
+								map['clientXY'] = trackervalues[tid+"/"+track];
+								map['width'] = $('#'+tid).width();
+								map['height'] = $('#'+tid).height();
+								map['value'] = parts.length > 6 ? parts[6] : "null";								
+							}	
+							break;
+						case "devicemotion":
+							var send = trackervalues["screen/devicemotion_send"];
 							if (send === 'true') {
 								trackervalues["screen/devicemotion_send"] = 'false';
 								map['alpha'] = trackervalues["screen/devicemotion_alpha"];
 								map['beta'] = trackervalues["screen/devicemotion_beta"];
 								map['gamma'] = trackervalues["screen/devicemotion_gamma"];
 							}
-            						break;
-            				case "location":
-								navigator.geolocation.getCurrentPosition(getPosition);
-					    		newvalue = trackervalues["screen/location"];
-                                			oldvalue = trackervalues["screen/location_old"];
-					    		if (oldvalue!=newvalue) {
-									trackervalues[tid+"/location_old"] = newvalue;
-									map["location"] = newvalue;
-									console.log("gps info="+newvalue);
-					    		}
-            						break;
-            					case "currentTime":
-					    		newvalue = $('#'+tid)[0].currentTime;
-                                			oldvalue = trackervalues[tid+"/"+track];
-					    		if (oldvalue!=newvalue) {
-									trackervalues[tid+"/"+track] = newvalue;
-									map['currentTime'] = newvalue*1000;
-					    		}
-            						break;
-            					default:
-            						break;
-					     }
-				   	}
+							break;
+						case "location":
+							navigator.geolocation.getCurrentPosition(getPosition);
+							newvalue = trackervalues["screen/location"];
+							oldvalue = trackervalues["screen/location_old"];
+							if (oldvalue!=newvalue) {
+								trackervalues[tid+"/location_old"] = newvalue;
+								map["location"] = newvalue;
+								console.log("gps info="+newvalue);
+							}
+							break;
+						case "currentTime":
+							newvalue = $('#'+tid)[0].currentTime;
+							oldvalue = trackervalues[tid+"/"+track];
+							if (oldvalue!=newvalue) {
+								trackervalues[tid+"/"+track] = newvalue;
+								map['currentTime'] = newvalue*1000;
+							}
+							break;
+						default:
+							break;
+						}
+					}
 				}
-                                var line = JSON.stringify(map);
+				var line = JSON.stringify(map);
 				if (line!="{}") {
-                                	self.putLou("","event("+tid+"/client,"+line+")");
+					self.putLou("","event("+tid+"/client,"+line+")");
 				}
 			}
 		}, 30);
 
 	};
-	
+
 	self.getTimeOffset = function() {
 		return settings.timeoffset;
 	};
@@ -229,19 +229,19 @@ var Eddie = function(options){
 				comp.destroy();
 			}
 		});
-		*/
+		 */
 		var splits = settings.screenId.split('/');
 
 		self.putLou('notification','show(user ' + splits[splits.length - 1] + ' left session!)');
 		var postData = "stop(" + settings.screenId + ")";
 		var args =
-		self.doRequest({
-			'type': 'POST',
-			'url': "//" + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp,
-			'data': postData,
-			'dataType': 'text',
-			'async': false
-		});
+			self.doRequest({
+				'type': 'POST',
+				'url': "//" + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp,
+				'data': postData,
+				'dataType': 'text',
+				'async': false
+			});
 	};
 
 	self.doRequest = function(args){
@@ -249,14 +249,14 @@ var Eddie = function(options){
 	};
 
 	self.sendEvent = function(targetid,eventtype,data){
-	    data['eventtype'] = eventtype;
-            self.putLou("","event("+targetid+"/client,"+JSON.stringify(data)+")");
+		data['eventtype'] = eventtype;
+		self.putLou("","event("+targetid+"/client,"+JSON.stringify(data)+")");
 	};
 
 	self.getComponent = function(comp){
 		return components[comp];
 	};
-	
+
 
 	self.listen = function(){
 		if(!settings.worker){
@@ -299,22 +299,22 @@ var Eddie = function(options){
 		return callvars[targetid];
 	};
 
-        self.log = function(msg,level) {
-                self.putLou("","log("+msg+","+level+")");
-                return false;
-        };
+	self.log = function(msg,level) {
+		self.putLou("","log("+msg+","+level+")");
+		return false;
+	};
 
 	self.putLou = function(targetid, content, sync) {
 		var postData = "put(" + settings.screenId + "," + targetid + ")=" + content;
 		if (wsactive===false) {
 			console.log("send http data");
 			self.doRequest({
-			'type': 'POST',
-			'url': '//' + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp,
-			'contentType': 'text/plain',
-			'data': postData,
-			'dataType': 'text',
-			'async': !sync
+				'type': 'POST',
+				'url': '//' + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp,
+				'contentType': 'text/plain',
+				'data': postData,
+				'dataType': 'text',
+				'async': !sync
 			});
 		} else {
 			//console.log("send ws data");
@@ -365,31 +365,31 @@ var Eddie = function(options){
 		responsetime = new Date().getTime();
 		var result = response;
 		if (result.indexOf("<screenid>appreset</screenid>")!=-1) {
-				console.log('server reset');
+			console.log('server reset');
 		}
 		// so we have a correct connection recheck and init websocket if needed
 		if (websocket===null) {
 			var uri = ((window.location.protocol === "https:") ? "wss://" : "ws://") + settings.lou_ip + ":" + settings.lou_port+"/lou/ws?screenid="+settings.screenId;
-  			 websocket = new WebSocket(uri);
-    		websocket.onopen = function(evt) { onWSOpen(evt) };
-    	    websocket.onclose = function(evt) { onWSClose(evt) };
-            websocket.onmessage = function(evt) { onWSMessage(evt) };
-            websocket.onerror = function(evt) { onWSError(evt) };
-			
+			websocket = new WebSocket(uri);
+			websocket.onopen = function(evt) { onWSOpen(evt) };
+			websocket.onclose = function(evt) { onWSClose(evt) };
+			websocket.onmessage = function(evt) { onWSMessage(evt) };
+			websocket.onerror = function(evt) { onWSError(evt) };
+
 		}
-		
+
 		var pos = result.indexOf("(");
 		while (pos!=-1) {
 			var command = result.substring(0,pos);
 			result = result.substring(pos+1);
-			
+
 			pos = result.indexOf("($end$)");
 			var content = result;
 			var targetid;
 			if (pos != -1) {
 				content = content.substring(0,pos);
 			}
-			
+
 			var pos2 = content.indexOf("=");
 			if (pos2 != -1) {
 				targetid = content.substring(0, pos2-1);
@@ -398,211 +398,211 @@ var Eddie = function(options){
 				targetid = content.substring(0, content.length-1);
 				content = "";
 			}
-			
-            switch(command){
-            	case "set":
-            		setDiv(targetid,content);
-            		break;
-            	case "val":
-                    $('#'+targetid).val(content);
-            		break;
-            	case "html":
-            		$('#'+targetid).html(content);
-            		break;
-                case "screenshot":
-                    makeScreenShot(targetid,content);
-                    break;
-                case "scrolltop":
-                	$('#'+targetid).scrollTop(content);
-                    break;
-                case "click":
-                    $('#'+targetid).click();
-                    break;
-                case "downloadblob":
-                    var splits = content.split(",");
-                    var binary = atob(splits[1]);
-                    var array = new Uint8Array(binary.length);
-                    for( var i = 0; i < binary.length; i++ ) { array[i] = binary.charCodeAt(i) }
-                    blob = new Blob([array]);
-                    var a = document.createElement('a');
-                    document.body.appendChild(a)
-                    a.href = window.URL.createObjectURL(blob);
-                    a.download = splits[0];
-                    a.click();
-                    break;
-                case "download":
-                        var splits = content.split(",");
-                        var a = document.createElement("a");
-                        a.href = splits[0];
-                        a.download = splits[1];
-                        a.click();
-                    break;
-                case "watch":
-                    var splits = content.split(",");
-                    window.open(splits[0],splits[1]);
-                    break;
-            	case "location":
-            		window.location.href = content;
-            		break;
-            	case "focus":
-                    var cur = $('#'+targetid).val();
-                    $('#'+targetid).focus();
-                    $('#'+targetid).val(cur);
-            		break;
-            	case "translateXY":
-            		doTranslateXY(targetid,content);
-            		break;
-                case "append":
-                	$('#'+targetid).append(content);
-                    break;
-                case "parsehtml":
-                	parseHtml(targetid,content);
-                    break;
-                case "radarping":
-            		var splits = content.split(",");
-                    var hits = "";
-                    for(var i = 1; i < splits.length; i++) {
-                        var tdiv = splits[i];
-                        if (tdiv.startsWith(".")) {
-                        	$( tdiv ).each(function(index, value) {
-                        		var tid = (this).id;
-                        		if (tid != "") {
-                        			var hit = collision("#"+targetid,"#"+tid);
-                                	if (hit) {
-                                        if (hits==="") {
-                                        	hits=tid;
-                                        } else {
-                                        	hits+=","+tid;
-                                        }
-                                	}
-                        		} else {
-                        			var hit = collision("#"+targetid, tdiv+":eq("+index+")");
-                        			if (hit) {
-                        				if (hits==="") {
-                        					hits="."+tdiv+":eq("+index+")";
-                        				} else {
-                        					hits+=","+"."+tdiv+":eq\("+index+"\)";
-                        				}
-                        			}
-                        		}
-                        	});
-                        } else {
-                        	var hit = collision("#"+targetid,tdiv);
-                        	if (hit) {
-                                if (hits==="") {
-                                   	hits=tdiv;
-                                } else {
-                                   	hits+=","+tdiv;
-                                }
-                        	} 
-                        }
-                    }
-                    var map = {};
-                    map["input"] = content;
-                    map["hits"] = hits;
-                    map["dest"] = splits[0];
-                    map["targetid"] = targetid;
-                    self.putLou("","event(notify,"+JSON.stringify(map)+")");
-                    break;
-                case "pingsettings":
-                	pingSettings(targetid,content);
-                	break;
-            	case "show":
-            		$(targetid).show();
-            		break;
-                case "play":
-                	$("#"+targetid)[0].play();
-                    break;
-                case "pause":
-                	$("#"+targetid)[0].pause();
-                    break;
-                case "autoplay":
-            		$("#"+targetid)[0].autoplay=content;
-            		break;
-                case "volume":
-            		$("#"+targetid)[0].volume=content;
-            		break;
-                case "loop":
-            		$("#"+targetid)[0].loop=content;
-            		break;
-            	case "hide":
-            		$(targetid).hide(content);
-            		break;
-            	case "draggable":
-            		$(targetid).draggable();
-            		break;
-                case "fullscreen":
-                    window.fullscreenwanted = true;
-                    break;
-                case "image":
-                    var binary = atob(content);
-                    var array = new Uint8Array(binary.length);
-                    for( var i = 0; i < binary.length; i++ ) { array[i] = binary.charCodeAt(i) }
-                    blob = new Blob([array]);
-                    let img = new Image();
-                    img.src = URL.createObjectURL(blob)
-                    document.body.appendChild(img)
-                    document.getElementById(targetid).appendChild(img);
-                break;
-                case "exitfullscreen":
-                    window.fullscreenwanted = false;
-                    document.exitFullscreen();
-                    break;
-            	case "bind":
-                   	setBind(targetid,content);
-                   	break;
-               	case "externalprogram":
-					externalprogram = true;
-					break;
-               	case "internalprogram":
-                    responsetime = new Date().getTime();
-					externalprogram = false;
-					break;
-            	case "template":
-            		setTemplate(targetid,content);
-            		break;
-            	case "syncvars":
-            		setSyncvars(targetid,content);
-            		break;
-            	case "update":
-            		doUpdate(targetid,content);
-            		break;
-             	case "add":
-            	    addToDiv(targetid,content);
-            		break;
-            	case "put":
-            		putMsg(targetid,content);
-					break;
-				case "remove":
-					remove(targetid);
-					break;
-				case "terminate":
-					console.log("terminate command");
-					doTerminate(targetid);
-					break;
-				case "setcss":
-					setCSS(content);
-                    break;
-                case "setstyle":
-					setStyle(content);
-                    break;
-            	case "setscript":
-                	setScript(targetid,content);
-                	break;
-                case "removestyle":
-   					removeStyle(targetid);
-                	break;
-                case "sdiv":
-                	setDivProperty(targetid,content);
-                	break;
-                case "gethtml":
-                	getHtml(targetid); 
-                	break;
-               default:
-                	break;
-            }
 
-            // lets check if there are more messages
+			switch(command){
+			case "set":
+				setDiv(targetid,content);
+				break;
+			case "val":
+				$('#'+targetid).val(content);
+				break;
+			case "html":
+				$('#'+targetid).html(content);
+				break;
+			case "screenshot":
+				makeScreenShot(targetid,content);
+				break;
+			case "scrolltop":
+				$('#'+targetid).scrollTop(content);
+				break;
+			case "click":
+				$('#'+targetid).click();
+				break;
+			case "downloadblob":
+				var splits = content.split(",");
+				var binary = atob(splits[1]);
+				var array = new Uint8Array(binary.length);
+				for( var i = 0; i < binary.length; i++ ) { array[i] = binary.charCodeAt(i) }
+				blob = new Blob([array]);
+				var a = document.createElement('a');
+				document.body.appendChild(a)
+				a.href = window.URL.createObjectURL(blob);
+				a.download = splits[0];
+				a.click();
+				break;
+			case "download":
+				var splits = content.split(",");
+				var a = document.createElement("a");
+				a.href = splits[0];
+				a.download = splits[1];
+				a.click();
+				break;
+			case "watch":
+				var splits = content.split(",");
+				window.open(splits[0],splits[1]);
+				break;
+			case "location":
+				window.location.href = content;
+				break;
+			case "focus":
+				var cur = $('#'+targetid).val();
+				$('#'+targetid).focus();
+				$('#'+targetid).val(cur);
+				break;
+			case "translateXY":
+				doTranslateXY(targetid,content);
+				break;
+			case "append":
+				$('#'+targetid).append(content);
+				break;
+			case "parsehtml":
+				parseHtml(targetid,content);
+				break;
+			case "radarping":
+				var splits = content.split(",");
+				var hits = "";
+				for(var i = 1; i < splits.length; i++) {
+					var tdiv = splits[i];
+					if (tdiv.startsWith(".")) {
+						$( tdiv ).each(function(index, value) {
+							var tid = (this).id;
+							if (tid != "") {
+								var hit = collision("#"+targetid,"#"+tid);
+								if (hit) {
+									if (hits==="") {
+										hits=tid;
+									} else {
+										hits+=","+tid;
+									}
+								}
+							} else {
+								var hit = collision("#"+targetid, tdiv+":eq("+index+")");
+								if (hit) {
+									if (hits==="") {
+										hits="."+tdiv+":eq("+index+")";
+									} else {
+										hits+=","+"."+tdiv+":eq\("+index+"\)";
+									}
+								}
+							}
+						});
+					} else {
+						var hit = collision("#"+targetid,tdiv);
+						if (hit) {
+							if (hits==="") {
+								hits=tdiv;
+							} else {
+								hits+=","+tdiv;
+							}
+						} 
+					}
+				}
+				var map = {};
+				map["input"] = content;
+				map["hits"] = hits;
+				map["dest"] = splits[0];
+				map["targetid"] = targetid;
+				self.putLou("","event(notify,"+JSON.stringify(map)+")");
+				break;
+			case "pingsettings":
+				pingSettings(targetid,content);
+				break;
+			case "show":
+				$(targetid).show();
+				break;
+			case "play":
+				$("#"+targetid)[0].play();
+				break;
+			case "pause":
+				$("#"+targetid)[0].pause();
+				break;
+			case "autoplay":
+				$("#"+targetid)[0].autoplay=content;
+				break;
+			case "volume":
+				$("#"+targetid)[0].volume=content;
+				break;
+			case "loop":
+				$("#"+targetid)[0].loop=content;
+				break;
+			case "hide":
+				$(targetid).hide(content);
+				break;
+			case "draggable":
+				$(targetid).draggable();
+				break;
+			case "fullscreen":
+				window.fullscreenwanted = true;
+				break;
+			case "image":
+				var binary = atob(content);
+				var array = new Uint8Array(binary.length);
+				for( var i = 0; i < binary.length; i++ ) { array[i] = binary.charCodeAt(i) }
+				blob = new Blob([array]);
+				let img = new Image();
+				img.src = URL.createObjectURL(blob)
+				document.body.appendChild(img)
+				document.getElementById(targetid).appendChild(img);
+				break;
+			case "exitfullscreen":
+				window.fullscreenwanted = false;
+				document.exitFullscreen();
+				break;
+			case "bind":
+				setBind(targetid,content);
+				break;
+			case "externalprogram":
+				externalprogram = true;
+				break;
+			case "internalprogram":
+				responsetime = new Date().getTime();
+				externalprogram = false;
+				break;
+			case "template":
+				setTemplate(targetid,content);
+				break;
+			case "syncvars":
+				setSyncvars(targetid,content);
+				break;
+			case "update":
+				doUpdate(targetid,content);
+				break;
+			case "add":
+				addToDiv(targetid,content);
+				break;
+			case "put":
+				putMsg(targetid,content);
+				break;
+			case "remove":
+				remove(targetid);
+				break;
+			case "terminate":
+				console.log("terminate command");
+				doTerminate(targetid);
+				break;
+			case "setcss":
+				setCSS(content);
+				break;
+			case "setstyle":
+				setStyle(content);
+				break;
+			case "setscript":
+				setScript(targetid,content);
+				break;
+			case "removestyle":
+				removeStyle(targetid);
+				break;
+			case "sdiv":
+				setDivProperty(targetid,content);
+				break;
+			case "requesthtml":
+				requestHtml(targetid,content); 
+				break;
+			default:
+				break;
+			}
+
+			// lets check if there are more messages
 			pos = result.indexOf("($end$)");
 			if (pos!=-1) {
 				result = result.substring(pos+7);
@@ -627,7 +627,7 @@ var Eddie = function(options){
 		removeScript(targetid);
 		removeInstance(targetid);
 	}
-	
+
 	function doTerminate(what){
 		if (what==="httpworker") {
 			settings.worker.terminate()
@@ -649,7 +649,7 @@ var Eddie = function(options){
 			div.innerHTML = "";
 		}
 	}
-	
+
 
 	function removeScript(targetid){
 		$('#script_' + targetid).remove();
@@ -668,12 +668,12 @@ var Eddie = function(options){
 				var command = new_content.substring(0,pos);
 				var args = new_content.substring(pos+1,new_content.length-1);
 				new_content = {
-					"target" : [{
-						"id" : command,
-						"class" : command
-					}],
-					"content" : args,
-					"originalMessage" : content
+						"target" : [{
+							"id" : command,
+							"class" : command
+						}],
+						"content" : args,
+						"originalMessage" : content
 				};
 			}
 		}catch(e){ console.log("escaped: " + content);}
@@ -689,32 +689,32 @@ var Eddie = function(options){
 	}
 
 	function setCSS(filename) {
-	  var fileref=document.createElement("link");
-	  fileref.setAttribute("rel", "stylesheet");
-	  fileref.setAttribute("type", "text/css");
-	  fileref.setAttribute("href", filename);
-	  document.getElementsByTagName("head")[0].appendChild(fileref);
+		var fileref=document.createElement("link");
+		fileref.setAttribute("rel", "stylesheet");
+		fileref.setAttribute("type", "text/css");
+		fileref.setAttribute("href", filename);
+		document.getElementsByTagName("head")[0].appendChild(fileref);
 	}
-	
-	  function onWSOpen(evt) {
-  		console.log("WS OPEN "+settings.worker);
-  		wsactive = true;
-  		hadwsactive = true;
-  		delayresettime = 25000;
-	  }
-	  
-	  function onWSClose(evt) {
-  		console.log("WS CLOSE");
-  		wsactive = false;
-	  }
-	  
-	  function onWSError(evt) {
-  		console.log("WS Error");
-	  }
-	  
-	  function onWSMessage(evt) {
-  		parseResponse(evt.data);
-	  }
+
+	function onWSOpen(evt) {
+		console.log("WS OPEN "+settings.worker);
+		wsactive = true;
+		hadwsactive = true;
+		delayresettime = 25000;
+	}
+
+	function onWSClose(evt) {
+		console.log("WS CLOSE");
+		wsactive = false;
+	}
+
+	function onWSError(evt) {
+		console.log("WS Error");
+	}
+
+	function onWSMessage(evt) {
+		parseResponse(evt.data);
+	}
 
 
 
@@ -727,17 +727,17 @@ var Eddie = function(options){
 			// console.log("**************"+content);
 			// console.log('stylename: ' + stylename);
 			var head = document.getElementsByTagName('head')[0],
-			    style = document.getElementsByTagName('style'),
-			    sstyle = $("style#"+stylename);
-			    content = content.substring(content.indexOf(",")+1);
+			style = document.getElementsByTagName('style'),
+			sstyle = $("style#"+stylename);
+			content = content.substring(content.indexOf(",")+1);
 			if(sstyle.length===0){
 				sstyle = document.createElement("style");
 				sstyle.type = 'text/css';
 				sstyle.setAttribute("id", stylename);
 				if (style.styleSheet){
-				  sstyle.styleSheet.cssText = content;
+					sstyle.styleSheet.cssText = content;
 				} else {
-				  sstyle.appendChild(document.createTextNode(content));
+					sstyle.appendChild(document.createTextNode(content));
 				}
 				head.appendChild(sstyle);
 			}
@@ -746,7 +746,7 @@ var Eddie = function(options){
 			}
 		}catch(err){
 			var trace = printStackTrace();
-		    console.error("eddie.js: "+err.message + "\n\n" + trace.join('\n\n'));
+			console.error("eddie.js: "+err.message + "\n\n" + trace.join('\n\n'));
 		}
 	}
 
@@ -754,46 +754,46 @@ var Eddie = function(options){
 		$('style#'+style).remove();
 	}
 
-    function makeScreenShot(targetid,name) {
-        var nw  = window.innerWidth;
-        var nh  = window.innerHeight;
-        var mf = 1;
-        if (nw<1920 && nh<1080) {
-                var mfw = 1920/nw;
-                var mfh = 1080/nh;
-                if (mfw>mfh) {
-                        nw = nw * mfh;
-                        nh = nh * mfh;
-                        mf = mfh;
-                } else {
-                        nw = nw * mfw;
-                        nh = nh * mfw;
-                        mf = mfw;
-                }
-        }
+	function makeScreenShot(targetid,name) {
+		var nw  = window.innerWidth;
+		var nh  = window.innerHeight;
+		var mf = 1;
+		if (nw<1920 && nh<1080) {
+			var mfw = 1920/nw;
+			var mfh = 1080/nh;
+			if (mfw>mfh) {
+				nw = nw * mfh;
+				nh = nh * mfh;
+				mf = mfh;
+			} else {
+				nw = nw * mfw;
+				nh = nh * mfw;
+				mf = mfw;
+			}
+		}
 
-        window.screenshotname = name; // not nice but works
+		window.screenshotname = name; // not nice but works
 
-        //get dom from html element
-        var postData = $("html").html();
-        //add doctype (IMPORTANT for correct rendering!)                     
-        var docTypeAndHTML = new XMLSerializer().serializeToString(document.doctype) + '<html xmlns="http://www.w3.org/1999/xhtml">';
-        postData = docTypeAndHTML + postData + "</html>";
+		//get dom from html element
+		var postData = $("html").html();
+		//add doctype (IMPORTANT for correct rendering!)                     
+		var docTypeAndHTML = new XMLSerializer().serializeToString(document.doctype) + '<html xmlns="http://www.w3.org/1999/xhtml">';
+		postData = docTypeAndHTML + postData + "</html>";
 
-        var xhr = new XMLHttpRequest();
-        xhr.responseType = 'blob';
-        xhr.addEventListener("load", reqListener);
-        xhr.open("POST","https://browservisuals.qandr.eu", true);
-        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        xhr.send(JSON.stringify({"oheight": window.innerHeight,"owidth": window.innerWidth,"scale": mf,"width": nw,"height":nh,"baseUrl": window.location.href, "type": "image", "dom": postData}));
-    }	
+		var xhr = new XMLHttpRequest();
+		xhr.responseType = 'blob';
+		xhr.addEventListener("load", reqListener);
+		xhr.open("POST","https://browservisuals.qandr.eu", true);
+		xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+		xhr.send(JSON.stringify({"oheight": window.innerHeight,"owidth": window.innerWidth,"scale": mf,"width": nw,"height":nh,"baseUrl": window.location.href, "type": "image", "dom": postData}));
+	}	
 
-    function reqListener () {
-        var a = document.createElement("a");
-        a.href = window.URL.createObjectURL(this.response);
-        a.download = window.screenshotname+".jpg";
-        a.click();
-    }
+	function reqListener () {
+		var a = document.createElement("a");
+		a.href = window.URL.createObjectURL(this.response);
+		a.download = window.screenshotname+".jpg";
+		a.click();
+	}
 
 	function setScript(targetid, scriptbody) {
 		// ugly code to map object and create a dataspace for it
@@ -829,14 +829,14 @@ var Eddie = function(options){
 	function setDivProperty(targetid,content) {
 		var div = document.getElementById(targetid);
 		//check if element also doesn't exist in jQuery syntax
-        if (div !== null || $(targetid).length) {
+		if (div !== null || $(targetid).length) {
 			var commands = content.split(",");
 			for(i = 0; i < commands.length; i++){
 				var command = commands[i];
 				var eventtargets = command.split(":");
 				command = eventtargets[0];
-            	switch(command){
-               	case "draggable":
+				switch(command){
+				case "draggable":
 					if (eventtargets.length>1) {
 						var data = eval('(' + content.substring(10)+ ')');
 						if (targetid.startsWith(".")) {
@@ -852,26 +852,26 @@ var Eddie = function(options){
 						}
 					}
 					break;
-               	case "undraggable":
-               		if (targetid.startsWith(".")) {
-               			$(targetid).draggable('disable');
-               		} else {
-               			$('#'+targetid).draggable('disable');
-               		}
+				case "undraggable":
+					if (targetid.startsWith(".")) {
+						$(targetid).draggable('disable');
+					} else {
+						$('#'+targetid).draggable('disable');
+					}
 					break;
-               	case "style":
-               		if (targetid.startsWith(".")) {
-               			$(targetid).css(eventtargets[1],eventtargets[2]);
-               		} else {
-               			$('#'+targetid).css(eventtargets[1],eventtargets[2]);
-               		}
+				case "style":
+					if (targetid.startsWith(".")) {
+						$(targetid).css(eventtargets[1],eventtargets[2]);
+					} else {
+						$('#'+targetid).css(eventtargets[1],eventtargets[2]);
+					}
 					break;
-               	case "sound":
+				case "sound":
 					self.makesound(content.substring(6));
 					break;
-               	case "bind":
-                        for(var j = 1; j < eventtargets.length; j++){
-                    		$('#'+targetid).bind(eventtargets[j], {etarget: eventtargets[j]}, function(event) {
+				case "bind":
+					for(var j = 1; j < eventtargets.length; j++){
+						$('#'+targetid).bind(eventtargets[j], {etarget: eventtargets[j]}, function(event) {
 							var data = event.data;
 							if (this.tagName=="INPUT") {
 								var edata = targetid+".value="+this.value;
@@ -911,187 +911,187 @@ var Eddie = function(options){
 		}
 	}
 
-        function parseHtml(targetid,data) {
-           var pdata =  JSON.parse(data);
-                var tagname = pdata.tagname;
-                if (pdata.tmpcrc!==undefined) {
-                        if (tagname!="") {
-                                var newtemplate = templatecache[pdata.tmpcrc];
-                                var htmlsub =  $(newtemplate).find("#"+tagname).prop("outerHTML");
-                                var parsed = Mustache.render(htmlsub,pdata);
-                                $('#'+tagname).html(parsed);
-                        } else {
-                                var parsed = Mustache.render(templatecache[pdata.tmpcrc],pdata);
-                                $('#'+targetid).html(parsed);
-                        }
-                } else {
-                        if (tagname!="") {
-                                var newtemplate = templatecache[pdata.tmpcrc];
-                                var htmlsub =  $(newtemplate).find("#"+tagname).prop("outerHTML");
-                                var parsed = Mustache.render(pdata.template,pdata);
-                                templatecache[pdata.newcrc] = pdata.template;
-                                $('#'+tagname).html(parsed);
-                        } else {
-                                var parsed = Mustache.render(pdata.template,pdata);
-                                templatecache[pdata.newcrc] = pdata.template;
-                                $('#'+targetid).html(parsed);
-                        }
-                }
-        }
-	
-	
-	
-		function pingSettings(size,callsec) {
-			console.log("size="+size+" call="+callsec);
-			var i=-1;
-			if (size==='off') {
-				performancetestcounter=-1;
-				return;
-			} else if (size==='10 bytes') { i=10;}
-			else if (size==='100 bytes') { i=100;}
-			else if (size==='1 kilobyte') { i=1024;}
-			else if (size==='10 kilobyte') { i=1024*1024;}
-			performancedata="";
-			for (j=0;j<i;j++) {
-				performancedata+=" ";
+	function parseHtml(targetid,data) {
+		var pdata =  JSON.parse(data);
+		var tagname = pdata.tagname;
+		if (pdata.tmpcrc!==undefined) {
+			if (tagname!="") {
+				var newtemplate = templatecache[pdata.tmpcrc];
+				var htmlsub =  $(newtemplate).find("#"+tagname).prop("outerHTML");
+				var parsed = Mustache.render(htmlsub,pdata);
+				$('#'+tagname).html(parsed);
+			} else {
+				var parsed = Mustache.render(templatecache[pdata.tmpcrc],pdata);
+				$('#'+targetid).html(parsed);
 			}
-			if (callsec==='33call/sec') {
-				performancetestcounter=1;
-			} else if (callsec==='16call/sec') { performancetestcounter=2; }
-			else if (callsec==='11call/sec') { performancetestcounter=3;}
-			else if (callsec==='8call/sec') { performancetestcounter=4;}
-			else if (callsec==='4call/sec') { performancetestcounter=7;}
-			else if (callsec==='2call/sec') { performancetestcounter=12;}
-			else if (callsec==='1call/sec') { performancetestcounter=33;}
-			performancetestcount=0;
+		} else {
+			if (tagname!="") {
+				var newtemplate = templatecache[pdata.tmpcrc];
+				var htmlsub =  $(newtemplate).find("#"+tagname).prop("outerHTML");
+				var parsed = Mustache.render(pdata.template,pdata);
+				templatecache[pdata.newcrc] = pdata.template;
+				$('#'+tagname).html(parsed);
+			} else {
+				var parsed = Mustache.render(pdata.template,pdata);
+				templatecache[pdata.newcrc] = pdata.template;
+				$('#'+targetid).html(parsed);
+			}
 		}
+	}
 
-        function setTemplate(targetid,content) {
-           	var data =  JSON.parse(content);
+
+
+	function pingSettings(size,callsec) {
+		console.log("size="+size+" call="+callsec);
+		var i=-1;
+		if (size==='off') {
+			performancetestcounter=-1;
+			return;
+		} else if (size==='10 bytes') { i=10;}
+		else if (size==='100 bytes') { i=100;}
+		else if (size==='1 kilobyte') { i=1024;}
+		else if (size==='10 kilobyte') { i=1024*1024;}
+		performancedata="";
+		for (j=0;j<i;j++) {
+			performancedata+=" ";
+		}
+		if (callsec==='33call/sec') {
+			performancetestcounter=1;
+		} else if (callsec==='16call/sec') { performancetestcounter=2; }
+		else if (callsec==='11call/sec') { performancetestcounter=3;}
+		else if (callsec==='8call/sec') { performancetestcounter=4;}
+		else if (callsec==='4call/sec') { performancetestcounter=7;}
+		else if (callsec==='2call/sec') { performancetestcounter=12;}
+		else if (callsec==='1call/sec') { performancetestcounter=33;}
+		performancetestcount=0;
+	}
+
+	function setTemplate(targetid,content) {
+		var data =  JSON.parse(content);
 		callvars[targetid]={"template":data.template};
 	}
 
-        function doUpdate(targetid,content) {
-           	var data =  JSON.parse(content);
+	function doUpdate(targetid,content) {
+		var data =  JSON.parse(content);
 		data['targetid'] = targetid;
 		//console.log("targetid="+targetid);
 		callers[targetid].update(callvars[targetid],data);
 	}
 
 
-        function setSyncvars(targetid,content) {
-           	var data =  JSON.parse(content);
+	function setSyncvars(targetid,content) {
+		var data =  JSON.parse(content);
 		var vars = callvars[targetid];
 		for (var key in data) {
 			//vars.set(key, data[key]);
 			vars[key]=data[key];
 		}
 	}
-	
+
 	function doTranslateXY(targetid,content) {
-        var xy = content.split(",");
-        var x = xy[0];
-        var y = xy[1];
-        if (x.indexOf('%')!==0) {
-       		var pw = $('#'+targetid).parent();
-        	x = (pw.width()/100)*(x.substring(0,x.length-1));
-        } 
-        if (y.indexOf('%')!==0) {
-       		var ph = $('#'+targetid).parent();
-        	y = (ph.height()/100)*(y.substring(0,y.length-1));
-        } 
-        $('#'+targetid).css('transform','translate('+x+'px,'+y+'px)');
+		var xy = content.split(",");
+		var x = xy[0];
+		var y = xy[1];
+		if (x.indexOf('%')!==0) {
+			var pw = $('#'+targetid).parent();
+			x = (pw.width()/100)*(x.substring(0,x.length-1));
+		} 
+		if (y.indexOf('%')!==0) {
+			var ph = $('#'+targetid).parent();
+			y = (ph.height()/100)*(y.substring(0,y.length-1));
+		} 
+		$('#'+targetid).css('transform','translate('+x+'px,'+y+'px)');
 	}
 
 	function setBind(targetid,content) {
-         var div = document.getElementById(targetid);
- 		if (content.indexOf('keypress')===0) {
-                	$(document).keydown(function(e) {
-                    	if (e.which==9) {
-                      	  e.preventDefault();
-							e.stopPropagation();
-                        } else if (e.which==16) {
-                            map = {};
-                            map["targetid"] = targetid;
-                            map["which"] = e.which+1000;
-                            map["id"] = e.target.id;
-                           self.putLou("","event("+targetid+"/keypress,"+JSON.stringify(map)+"):w" +
-                           		"");
-						}
+		var div = document.getElementById(targetid);
+		if (content.indexOf('keypress')===0) {
+			$(document).keydown(function(e) {
+				if (e.which==9) {
+					e.preventDefault();
+					e.stopPropagation();
+				} else if (e.which==16) {
+					map = {};
+					map["targetid"] = targetid;
+					map["which"] = e.which+1000;
+					map["id"] = e.target.id;
+					self.putLou("","event("+targetid+"/keypress,"+JSON.stringify(map)+"):w" +
+					"");
+				}
 
-                	});
-                	$(document).keyup(function(e) {
-                        map = {};
-                        map["targetid"] = targetid;
-                        map["which"] = e.which;
-                        map["id"] = e.target.id;
+			});
+			$(document).keyup(function(e) {
+				map = {};
+				map["targetid"] = targetid;
+				map["which"] = e.which;
+				map["id"] = e.target.id;
 
-                        var padding = content.split(",");
-                        if (padding.length>1) {
-        				for (var i = 1; i < padding.length; i++) {
-                			var name = padding[i];
-							var p = $("#"+name);
-							var nt=$('input[name='+name+']:checked').val();
-							if (nt!==undefined) {
-    							map[name] = nt;
-                			} else if (p.prop("tagName")==="INPUT") {
-    							map[name] = $("#"+name).val();
-							} else {
-    							map[name] = $("#"+name).val();
-							}
+				var padding = content.split(",");
+				if (padding.length>1) {
+					for (var i = 1; i < padding.length; i++) {
+						var name = padding[i];
+						var p = $("#"+name);
+						var nt=$('input[name='+name+']:checked').val();
+						if (nt!==undefined) {
+							map[name] = nt;
+						} else if (p.prop("tagName")==="INPUT") {
+							map[name] = $("#"+name).val();
+						} else {
+							map[name] = $("#"+name).val();
 						}
 					}
-		        		self.putLou("","event("+targetid+"/keypress,"+JSON.stringify(map)+")");
-                	});
-        } else if (content.indexOf('play')===0 || content.indexOf('pause')===0 || content.indexOf('ended')===0 || content.indexOf('error')===0) {
-               	$("#"+targetid).on(content, function() {
-               	    var map = {};
-               	     map["targetid"] = targetid;
-               	     map["currentTime"] = $("#"+targetid)[0].currentTime*1000;
-               	     map["playbackRate"] = $("#"+targetid)[0].playbackRate;
-               	     map["buffered"] = $("#"+targetid)[0].buffered;
-               	     map["autoplay"] = $("#"+targetid)[0].autoplay;
-               	     map["loop"] = $("#"+targetid)[0].loop;
-               		self.putLou("","event("+targetid+"/"+content+","+JSON.stringify(map)+")");
-               	});
+				}
+				self.putLou("","event("+targetid+"/keypress,"+JSON.stringify(map)+")");
+			});
+		} else if (content.indexOf('play')===0 || content.indexOf('pause')===0 || content.indexOf('ended')===0 || content.indexOf('error')===0) {
+			$("#"+targetid).on(content, function() {
+				var map = {};
+				map["targetid"] = targetid;
+				map["currentTime"] = $("#"+targetid)[0].currentTime*1000;
+				map["playbackRate"] = $("#"+targetid)[0].playbackRate;
+				map["buffered"] = $("#"+targetid)[0].buffered;
+				map["autoplay"] = $("#"+targetid)[0].autoplay;
+				map["loop"] = $("#"+targetid)[0].loop;
+				self.putLou("","event("+targetid+"/"+content+","+JSON.stringify(map)+")");
+			});
 		} else if (content.indexOf('track/')===0) {
 			trackers[targetid] = content.substring(6);
-            trackervalues[targetid+"/"+content.substring(6)]="";
+			trackervalues[targetid+"/"+content.substring(6)]="";
 			if (content.indexOf('track/devicemotion')===0) {
 				window.addEventListener('devicemotion',function(event) {
-				    var alpha = Math.round(event.rotationRate.alpha);
-				    var beta = Math.round(event.rotationRate.beta);
-				    var gamma = Math.round(event.rotationRate.gamma);
-				    if (Math.abs(alpha)>10 || Math.abs(beta)>10 || Math.abs(gamma)>10 ) {
-                                    	trackervalues["screen/devicemotion_alpha"] = alpha;
-                                    	trackervalues["screen/devicemotion_beta"] = beta;
-                                    	trackervalues["screen/devicemotion_gamma"] = gamma;
-                                    	trackervalues["screen/devicemotion_send"] = "true";
-				    }
+					var alpha = Math.round(event.rotationRate.alpha);
+					var beta = Math.round(event.rotationRate.beta);
+					var gamma = Math.round(event.rotationRate.gamma);
+					if (Math.abs(alpha)>10 || Math.abs(beta)>10 || Math.abs(gamma)>10 ) {
+						trackervalues["screen/devicemotion_alpha"] = alpha;
+						trackervalues["screen/devicemotion_beta"] = beta;
+						trackervalues["screen/devicemotion_gamma"] = gamma;
+						trackervalues["screen/devicemotion_send"] = "true";
+					}
 				});
 			} else if (content.indexOf('track/mousemove')===0) {
 				// tricky since we need to track it
 				//console.log('track');
 				$("#"+targetid).mousemove(function(event) {
 					// set these already in the tracker to be send
-                    var oldvalue = trackervalues[targetid+"/mousemove"];
-        			var xp = (event.layerX/event.target.offsetWidth)*100;
-            		var yp = (event.layerY/event.target.offsetHeight)*100;
-            		var newvalue = event.offsetX+','+event.offsetY+','+event.layerX+','+event.layerY+','+xp+','+yp;
-            		
-            		//keep track of input type range element
-            		if (event.target.tagName==="INPUT") {
+					var oldvalue = trackervalues[targetid+"/mousemove"];
+					var xp = (event.layerX/event.target.offsetWidth)*100;
+					var yp = (event.layerY/event.target.offsetHeight)*100;
+					var newvalue = event.offsetX+','+event.offsetY+','+event.layerX+','+event.layerY+','+xp+','+yp;
+
+					//keep track of input type range element
+					if (event.target.tagName==="INPUT") {
 						newvalue += ","+ event.target.value;
 					}
-            		
-            		if (oldvalue!=newvalue) {
-                        	trackervalues[targetid+"/mousemove"] = newvalue;
-                            trackervalues[targetid+"/mousemove_send"] = "true";
+
+					if (oldvalue!=newvalue) {
+						trackervalues[targetid+"/mousemove"] = newvalue;
+						trackervalues[targetid+"/mousemove_send"] = "true";
 					}
 				});
 				$("#"+targetid).on('touchmove', function(ev) {
 					// set these already in the tracker to be send
-          			var oldvalue = trackervalues[targetid+"/mousemove"];
+					var oldvalue = trackervalues[targetid+"/mousemove"];
 					var newvalue = '';
 
 					var boundingBox = this.getBoundingClientRect();
@@ -1100,19 +1100,19 @@ var Eddie = function(options){
 						var touch = event.touches[i];
 						var top = touch.pageY - boundingBox.top;
 						var left = touch.pageX - boundingBox.left;
-            			if (i===0) {
-            			    var xp = (left/window.innerWidth)*100;
-            				var yp = (top/window.innerHeight)*100;
+						if (i===0) {
+							var xp = (left/window.innerWidth)*100;
+							var yp = (top/window.innerHeight)*100;
 							newvalue += left+','+top+','+left+','+top+','+xp+','+yp;
 
-					  	} else {
+						} else {
 							newvalue += ','+left+','+top+','+left+','+top+','+xp+','+yp;
-					  	}
-            			
-            			//keep track of input type range element
-                		if (ev.target.tagName==="INPUT") {
-    						newvalue += ","+ ev.target.value;
-    					}
+						}
+
+						//keep track of input type range element
+						if (ev.target.tagName==="INPUT") {
+							newvalue += ","+ ev.target.value;
+						}
 					}
 					if (oldvalue!=newvalue) {
 						trackervalues[targetid+"/mousemove"] = newvalue;
@@ -1124,41 +1124,41 @@ var Eddie = function(options){
 				});
 			}
 		} else if (div!==null) {
-                	var eventtargets = content.split(":");
-					for(j = 0; j < eventtargets.length; j++){
-						var padding = eventtargets[j].split(",");
-                        $("#"+targetid).bind(padding[0], {etarget: eventtargets[j]}, function(event) {
-                           var data = event.data;
-                           sendBasicEvent(targetid,this,data,event);
-                        });
-					}
+			var eventtargets = content.split(":");
+			for(j = 0; j < eventtargets.length; j++){
+				var padding = eventtargets[j].split(",");
+				$("#"+targetid).bind(padding[0], {etarget: eventtargets[j]}, function(event) {
+					var data = event.data;
+					sendBasicEvent(targetid,this,data,event);
+				});
+			}
 		} else {
-					var eventtargets = content.split(":");
-					for(j = 0; j < eventtargets.length; j++){
-						var padding = eventtargets[j].split(",");
-						$("."+targetid).bind(padding[0], {etarget: eventtargets[j]}, function(event) {
-							var data = event.data;
-							sendBasicEvent(targetid,this,data,event);
-						});
-					}
+			var eventtargets = content.split(":");
+			for(j = 0; j < eventtargets.length; j++){
+				var padding = eventtargets[j].split(",");
+				$("."+targetid).bind(padding[0], {etarget: eventtargets[j]}, function(event) {
+					var data = event.data;
+					sendBasicEvent(targetid,this,data,event);
+				});
+			}
 		}
 
 	}
 
- 
-     function sendBasicEvent(targetid,obj,data,event) {
+
+	function sendBasicEvent(targetid,obj,data,event) {
 		if (obj.tagName==="INPUT") {
-		      var map = {};
-              map[targetid+".value"]=obj.value;
-              map["value"]=obj.value;
-              map["id"] = event.target.id;
-		      self.putLou("","event("+targetid+"/"+data.etarget+","+JSON.stringify(map)+")");
+			var map = {};
+			map[targetid+".value"]=obj.value;
+			map["value"]=obj.value;
+			map["id"] = event.target.id;
+			self.putLou("","event("+targetid+"/"+data.etarget+","+JSON.stringify(map)+")");
 		} else if (obj.tagName==="SELECT") {
-			  var map = {};
-              map["value"]=obj.value;
-              map["id"] = event.target.id;
-		      self.putLou("","event("+targetid+"/"+data.etarget+","+JSON.stringify(map)+")");
-        } else {
+			var map = {};
+			map["value"]=obj.value;
+			map["id"] = event.target.id;
+			self.putLou("","event("+targetid+"/"+data.etarget+","+JSON.stringify(map)+")");
+		} else {
 			var padding = data.etarget.split(",");
 			map = {};
 			//map[targetid+".value"]=obj.value;
@@ -1168,31 +1168,31 @@ var Eddie = function(options){
 			map["screenX"] = event.screenX;
 			map["screenY"] = event.screenY;
 			var xp = (event.clientX/window.innerWidth)*100;
-            var yp = (event.clientY/window.innerHeight)*100;
-            map["screenXP"] = xp;
+			var yp = (event.clientY/window.innerHeight)*100;
+			map["screenXP"] = xp;
 			map["screenYP"] = yp;
-			
-	
+
+
 			if (padding.length>1) {
-        		for (var i = 1; i < padding.length; i++) {
-                	var name = padding[i];
+				for (var i = 1; i < padding.length; i++) {
+					var name = padding[i];
 					var p = name.startsWith("[") ? $(name) : $("#"+name);
-					
+
 					for(var j = 0; j < p.length; j++) {
 						name = p[j].id;
 						var nt=$('input[name='+name+']:checked').val();
 						if (nt!==undefined) {
-	    						map[name] = nt;
-	                	} else if (p.prop("tagName")==="INPUT") {
+							map[name] = nt;
+						} else if (p.prop("tagName")==="INPUT") {
 							//console.log('type='+p.prop("type"));
 							if (p.prop("type")==="file") {
 								var $i = $("#"+name);
 								input = $i[0];
 								file = input.files[0];
-	                            if (file===undefined) {
-	                                file=window.dropfile;
-	                            }							
-								
+								if (file===undefined) {
+									file=window.dropfile;
+								}							
+
 								var fileparams = "?targetid="+name+"&screenid="+settings.screenId+"&cfilename="+file.name+"&cfilesize="+file.size;								
 								reader = new FileReader();
 								reader.readAsDataURL(file);
@@ -1204,7 +1204,7 @@ var Eddie = function(options){
 										'data': file.data,
 										'dataType': 'data',
 										'processData': false,
-						                'contentType': 'application/data',
+										'contentType': 'application/data',
 										'async': true
 									});
 								};
@@ -1216,7 +1216,7 @@ var Eddie = function(options){
 								file.name = inp.data("filename");
 								file.data = inp.val();
 								var fileparams = "?targetid="+name+"&screenid="+settings.screenId+"&cfilename="+file.name+"&cfilesize="+file.data.length;							
-								
+
 								self.doRequest({
 									'type': 'POST',
 									'url': "//" + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp+fileparams,
@@ -1229,10 +1229,10 @@ var Eddie = function(options){
 								map['filename'] = file.name;
 								map[name] = "filehandle";
 							} else {
-	    							map[name] = $("#"+name).val(); 
+								map[name] = $("#"+name).val(); 
 							}
 						} else {
-	    						map[name] = $("#"+name).val();
+							map[name] = $("#"+name).val();
 						}
 					}
 				}
@@ -1244,17 +1244,17 @@ var Eddie = function(options){
 				var elementOffsetLeft = dragOffset.left;
 				var elementOffsetTop = dragOffset.top;
 				map["elementOffsetTop"] = elementOffsetTop;
-                        	map["elementOffsetLeft"] = elementOffsetLeft;
+				map["elementOffsetLeft"] = elementOffsetLeft;
 			}		
-	
+
 			var dragPosition = draggedElement.position();
 			if (dragPosition !== undefined) {
 				var elementPositionLeft = dragPosition.left;
 				var elementPositionTop = dragPosition.top;
 				map["elementPositionTop"] = elementPositionTop;
-                        	map["elementPositionLeft"] = elementPositionLeft;
+				map["elementPositionLeft"] = elementPositionLeft;
 			}	
-			
+
 			if (draggedElement[0] !== undefined) {
 				var elementWidth = draggedElement[0].clientWidth;
 				var elementHeight = draggedElement[0].clientHeight;
@@ -1262,27 +1262,27 @@ var Eddie = function(options){
 				map["elementHeight"] = elementHeight;
 			}
 			map["id"] = event.target.id;
-		        self.putLou("","event("+targetid+"/"+padding[0]+","+JSON.stringify(map)+")");
+			self.putLou("","event("+targetid+"/"+padding[0]+","+JSON.stringify(map)+")");
 		}
 	}
 
- 
+
 	function simpleKeys (original) {
-  		return Object.keys(original).reduce(function (obj, key) {
-    			obj[key] = typeof original[key] === 'object' ? '{ ... }' : original[key];
-    			return obj;
-  		}, {});
+		return Object.keys(original).reduce(function (obj, key) {
+			obj[key] = typeof original[key] === 'object' ? '{ ... }' : original[key];
+			return obj;
+		}, {});
 	}
 
 	function setDiv(targetid,content) {
 		var div = document.getElementById(targetid);
 		if (div!==null) {
-	       	    $('#'+targetid).html(content);
+			$('#'+targetid).html(content);
 		} else {
-	  	    div = document.createElement('div');
-	  	    div.setAttribute('id',targetid);
-	            div.innerHTML = content;
-	            document.getElementById("screen").appendChild(div);
+			div = document.createElement('div');
+			div.setAttribute('id',targetid);
+			div.innerHTML = content;
+			document.getElementById("screen").appendChild(div);
 		}
 
 	}
@@ -1291,9 +1291,9 @@ var Eddie = function(options){
 		var div = document.getElementById(targetid);
 		if (div!==null) {
 
-	       	    ne = document.createElement('div');
-	            ne.innerHTML = content;
-	            div.appendChild(ne);
+			ne = document.createElement('div');
+			ne.innerHTML = content;
+			div.appendChild(ne);
 		}
 	}
 
@@ -1334,66 +1334,88 @@ var Eddie = function(options){
 	}
 
 	function createCookie(name, value, days) {
-    	var expires;
-    	if (days) {
-       	 	var date = new Date();
-       	 	date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-         	expires = "; expires=" + date.toGMTString();
-    	} else {
-        	expires = "";
-    	}
-   	 	document.cookie = escape(name) + "=" + escape(value) + expires + "; domain=.mupop.net;path=/";
+		var expires;
+		if (days) {
+			var date = new Date();
+			date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+			expires = "; expires=" + date.toGMTString();
+		} else {
+			expires = "";
+		}
+		document.cookie = escape(name) + "=" + escape(value) + expires + "; domain=.qandr.eu;path=/";
 	}
 
 	function readCookie(name) {
-    	var nameEQ = escape(name) + "=";
-    	var ca = document.cookie.split(';');
-    	for (var i = 0; i < ca.length; i++) {
-        	var c = ca[i];
-        	while (c.charAt(0) === ' ') {
-        	 	c = c.substring(1, c.length);
-        	}
-        	if (c.indexOf(nameEQ) === 0) {
-        			return unescape(c.substring(nameEQ.length, c.length));
-        	}
-    	}
-    	return null;
+		var nameEQ = escape(name) + "=";
+		var ca = document.cookie.split(';');
+		for (var i = 0; i < ca.length; i++) {
+			var c = ca[i];
+			while (c.charAt(0) === ' ') {
+				c = c.substring(1, c.length);
+			}
+			if (c.indexOf(nameEQ) === 0) {
+				return unescape(c.substring(nameEQ.length, c.length));
+			}
+		}
+		return null;
 	}
 
 	function getPosition(position) {
-	    trackervalues["screen/location"]=""+position.coords.latitude+","+position.coords.longitude;
+		trackervalues["screen/location"]=""+position.coords.latitude+","+position.coords.longitude;
 	}
-	
+
 	function eraseCookie(name) {
-	    createCookie(name, "", -1);
+		createCookie(name, "", -1);
 	}
 
 	function addGestureEvents() {
 		window.addEventListener("orientationchange", function() {
-	  	//self.putLou('','orientationchange('+window.orientation+')');
+			//self.putLou('','orientationchange('+window.orientation+')');
 		}, false);
 	}
 
-	
+
 	return self;
-	
-	function getHtml(targetid) {
+
+	function requestHtml(targetid,content) {
 		//get dom from html element
-        var postData = $("html").html();
-        //add doctype (IMPORTANT for correct rendering!)                     
-        var docTypeAndHTML = new XMLSerializer().serializeToString(document.doctype) + '<html xmlns="http://www.w3.org/1999/xhtml">';
-        postData = docTypeAndHTML + postData + "</html>";
-        
-        data = {};
-        data['dom'] = postData;
-        data['baseurl'] = window.location.href;    
-        data['width'] = window.innerWidth;
-        data['height'] = window.innerHeight;
-        
+		var postData = $("html").html();
+		var dup =  "";
+		var  pos = postData.indexOf("<div id=\"synctime\"");
+		if (pos!==-1) {
+			var p1=postData.substring(0,pos);
+			var  pos2 = postData.indexOf("</div>",pos);
+			var dup = p1+postData.substring(pos2+6);
+		} else {
+			return;
+		}
+		if (content==="onlynew") {
+			if (typeof window.oldscreenshotdata === 'undefined') {
+				window.oldscreenshotdata =  dup;
+			} else {
+				if  (window.oldscreenshotdata === dup) {
+					return;
+				}
+				window.oldscreenshotdata =  dup;
+			}
+		}
+
+//		add doctype (IMPORTANT for correct rendering!)                     
+		var docTypeAndHTML = new XMLSerializer().serializeToString(document.doctype) + '<html xmlns="http://www.w3.org/1999/xhtml">';
+		postData = docTypeAndHTML + postData + "</html>";
+
+		data = {};
+		data['dom'] = postData;
+		data['baseurl'] = window.location.href;
+		data['width'] = window.innerWidth;
+		data['height'] = window.innerHeight;
+
 		self.putLou("","event("+targetid+"/client,"+JSON.stringify(data)+")");
 	}
+
+
 };
-	
+
 function collision(div1, div2) {
 	var x1 = $(div1).offset().left;
 	var y1 = $(div1).offset().top;
@@ -1415,5 +1437,5 @@ function collision(div1, div2) {
 	}
 	return false;
 };
-	    
-	
+
+
