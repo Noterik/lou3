@@ -1343,6 +1343,7 @@ var Eddie = function(options){
 			expires = "";
 		}
 		document.cookie = escape(name) + "=" + escape(value) + expires + "; domain=.qandr.eu;path=/";
+
 	}
 
 	function readCookie(name) {
