@@ -1,6 +1,7 @@
 package org.springfield.lou.controllers;
 
 import org.json.simple.JSONObject;
+import org.springfield.fs.FsNode;
 import org.springfield.lou.homer.LazyHomer;
 
 
@@ -33,6 +34,6 @@ public class ScreenController extends Html5Controller {
 			}
 		}
 		data.put("screengroups",sg);
-		screen.get(selector).parsehtml(data,"");
+		screen.get(selector).render(data,"");
 	}
 }
