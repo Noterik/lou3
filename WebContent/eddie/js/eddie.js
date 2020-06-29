@@ -16,6 +16,9 @@ var Eddie = function(options){
 	var performancedata ='';
 	var performancetestcount=0;
 	var externalprogram = false;
+    var autohidecursor = '';
+    var autohidecursortime = 2000;
+    var autohidecursortimer = 0;
 
 	var settings = {
 			lou_ip: "",
@@ -77,6 +80,15 @@ var Eddie = function(options){
 					}
 				}
 			}
+            if (window.autohidecursor!=='') {
+                if (window.autohidecursortimer===window.autohidecursortime) {
+                        $(window.autohidecursor).css('cursor','none');
+                        console.log('T='+window.autohidecursortimer+' '+window.autohidecursor);
+                        window.autohidecursortimer+=20;
+                } else if (window.autohidecursortimer<=window.autohidecursortime) {
+                        window.autohidecursortimer+=20;
+                }
+            }
 			for (var data in trackers){
 				var map = {};
 				var tid = data;
@@ -531,6 +543,11 @@ var Eddie = function(options){
 			case "draggable":
 				$(targetid).draggable();
 				break;
+            case "autohidecursor":
+                window.autohidecursor=targetid;
+                window.autohidecursortime=2000;
+                window.autohidecursortimer=0;
+                break;
 			case "fullscreen":
 				window.fullscreenwanted = true;
 				break;
@@ -577,7 +594,6 @@ var Eddie = function(options){
 				remove(targetid);
 				break;
 			case "terminate":
-				console.log("terminate command");
 				doTerminate(targetid);
 				break;
 			case "setcss":
@@ -1438,5 +1454,15 @@ function collision(div1, div2) {
 	}
 	return false;
 };
+
+$(document).mousemove(function(event){
+    if (window.autohidecursor!=='') {
+            if (window.autohidecursortimer>window.autohidecursortime) {
+                    window.autohidecursortimer=0;
+                    $(window.autohidecursor).css('cursor','auto');
+            }
+    }
+});
+ 
 
 

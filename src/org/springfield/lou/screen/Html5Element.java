@@ -77,7 +77,10 @@ public class Html5Element {
 		return true;
 	}
 	
-	
+	public boolean autohidecursor(String time) {
+		screen.send("autohidecursor("+selector+")="+time);
+		return true;
+	}
 	
 	public boolean fullscreen() {
 		screen.send("fullscreen("+selector+")");
