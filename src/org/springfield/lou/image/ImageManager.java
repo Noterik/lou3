@@ -41,10 +41,8 @@ public class ImageManager {
     }
     
     public List<AmazonImage> getAmazonS3Dir(String path) {
-    	System.out.println("AM PATH="+path);
     	String bucket = "springfield-private-storage";
 		AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withCredentials(new EnvironmentVariableCredentialsProvider()).build();
-        System.out.println("LOU AM Downloading an object");
         ObjectListing images = s3Client.listObjects(bucket,path); 
         
 
@@ -54,7 +52,7 @@ public class ImageManager {
             S3Object obj = s3Client.getObject(bucket, image.getKey());
             S3ObjectInputStream stream = obj.getObjectContent();
             String key=obj.getKey();
-            if (key.indexOf(".")!=-1) {
+            if (key.indexOf(".jpg")!=-1) { // kind of a mistake but needed for now
             	ByteArrayOutputStream byteStream = new ByteArrayOutputStream();  
             	AmazonImage ni = new AmazonImage(s3Client,bucket,key,stream);
             	results.add(ni);

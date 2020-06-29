@@ -1382,6 +1382,7 @@ var Eddie = function(options){
 		//get dom from html element
 		var postData = $("html").html();
 		var dup =  "";
+		var header = "";
 		var  pos = postData.indexOf("<div id=\"synctime\"");
 		if (pos!==-1) {
 			var p1=postData.substring(0,pos);
@@ -1400,20 +1401,48 @@ var Eddie = function(options){
 				window.oldscreenshotdata =  dup;
 			}
 		}
-
+		if (content==="compressed") {
+			if (typeof window.oldscreenshotdata === 'undefined') {
+				header = 'metadata(compressed,all)=';
+				window.oldscreenshotdata =  dup;
+			} else {
+				if  (window.oldscreenshotdata === dup) {
+					return;
+				}
+				var pos = postData.indexOf("<body");
+				if (pos!=-1) {
+					var headerdata = postData.substring(0,pos);
+					var htmldata = postData.substring(pos);
+				}
+				if (typeof window.oldscreenshotheader === 'undefined') {
+					window.oldscreenshotdata =  htmldata;
+					window.oldscreenshotheader =  headerdata;
+					header = 'metadata(compressed,all)=';
+				} else {
+					if  (window.oldscreenshotheader === headerdata) {
+						header = 'metadata(compressed,body)=';
+						postData = htmldata;
+						window.oldscreenshotdata =  dup;
+					} else {
+						header = 'metadata(compressed,header)=';
+						postData = headerdata;
+						window.oldscreenshotheader =  headerdata;
+					}
+				}
+			}
+		}
 //		add doctype (IMPORTANT for correct rendering!)                     
 		var docTypeAndHTML = new XMLSerializer().serializeToString(document.doctype) + '<html xmlns="http://www.w3.org/1999/xhtml">';
-		postData = docTypeAndHTML + postData + "</html>";
+		postData = header+docTypeAndHTML + postData + "</html>";
 
 		data = {};
 		data['dom'] = postData;
 		data['baseurl'] = window.location.href;
 		data['width'] = window.innerWidth;
 		data['height'] = window.innerHeight;
-
+		console.log("ID="+targetid);
 		self.putLou("","event("+targetid+"/client,"+JSON.stringify(data)+")");
 	}
-
 
 };
 
