@@ -776,6 +776,11 @@ var Eddie = function(options){
 
 		//get dom from html element
 		var postData = $("html").html();
+		
+		//replace # with %23
+        var regex = new RegExp('#', 'g');
+        postData = postData.replace(regex, '%23');
+		
 		//add doctype (IMPORTANT for correct rendering!)                     
 		var docTypeAndHTML = new XMLSerializer().serializeToString(document.doctype) + '<html xmlns="http://www.w3.org/1999/xhtml">';
 		postData = docTypeAndHTML + postData + "</html>";
