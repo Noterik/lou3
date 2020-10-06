@@ -45,17 +45,20 @@ public class ImageManager {
 		AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withCredentials(new EnvironmentVariableCredentialsProvider()).build();
         ObjectListing images = s3Client.listObjects(bucket,path); 
         
-
         List<S3ObjectSummary> list = images.getObjectSummaries();
         List<AmazonImage> results = new ArrayList<AmazonImage>();
         for(S3ObjectSummary image: list) {
             S3Object obj = s3Client.getObject(bucket, image.getKey());
-            S3ObjectInputStream stream = obj.getObjectContent();
+            
             String key=obj.getKey();
             if (key.indexOf(".jpg")!=-1) { // kind of a mistake but needed for now
-            	ByteArrayOutputStream byteStream = new ByteArrayOutputStream();  
-            	AmazonImage ni = new AmazonImage(s3Client,bucket,key,stream);
-            	results.add(ni);
+            	AmazonImage ni = new AmazonImage(s3Client,bucket,key);
+            	results.add(ni);            	
+            }
+            try {
+            	obj.close();
+            } catch (IOException e) {
+            	e.printStackTrace();
             }
         }
     	return results;

@@ -7,12 +7,10 @@ import com.amazonaws.services.s3.model.*;
 
 public class AmazonImage {
 	private String key;
-	private S3ObjectInputStream stream;
 	private AmazonS3 s3Client;
 	private String bucket;
 
-	public AmazonImage(AmazonS3 c,String b,String k,S3ObjectInputStream s) {
-		stream = s;
+	public AmazonImage(AmazonS3 c,String b,String k) {
 		key = k;
 		s3Client = c;
 		bucket = b;
@@ -26,6 +24,10 @@ public class AmazonImage {
 	public byte[] getBytes() {
 		try {
         ByteArrayOutputStream byteStream = new ByteArrayOutputStream();  
+        
+        S3Object obj = s3Client.getObject(bucket, key);
+        S3ObjectInputStream stream = obj.getObjectContent();
+        
         int nextValue = stream.read();  
         while (-1 != nextValue) {  
         	byteStream.write(nextValue);  
@@ -34,6 +36,8 @@ public class AmazonImage {
   
         byte[] blob = byteStream.toByteArray(); 
 		
+        obj.close();
+        
 		return blob;
 		} catch(Exception e) {
 			e.printStackTrace();
