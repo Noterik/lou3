@@ -638,5 +638,11 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     public void removeEvents(Object obj) {
 		Model.getEventManager().removeController(obj);
     }
+    
+	public String proxyPost(String path,String fsxml,String mimetype) {
+		// can be overridden in app...
+		System.out.println("proxyCall done but not overridden "+path);
+		return null;
+	}
 
 }

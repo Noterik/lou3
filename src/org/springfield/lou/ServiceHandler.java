@@ -1,6 +1,8 @@
 package org.springfield.lou;
 
 import org.springfield.lou.application.ApplicationManager;
+import org.springfield.lou.application.Html5Application;
+import org.springfield.lou.application.Html5ApplicationInterface;
 import org.springfield.lou.model.*;
 import org.springfield.lou.homer.LazyHomer;
 import org.springfield.lou.model.ModelEventManager;
@@ -62,6 +64,8 @@ public class ServiceHandler implements ServiceInterface{
 	}
 
 	public String post(String path,String fsxml,String mimetype) {
+		Html5ApplicationInterface app = ApplicationManager.instance().getApplication(path);
+		if (app!=null) return app.proxyPost(path, fsxml, mimetype);
 		return null;
 	}
 

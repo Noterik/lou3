@@ -98,7 +98,7 @@ public class LouServlet extends HttpServlet {
 	 */
 	public LouServlet() {
 		super();
-		System.out.println("servlet object created");
+		System.out.println("servlet object created lou");
 		// TODO Auto-generated constructor stub
 	}
 
@@ -343,6 +343,13 @@ public class LouServlet extends HttpServlet {
 		//read the data from the put request
 
 		//System.out.println("PUT REQ="+request.getRequestURI());
+		
+		String body = request.getRequestURI();
+		// if proxy request send it to Servicehandler 
+		if (body.indexOf("/lou/proxy/")!=-1) {
+			ProxyHandler.post("lou",request,response);
+			return;
+		}
 
 
 		String mt = request.getContentType();

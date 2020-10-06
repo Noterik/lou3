@@ -106,3 +106,4 @@ dist/lou.war
 *.jar
 *.war
 /bin/
+*.jar
