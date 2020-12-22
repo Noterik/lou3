@@ -563,7 +563,9 @@ var Eddie = function(options){
 				break;
 			case "exitfullscreen":
 				window.fullscreenwanted = false;
-				document.exitFullscreen();
+				if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+				    document.exitFullscreen();
+				}
 				break;
 			case "bind":
 				setBind(targetid,content);
@@ -942,7 +944,10 @@ var Eddie = function(options){
 				var parsed = Mustache.render(htmlsub,pdata);
 				$('#'+tagname).html(parsed);
 			} else {
-				var parsed = Mustache.render(templatecache[pdata.tmpcrc],pdata);
+			    	if (!templatecache.hasOwnProperty(pdata.tmpcrc)) {
+        				console.log("Why don't we have this template cached?? "+ pdata.tmpcrc);
+        			}
+			    	var parsed = Mustache.render(templatecache[pdata.tmpcrc],pdata);
 				$('#'+targetid).html(parsed);
 			}
 		} else {
