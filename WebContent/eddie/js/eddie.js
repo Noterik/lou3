@@ -562,8 +562,11 @@ var Eddie = function(options){
 				document.getElementById(targetid).appendChild(img);
 				break;
 			case "exitfullscreen":
-				window.fullscreenwanted = false;
-				document.exitFullscreen();
+                window.fullscreenwanted = false;
+                document.exitFullscreen();
+                if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+                    document.exitFullscreen();
+                }
 				break;
 			case "bind":
 				setBind(targetid,content);
