@@ -48,7 +48,12 @@ public class UserManager {
 	}
 	
 	public void removeUser(User user){
-		users.remove(user.getId());		
+		
+		String id = ""+user.getId();
+		id = id.replace("@","-at-");
+		users.remove(id);		
+		
+
 	}
 	
 	/**

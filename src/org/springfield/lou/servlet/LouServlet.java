@@ -614,7 +614,7 @@ public class LouServlet extends HttpServlet {
 					
 			        or.setGeneralProgressListener(new UploadProgressListener(eventscreen.getModel(),publicurl,cfilename,cfilesize,targetid));
 					s3Client.putObject(or);
-			
+					
 
 				} catch (AmazonServiceException ase) {
 					ase.printStackTrace();
