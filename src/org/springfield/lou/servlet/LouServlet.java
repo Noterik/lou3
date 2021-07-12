@@ -513,15 +513,11 @@ public class LouServlet extends HttpServlet {
 	}
 
 	private String handleFileUpload(HttpServletRequest request) {
-		System.out.println("HANDLE FILE UPLOAD");
 		try {
 			String targetid = request.getParameter("targetid");
-			System.out.println("TARGETID UPLOAD="+targetid);
 			String screenid = request.getParameter("screenid");
 			String cfilename = request.getParameter("cfilename");
-			System.out.println("CFILENAME="+cfilename);
 			String cfilesize = request.getParameter("cfilesize");
-			System.out.println("CFILESIZE="+cfilesize);
 			
 
 			Html5ApplicationInterface app = null;
@@ -537,10 +533,8 @@ public class LouServlet extends HttpServlet {
 
 
 			String method = eventscreen.getModel().getProperty("/screen['upload']/target['"+targetid+"']/method");
-			System.out.println("METHOD="+method);
 
 			String destpath = eventscreen.getModel().getProperty("/screen['upload']/target['"+targetid+"']/destpath");
-			System.out.println("DESTPATH="+destpath+" T="+targetid);
 			if (destpath==null || destpath.equals("")) { setUploadError(eventscreen,targetid,"destpath not set");return null;}
 
 			String destname_prefix = eventscreen.getModel().getProperty("/screen['upload']/target['"+targetid+"']/destname_prefix");
