@@ -16,9 +16,11 @@ var Eddie = function(options){
 	var performancedata ='';
 	var performancetestcount=0;
 	var externalprogram = false;
-    var autohidecursor = '';
-    var autohidecursortime = 2000;
-    var autohidecursortimer = 0;
+	var autohidecursor = '';
+	var autohidecursortime = 2000;
+	var autohidecursortimer = 0;
+	var trackdelay = 2;
+	var trackdelaycounter = 0;
 
 	var settings = {
 			lou_ip: "",
@@ -32,6 +34,7 @@ var Eddie = function(options){
 			appparams: null,
 			worker_location: '/eddie/js/eddie_worker.js',
 			worker: null
+
 	};
 	$.extend(settings, options);
 
@@ -80,153 +83,157 @@ var Eddie = function(options){
 					}
 				}
 			}
-            if (window.autohidecursor!=='') {
-                if (window.autohidecursortimer===window.autohidecursortime) {
-                        $(window.autohidecursor).css('cursor','none');
-                        console.log('T='+window.autohidecursortimer+' '+window.autohidecursor);
-                        window.autohidecursortimer+=20;
-                } else if (window.autohidecursortimer<=window.autohidecursortime) {
-                        window.autohidecursortimer+=20;
-                }
-            }
-			for (var data in trackers){
-				var map = {};
-				var tid = data;
-				var tracks = trackers[data].split(",");
-				for(i = 0; i < tracks.length; i++){
-					var track = tracks[i];
-					var trackp = track.split('(');
-					if ($('#'+tid).length) {
-						switch(trackp[0]){
-						case "vars":
-							var tname = trackp[1].substring(0,trackp[1].length-1);
-							var v = callvars[tid];
-							var oldvalue = trackervalues[tid+"/"+track];
-							var newvalue = v[tname];
-							if (oldvalue!=newvalue) {
-								trackervalues[tid+"/"+track] = newvalue;
-								map[tname] = newvalue;
-							}
-							break;
-						case "divInfo":
-							var ele = $('#'+tid);
-							var rh  = document.getElementById(tid).naturalHeight;
-							var rw  = document.getElementById(tid).naturalWidth;
-							var newvalue = ele.width()+","+ele.height()+","+rw+","+rh;
-							var oldvalue = trackervalues[tid+"/"+track];
-							if (oldvalue!=newvalue) {
-								trackervalues[tid+"/"+track] = newvalue;
-								map['divInfo'] = newvalue;
-							}
-							break;							
-						case "scrollTop":
-							var newvalue = $('#'+tid).scrollTop()+","+$('#'+tid).height();
-							var oldvalue = trackervalues[tid+"/"+track];
-							if (oldvalue!=newvalue) {
-								trackervalues[tid+"/"+track] = newvalue;
-								map['scrollTop'] = newvalue;
-							}
-							break;
-						case "divXYPerc":
-							var top = $('#'+tid).position().top;
-							var left = $('#'+tid).position().left;
-
-							var height = $('#'+tid).parent().height();
-							var width = $('#'+tid).parent().width();
-
-							var oldvalue = trackervalues[tid+"/"+track];
-							var newvalue = ""+(left/width)*100;
-							newvalue += ","+((top/height)*100);
-							if (oldvalue!=newvalue) {
-								console.log("xy="+newvalue+" T="+top+" H="+height);
-								trackervalues[tid+"/"+track] = newvalue;
-								map['divXYPerc'] = newvalue;
-							}
-							break;
-						case "screenXYPerc":
-							var position = $('#'+tid).position();
-							var oldvalue = trackervalues[tid+"/"+track];
-							var newvalue = ""+(position.left/window.innerWidth)*100;
-							newvalue += ","+((position.top/window.innerHeight)*100);
-							if (oldvalue!=newvalue) {
-								console.log("xy="+newvalue);
-								trackervalues[tid+"/"+track] = newvalue;
-								map['screenXYPerc'] = newvalue;
-							}
-							break;
-						case "screenXPerc":
-							var position = $('#'+tid).position();
-							var oldvalue = trackervalues[tid+"/"+track];
-							var newvalue = (position.left/window.innerWidth)*100;
-							if (oldvalue!=newvalue) {
-								trackervalues[tid+"/"+track] = newvalue;
-								map['screenXPerc'] = newvalue;
-							}
-							break;
-						case "screenYPerc":
-							position = $('#'+tid).position();
-							oldvalue = trackervalues[tid+"/"+track];
-							newvalue = (position.top/window.innerHeight)*100;
-							if (oldvalue!=newvalue) {
-								trackervalues[tid+"/"+track] = newvalue;
-								map['screenYPerc'] = newvalue;
-							}
-							break;
-						case "mousemove":
-							var send = trackervalues[tid+"/"+track+"_send"];
-							if (send === 'true') {
-								trackervalues[tid+"/"+track+"_send"] = 'false';
-								parts = trackervalues[tid+"/"+track].split(',');
-								map['screenX'] = parseFloat(parts[0]);
-								map['screenY'] = parseFloat(parts[1]);
-								map['clientX'] = parseFloat(parts[2]);
-								map['clientY'] = parseFloat(parts[3]);																		
-								map['screenXP'] = parseFloat(parts[4]);
-								map['screenYP'] = parseFloat(parts[5]);
-								map['clientXY'] = trackervalues[tid+"/"+track];
-								map['width'] = $('#'+tid).width();
-								map['height'] = $('#'+tid).height();
-								map['value'] = parts.length > 6 ? parts[6] : "null";								
-							}	
-							break;
-						case "devicemotion":
-							var send = trackervalues["screen/devicemotion_send"];
-							if (send === 'true') {
-								trackervalues["screen/devicemotion_send"] = 'false';
-								map['alpha'] = trackervalues["screen/devicemotion_alpha"];
-								map['beta'] = trackervalues["screen/devicemotion_beta"];
-								map['gamma'] = trackervalues["screen/devicemotion_gamma"];
-							}
-							break;
-						case "location":
-							navigator.geolocation.getCurrentPosition(getPosition);
-							newvalue = trackervalues["screen/location"];
-							oldvalue = trackervalues["screen/location_old"];
-							if (oldvalue!=newvalue) {
-								trackervalues[tid+"/location_old"] = newvalue;
-								map["location"] = newvalue;
-								console.log("gps info="+newvalue);
-							}
-							break;
-						case "currentTime":
-							newvalue = $('#'+tid)[0].currentTime;
-							oldvalue = trackervalues[tid+"/"+track];
-							if (oldvalue!=newvalue) {
-								trackervalues[tid+"/"+track] = newvalue;
-								map['currentTime'] = newvalue*1000;
-							}
-							break;
-						default:
-							break;
-						}
-					}
-				}
-				var line = JSON.stringify(map);
-				if (line!="{}") {
-					self.putLou("","event("+tid+"/client,"+line+")");
+			if (window.autohidecursor!=='') {
+				if (window.autohidecursortimer===window.autohidecursortime) {
+					$(window.autohidecursor).css('cursor','none');
+					console.log('T='+window.autohidecursortimer+' '+window.autohidecursor);
+					window.autohidecursortimer+=20;
+				} else if (window.autohidecursortimer<=window.autohidecursortime) {
+					window.autohidecursortimer+=20;
 				}
 			}
-		}, 30);
+			trackdelaycounter++;
+			if (trackdelaycounter>=trackdelay) {
+				trackdelaycounter=0;
+				for (var data in trackers){
+					var map = {};
+					var tid = data;
+					var tracks = trackers[data].split(",");
+					for(i = 0; i < tracks.length; i++){
+						var track = tracks[i];
+						var trackp = track.split('(');
+						if ($('#'+tid).length) {
+							switch(trackp[0]){
+							case "vars":
+								var tname = trackp[1].substring(0,trackp[1].length-1);
+								var v = callvars[tid];
+								var oldvalue = trackervalues[tid+"/"+track];
+								var newvalue = v[tname];
+								if (oldvalue!=newvalue) {
+									trackervalues[tid+"/"+track] = newvalue;
+									map[tname] = newvalue;
+								}
+								break;
+							case "divInfo":
+								var ele = $('#'+tid);
+								var rh  = document.getElementById(tid).naturalHeight;
+								var rw  = document.getElementById(tid).naturalWidth;
+								var newvalue = ele.width()+","+ele.height()+","+rw+","+rh;
+								var oldvalue = trackervalues[tid+"/"+track];
+								if (oldvalue!=newvalue) {
+									trackervalues[tid+"/"+track] = newvalue;
+									map['divInfo'] = newvalue;
+								}
+								break;							
+							case "scrollTop":
+								var newvalue = $('#'+tid).scrollTop()+","+$('#'+tid).height();
+								var oldvalue = trackervalues[tid+"/"+track];
+								if (oldvalue!=newvalue) {
+									trackervalues[tid+"/"+track] = newvalue;
+									map['scrollTop'] = newvalue;
+								}
+								break;
+							case "divXYPerc":
+								var top = $('#'+tid).position().top;
+								var left = $('#'+tid).position().left;
+
+								var height = $('#'+tid).parent().height();
+								var width = $('#'+tid).parent().width();
+
+								var oldvalue = trackervalues[tid+"/"+track];
+								var newvalue = ""+(left/width)*100;
+								newvalue += ","+((top/height)*100);
+								if (oldvalue!=newvalue) {
+									console.log("xy="+newvalue+" T="+top+" H="+height);
+									trackervalues[tid+"/"+track] = newvalue;
+									map['divXYPerc'] = newvalue;
+								}
+								break;
+							case "screenXYPerc":
+								var position = $('#'+tid).position();
+								var oldvalue = trackervalues[tid+"/"+track];
+								var newvalue = ""+(position.left/window.innerWidth)*100;
+								newvalue += ","+((position.top/window.innerHeight)*100);
+								if (oldvalue!=newvalue) {
+									console.log("xy="+newvalue);
+									trackervalues[tid+"/"+track] = newvalue;
+									map['screenXYPerc'] = newvalue;
+								}
+								break;
+							case "screenXPerc":
+								var position = $('#'+tid).position();
+								var oldvalue = trackervalues[tid+"/"+track];
+								var newvalue = (position.left/window.innerWidth)*100;
+								if (oldvalue!=newvalue) {
+									trackervalues[tid+"/"+track] = newvalue;
+									map['screenXPerc'] = newvalue;
+								}
+								break;
+							case "screenYPerc":
+								position = $('#'+tid).position();
+								oldvalue = trackervalues[tid+"/"+track];
+								newvalue = (position.top/window.innerHeight)*100;
+								if (oldvalue!=newvalue) {
+									trackervalues[tid+"/"+track] = newvalue;
+									map['screenYPerc'] = newvalue;
+								}
+								break;
+							case "mousemove":
+								var send = trackervalues[tid+"/"+track+"_send"];
+								if (send === 'true') {
+									trackervalues[tid+"/"+track+"_send"] = 'false';
+									parts = trackervalues[tid+"/"+track].split(',');
+									map['screenX'] = parseFloat(parts[0]);
+									map['screenY'] = parseFloat(parts[1]);
+									map['clientX'] = parseFloat(parts[2]);
+									map['clientY'] = parseFloat(parts[3]);																		
+									map['screenXP'] = parseFloat(parts[4]);
+									map['screenYP'] = parseFloat(parts[5]);
+									map['clientXY'] = trackervalues[tid+"/"+track];
+									map['width'] = $('#'+tid).width();
+									map['height'] = $('#'+tid).height();
+									map['value'] = parts.length > 6 ? parts[6] : "null";								
+								}	
+								break;
+							case "devicemotion":
+								var send = trackervalues["screen/devicemotion_send"];
+								if (send === 'true') {
+									trackervalues["screen/devicemotion_send"] = 'false';
+									map['alpha'] = trackervalues["screen/devicemotion_alpha"];
+									map['beta'] = trackervalues["screen/devicemotion_beta"];
+									map['gamma'] = trackervalues["screen/devicemotion_gamma"];
+								}
+								break;
+							case "location":
+								navigator.geolocation.getCurrentPosition(getPosition);
+								newvalue = trackervalues["screen/location"];
+								oldvalue = trackervalues["screen/location_old"];
+								if (oldvalue!=newvalue) {
+									trackervalues[tid+"/location_old"] = newvalue;
+									map["location"] = newvalue;
+									console.log("gps info="+newvalue);
+								}
+								break;
+							case "currentTime":
+								newvalue = $('#'+tid)[0].currentTime;
+								oldvalue = trackervalues[tid+"/"+track];
+								if (oldvalue!=newvalue) {
+									trackervalues[tid+"/"+track] = newvalue;
+									map['currentTime'] = newvalue*1000;
+								}
+								break;
+							default:
+								break;
+							}
+						}
+					}
+					var line = JSON.stringify(map);
+					if (line!="{}") {
+						self.putLou("","event("+tid+"/client,"+line+")");
+					}
+				} 
+			} // end of trackers loop
+		}, 50);
 
 	};
 
@@ -543,11 +550,15 @@ var Eddie = function(options){
 			case "draggable":
 				$(targetid).draggable();
 				break;
-            case "autohidecursor":
-                window.autohidecursor=targetid;
-                window.autohidecursortime=2000;
-                window.autohidecursortimer=0;
-                break;
+			case "autohidecursor":
+				window.autohidecursor=targetid;
+				window.autohidecursortime=2000;
+				window.autohidecursortimer=0;
+				break;
+			case "settrackdelay":
+				trackdelay=parseInt(content);
+				if (trackdelay<2) trackdelay = 2;
+				break;
 			case "fullscreen":
 				window.fullscreenwanted = true;
 				break;
@@ -562,11 +573,11 @@ var Eddie = function(options){
 				document.getElementById(targetid).appendChild(img);
 				break;
 			case "exitfullscreen":
-                window.fullscreenwanted = false;
-                document.exitFullscreen();
-                if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
-                    document.exitFullscreen();
-                }
+				window.fullscreenwanted = false;
+				document.exitFullscreen();
+				if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+					document.exitFullscreen();
+				}
 				break;
 			case "bind":
 				setBind(targetid,content);
@@ -795,11 +806,11 @@ var Eddie = function(options){
 
 		//get dom from html element
 		var postData = $("html").html();
-		
+
 		//replace # with %23
-        var regex = new RegExp('#', 'g');
-        postData = postData.replace(regex, '%23');
-		
+		var regex = new RegExp('#', 'g');
+		postData = postData.replace(regex, '%23');
+
 		//add doctype (IMPORTANT for correct rendering!)                     
 		var docTypeAndHTML = new XMLSerializer().serializeToString(document.doctype) + '<html xmlns="http://www.w3.org/1999/xhtml">';
 		postData = docTypeAndHTML + postData + "</html>";
@@ -1493,13 +1504,13 @@ function collision(div1, div2) {
 };
 
 $(document).mousemove(function(event){
-    if (window.autohidecursor!=='') {
-            if (window.autohidecursortimer>window.autohidecursortime) {
-                    window.autohidecursortimer=0;
-                    $(window.autohidecursor).css('cursor','auto');
-            }
-    }
+	if (window.autohidecursor!=='') {
+		if (window.autohidecursortimer>window.autohidecursortime) {
+			window.autohidecursortimer=0;
+			$(window.autohidecursor).css('cursor','auto');
+		}
+	}
 });
- 
+
 
 
