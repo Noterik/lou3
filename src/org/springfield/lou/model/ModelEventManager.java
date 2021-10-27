@@ -17,6 +17,7 @@ import org.springfield.lou.application.PathBindObject;
 import org.springfield.lou.controllers.Html5Controller;
 import org.springfield.lou.screen.BindEvent;
 import org.springfield.lou.screen.Screen;
+import java.util.concurrent.*;
 
 public class ModelEventManager {
     private Map<String, ArrayList<ModelBindObject>> propertybinds = new HashMap<String, ArrayList<ModelBindObject>>();
@@ -29,7 +30,9 @@ public class ModelEventManager {
     
 	protected Stack<ModelBindEvent> eventqueue  = new Stack<ModelBindEvent>();
 	private ModelEventThread normalthread;
-    
+    private static ExecutorService es=Executors.newFixedThreadPool(500);
+	
+	
     public ModelEventManager() {
     	normalthread = new ModelEventThread("normal",this);
     }
@@ -462,33 +465,53 @@ public class ModelEventManager {
     public void deliverNotify(String path,FsNode node) {	
  //   	System.out.println("PATH="+path+" N="+node.asXML());
     	String dstring="";
+    	boolean threaded = true;
 		long starttime = new Date().getTime();
 		ArrayList<ModelBindObject> binds = notifybinds.get(path); // direct hit
 		if (binds!=null) {
-			ModelEvent event = new ModelEvent();
+  			ModelEvent event = new ModelEvent();
 			event.path = path;
 			event.target = node;
 			event.eventtype = ModelBindEvent.NOTIFY;
-			for (int i=binds.size()-1;i>-1;i--) {
-				ModelBindObject bind  = binds.get(i);
-				try {	
-					bind.methodcall.invoke(bind.obj,event);
-					dstring += ""+bind.obj+"/"+bind.method+"("+(new Date().getTime()-starttime)+") ";
-				} catch(Exception e) {
-					System.out.println("Error during nofity delivery : "+bind.selector+" "+bind.method+" "+bind.obj);
-
-					e.printStackTrace();
+			if (threaded) {
+				// done in cast (multithreaded) loop
+				for (int i=binds.size()-1;i>-1;i--) {
+					ModelBindObject bind  = binds.get(i);
+					ModelPoolNotify tr = new ModelPoolNotify(event,bind);
+					// add this to the threadpool 
+					es.execute(tr);
+				}
+			} else {
+				// done in one loop
+				for (int i=binds.size()-1;i>-1;i--) {
+					ModelBindObject bind  = binds.get(i);
+					try {	
+						bind.methodcall.invoke(bind.obj,event);
+					//	dstring += ""+bind.obj+"/"+bind.method+"("+(new Date().getTime()-starttime)+") ";
+					} catch(Exception e) {
+						System.out.println("Error during nofity delivery : "+bind.selector+" "+bind.method+" "+bind.obj);
+						e.printStackTrace();
+					}
 				}
 			}
+			long time = new Date().getTime()-starttime;
+			int callsdone = binds.size();
+			if (time>100) {
+				System.out.println("QUEUE SLOW notify delivertime="+path+" time="+time+" binds="+callsdone+" avg="+(time/callsdone));
+			}
+
+			//System.out.println("notify delivertime="+path+" "+time+" trace="+dstring);
+
 		}
-		long time = new Date().getTime()-starttime;
-		if (time>200) System.out.println("notify delivertime="+path+" "+time+" trace="+dstring);
     }
     
     
     public void checkNormalQueue() {
     	while (eventqueue.size()>0) {
+
     		ModelBindEvent b = eventqueue.pop(); // should be a case statement
+    		
+    		if (eventqueue.size()>200) System.out.println("big eventqueue size="+eventqueue.size());
     		if (b.type == ModelBindEvent.PROPERTY) {
     			deliverProperty(b.path,(String)b.value);
     		} else if (b.type == ModelBindEvent.PROPERTIES) {

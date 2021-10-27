@@ -125,7 +125,7 @@ public class Model {
  		notify("/shared/internal",node);
 	}
  	
-	public void notify(String path) {
+	public void notify(String path) { 
  		FsNode notifynode = new FsNode("notify","1");
  		notify(path,notifynode);
 	}
