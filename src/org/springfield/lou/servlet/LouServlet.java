@@ -254,6 +254,7 @@ public class LouServlet extends HttpServlet {
 			body+="<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n";
 			body+="<meta name=\"viewport\" content=\"width=device-width, user-scalable=no,initial-scale=1, maximum-scale=1\">";
 			body+=app.getMetaHeaders(request);
+			body+="<link rel=\"stylesheet\" href=\"/eddie/css/init-loader.css\">\n";
 			body+="<script type=\"text/javascript\">if (!window.console) window.console = {};if (!window.console.log) window.console.log = function () { };</script>";
 			body+="<script language=\"javascript\" type=\"text/javascript\">var LouSettings = {\"lou_ip\": \"" + LazyHomer.getExternalIpNumber() + "\", \"lou_port\": \"" + LazyHomer.getBartPort() + "\", \"user\": \"" + user + "\", \"app\": \"" + nameapp + "\", \"fullapp\": \"" + fullappname + "\", \"appparams\": \"" + params + "\"}</script>\n";
 			body+="<script language=\"javascript\" type=\"text/javascript\" src=\"/eddie/js/jquery-2.2.4.min.js\"></script>\n";
@@ -286,7 +287,19 @@ public class LouServlet extends HttpServlet {
 
 			body+="<body>\n";
 
-			body+="<div id=\"screen\" />\n";
+			body+="<div id=\"screen\">\n";
+			body+="</div>\n";
+			body+="<div class=\"init-loader-wrapper\">\n";
+			body+="<div class=\"init-loader\"></div>\n";
+			body+="<div class=\"init-loader-text\">\n";
+			body+="<p>Loading...</p>\n";
+			body+="<p>Parsing the requests...</p>\n";
+			body+="<p>Warming up the modules...</p>\n";
+			body+="<p>Connecting the database...</p>\n";
+			body+="<p>Rendering the data...</p>\n";
+			body+="<p>Getting up the slides...</p>\n";
+			body+="</div>\n";
+			body+="</div>\n";
 			body+="</body>\n";
 			body+="</html>\n";
 			out.write(body.getBytes());
