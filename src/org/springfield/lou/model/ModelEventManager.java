@@ -295,7 +295,11 @@ public class ModelEventManager {
     		List<ModelBindObject> l = (List)binds.get(key);
     		for (int i=l.size()-1;i>=0;i--) {
 				ModelBindObject bind  = l.get(i);
-				if (bind.screenid.equals(screenid)) {
+				if (bind==null) {
+					System.out.println("ModelEventManager bind=null");
+				} else if (bind.screenid==null) {
+					System.out.println("ModelEventManager screenid=null");
+				} else if (bind.screenid.equals(screenid)) {
 					l.remove(i);
 				}
     		}
@@ -473,11 +477,12 @@ public class ModelEventManager {
 			event.path = path;
 			event.target = node;
 			event.eventtype = ModelBindEvent.NOTIFY;
+			int bindsize = binds.size();
 			if (threaded) {
 				// done in cast (multithreaded) loop
 				for (int i=binds.size()-1;i>-1;i--) {
 					ModelBindObject bind  = binds.get(i);
-					ModelPoolNotify tr = new ModelPoolNotify(event,bind);
+					ModelPoolNotify tr = new ModelPoolNotify(event,bind,bindsize,(i+1));
 					// add this to the threadpool 
 					es.execute(tr);
 				}

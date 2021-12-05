@@ -6,10 +6,14 @@ public class ModelPoolNotify implements Runnable {
 
 	ModelEvent event;
 	ModelBindObject bind;
+	int groupsize;
+	int iamnumber;
 	
-	public ModelPoolNotify(ModelEvent e,ModelBindObject b) {
+	public ModelPoolNotify(ModelEvent e,ModelBindObject b,int g,int i) {
 		event = e;
 		bind = b;
+		groupsize = g;
+		iamnumber = i;
 	}
 	
 	public void run() {
@@ -22,8 +26,8 @@ public class ModelPoolNotify implements Runnable {
 			e.printStackTrace();
 		}
 		long time = new Date().getTime()-starttime;
-		if (time>200) {
-			System.out.println("SLOW notify delivertime="+time+" "+bind.selector+" "+bind.method+" "+bind.obj);
+		if (time>100) {
+			System.out.println("SLOW notify delivertime("+groupsize+"/"+iamnumber+")="+time+" "+bind.selector+" "+bind.method+" "+bind.obj);
 		}
 
 	}

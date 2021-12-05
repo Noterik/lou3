@@ -10,6 +10,7 @@ import javax.websocket.Session;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.springfield.lou.screen.Screen;
+import org.springfield.lou.application.*;
 
 public class LouWebSocketConnection implements MessageHandler.Partial<String> {
 
@@ -124,7 +125,13 @@ public class LouWebSocketConnection implements MessageHandler.Partial<String> {
 	}
 	
 	public synchronized void send(String message) {
-		if (!session.isOpen()) return;
+		if (!session.isOpen()) {
+		//	Html5ApplicationInterface app = screen.getApplication();
+		//	String username = screen.getUserName();
+		//	System.out.println("WANT TO SEND TO BROKEN CONNECTION SCREEN SHOULD BE REMOVED "+screen+" APP="+app+" USER="+username);
+		//	if (app!=null) app.removeScreen(screen.getId(),username);
+			return;
+		}
 		long st = new Date().getTime();
 		try {
 			session.getBasicRemote().sendText(message);
