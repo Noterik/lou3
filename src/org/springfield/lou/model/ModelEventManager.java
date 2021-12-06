@@ -496,7 +496,7 @@ public class ModelEventManager {
 			}
 			long time = new Date().getTime()-starttime;
 			int callsdone = binds.size();
-			if (time>100) {
+			if (time>200) {
 				System.out.println("QUEUE SLOW notify delivertime="+path+" time="+time+" binds="+callsdone+" avg="+(time/callsdone));
 			}
 
@@ -511,7 +511,7 @@ public class ModelEventManager {
 
     		ModelBindEvent b = eventqueue.pop(); // should be a case statement
     		
-    		if (eventqueue.size()>200) System.out.println("big eventqueue size="+eventqueue.size());
+    		//if (eventqueue.size()>200) System.out.println("big eventqueue size="+eventqueue.size());
     		if (b.type == ModelBindEvent.PROPERTY) {
     			deliverProperty(b.path,(String)b.value);
     		} else if (b.type == ModelBindEvent.PROPERTIES) {
