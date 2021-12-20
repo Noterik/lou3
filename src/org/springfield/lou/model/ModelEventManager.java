@@ -28,13 +28,13 @@ public class ModelEventManager {
     private Map<String,TimeLineWatcher> timelinewatchers = new HashMap<String,TimeLineWatcher>();
 
     
-	protected Stack<ModelBindEvent> eventqueue  = new Stack<ModelBindEvent>();
-	private ModelEventThread normalthread;
+	//protected Stack<ModelBindEvent> eventqueue  = new Stack<ModelBindEvent>();
+	//private ModelEventThread normalthread;
     private static ExecutorService es=Executors.newFixedThreadPool(500);
 	
 	
     public ModelEventManager() {
-    	normalthread = new ModelEventThread("normal",this);
+    //	normalthread = new ModelEventThread("normal",this);
     }
     
     public int getTotalBindsCount() {
@@ -309,20 +309,15 @@ public class ModelEventManager {
      
     
     public void setProperty(String path,String value) {
-    	eventqueue.push(new ModelBindEvent(ModelBindEvent.PROPERTY,path,value));
-    	if (eventqueue.size()>0) {
-    		normalthread.check();
-    	//	checkNormalQueue(); // direct delivery for testing.
-    	}
-    
+    	// TYPE 1
+    	System.out.println("TYPE 1");
+		deliverProperty(path,value);
     }
     
     public void notify(String path,FsNode value) {
-    	eventqueue.push(new ModelBindEvent(ModelBindEvent.NOTIFY,path,value));
-    	if (eventqueue.size()>0) {
-    		normalthread.check();
-    	}
-    
+    	// TYPE 2
+    	System.out.println("TYPE 2");
+ 		deliverNotify(path,value);
     }
     
 	public synchronized void onTimeLineNotify(String path,String timer,String starttime,String duration,String methodname,Html5Controller callbackobject) {
@@ -362,10 +357,9 @@ public class ModelEventManager {
  	
     
 	public void setProperties(String path,FsPropertySet set) {
-    	eventqueue.push(new ModelBindEvent(ModelBindEvent.PROPERTIES,path,set));
-    	if (eventqueue.size()>0) {
-    		normalthread.check();
-    	}
+		// TYPE 3
+    	System.out.println("TYPE 3");
+		deliverProperties(path,set);
 	}
 	
 	
@@ -469,7 +463,7 @@ public class ModelEventManager {
     public void deliverNotify(String path,FsNode node) {	
  //   	System.out.println("PATH="+path+" N="+node.asXML());
     	String dstring="";
-    	boolean threaded = false;
+    	boolean threaded = true;
 		long starttime = new Date().getTime();
 		ArrayList<ModelBindObject> binds = notifybinds.get(path); // direct hit
 		if (binds!=null) {
@@ -502,7 +496,7 @@ public class ModelEventManager {
 			long time = new Date().getTime()-starttime;
 			int callsdone = binds.size();
 			if (time>200) {
-				System.out.println("QUEUE SLOW notify delivertime="+path+" time="+time+" binds="+callsdone+" avg="+(time/callsdone));
+				System.out.println("QUEUE SLOW ("+threaded+") notify delivertime="+path+" time="+time+" binds="+callsdone+" avg="+(time/callsdone));
 			}
 
 			//System.out.println("notify delivertime="+path+" "+time+" trace="+dstring);
@@ -510,21 +504,6 @@ public class ModelEventManager {
 		}
     }
     
-    
-    public void checkNormalQueue() {
-    	while (eventqueue.size()>0) {
 
-    		ModelBindEvent b = eventqueue.pop(); // should be a case statement
-    		
-    		//if (eventqueue.size()>200) System.out.println("big eventqueue size="+eventqueue.size());
-    		if (b.type == ModelBindEvent.PROPERTY) {
-    			deliverProperty(b.path,(String)b.value);
-    		} else if (b.type == ModelBindEvent.PROPERTIES) {
-        			deliverProperties(b.path,(FsPropertySet)b.value);
-    		} else if (b.type == ModelBindEvent.NOTIFY) {
-    			deliverNotify(b.path,(FsNode)b.value);
-    		}
-    	}
-    }
 
 }

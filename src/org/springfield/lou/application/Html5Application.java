@@ -179,8 +179,8 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 	public void setCallback(String name,String m,Class c) {
 		
 	}
-	
-	public synchronized Screen getNewScreen(Capabilities caps,Map<String,String[]> p) {
+	public Screen getNewScreen(Capabilities caps,Map<String,String[]> p) {
+//	public synchronized Screen getNewScreen(Capabilities caps,Map<String,String[]> p) {
 		Long newid = new Date().getTime();
 		screencounter++;
 		Screen screen = new Screen(this,caps,id+"/1/screen/"+newid);

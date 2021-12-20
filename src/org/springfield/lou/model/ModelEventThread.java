@@ -28,7 +28,7 @@ public class ModelEventThread extends Thread {
 	}
 	
 	private void doWork() {
-		parent.checkNormalQueue();
+	//	parent.checkNormalQueue();
 	}
 	
 	public void check() {
