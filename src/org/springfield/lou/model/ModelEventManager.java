@@ -202,8 +202,13 @@ public class ModelEventManager {
 			if (list!=null) {
 				for (int i=list.size()-1;i>=0;i--) {
 					ModelBindObject co = list.get(i);
-					if (co.screenid.equals(screenid) && co.method.equals(methodname) && co.methodcall.getDeclaringClass().getName().equals(method.getDeclaringClass().getName())) {
-						list.remove(i); // dub kill
+					try {
+						if (co.screenid.equals(screenid) && co.method.equals(methodname) && co.methodcall.getDeclaringClass().getName().equals(method.getDeclaringClass().getName())) {
+							list.remove(i); // dub kill
+						}
+					} catch(Exception e) {
+						// something was wrong we don't report unless in debug
+						System.out.println("co="+co+" co.s="+co.screenid);
 					}
 				}
 				list.add(new ModelBindObject(methodname,screenid,callbackobject.getApplicationHashCode(),targetid,callbackobject,method));
@@ -310,13 +315,13 @@ public class ModelEventManager {
     
     public void setProperty(String path,String value) {
     	// TYPE 1
-    	System.out.println("TYPE 1");
+    	//System.out.println("TYPE 1");
 		deliverProperty(path,value);
     }
     
     public void notify(String path,FsNode value) {
     	// TYPE 2
-    	System.out.println("TYPE 2");
+    	//System.out.println("TYPE 2="+path);
  		deliverNotify(path,value);
     }
     
@@ -358,7 +363,7 @@ public class ModelEventManager {
     
 	public void setProperties(String path,FsPropertySet set) {
 		// TYPE 3
-    	System.out.println("TYPE 3");
+    	// System.out.println("TYPE 3");
 		deliverProperties(path,set);
 	}
 	
