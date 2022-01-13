@@ -147,6 +147,7 @@ public class Screen {
 		HashMap<String,PathBindObject> binds = pathbindobjects.get(key);
 		//System.out.println("BB="+binds);
 		if (binds==null) return;
+		//System.out.println("BBSIZE="+binds.size());
 		
 		Set<String> keys = binds.keySet();
 		Iterator<String> it = keys.iterator();
@@ -166,10 +167,27 @@ public class Screen {
 						//System.out.println("methodname="+methodname+" object="+object+" selector="+bind.selector);
 						if (object!=null) {
 							try {
+								// crash test based on a key event
+								//if (key.equals("admincopy/keypress")) {
+								//	System.out.println("TRY CRASH DATA2");
+									//System.out.println("methodname="+methodname+" object="+object+" selector="+bind.selector);
+								//	data=null;
+							//	}
 								Method method = object.getClass().getMethod(methodname,Screen.class,JSONObject.class);
 								if (method!=null) {	
-									Screen fs = app.getScreen(from);
-									method.invoke(object,fs,data);
+									try {
+										Screen fs = app.getScreen(from);
+										if (fs!=null && data!=null) {
+											method.invoke(object,fs,data); // possible crash point
+										} else {
+											System.out.println("invoke on empty screen tried="+from+" fs="+fs+" d="+data);
+											System.out.println("methodname="+methodname+" object="+object+" selector="+bind.selector);
+										}
+									} catch(Exception e) {
+										System.out.println("methodname="+methodname+" object="+object+" selector="+bind.selector);
+										e.printStackTrace();
+										
+									}
 								} else {
 									System.out.println("MISSING METHOD IN APP ="+method);
 								}

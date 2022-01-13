@@ -386,6 +386,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     				rerouteNotify(s,component);
     			} else {
     				JSONObject data = (JSONObject)new JSONParser().parse(component);
+    				
     				s.event(from,lookup,data);
     			}
     		} catch(Exception e) {

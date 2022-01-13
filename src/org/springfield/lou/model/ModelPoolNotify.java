@@ -26,7 +26,7 @@ public class ModelPoolNotify implements Runnable {
 			e.printStackTrace();
 		}
 		long time = new Date().getTime()-starttime;
-		if (time>100) {
+		if (time>300) {
 			System.out.println("SLOW notify (threader) delivertime("+groupsize+"/"+iamnumber+")="+time+" "+bind.selector+" "+bind.method+" "+bind.obj);
 		}
 
