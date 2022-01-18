@@ -41,6 +41,7 @@ import org.springfield.lou.homer.LazyHomer;
 import org.springfield.lou.model.AppInstanceModel;
 import org.springfield.lou.model.AppModel;
 import org.springfield.lou.model.Model;
+import org.springfield.lou.model.ModelEventManager;
 import org.springfield.lou.screen.Capabilities;
 import org.springfield.lou.screen.Html5Element;
 import org.springfield.lou.screen.Screen;
@@ -234,6 +235,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 				System.out.println("Exception in run() application");
 				e.printStackTrace();
 			}
+			System.out.println("TR INUSE="+ModelEventManager.getInuse());
 		}
 		System.out.println("application run done, shutting down");
 	}

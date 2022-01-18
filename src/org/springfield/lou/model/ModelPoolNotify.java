@@ -29,7 +29,7 @@ public class ModelPoolNotify implements Runnable {
 		if (time>300) {
 			System.out.println("SLOW notify (threader) delivertime("+groupsize+"/"+iamnumber+")="+time+" "+bind.selector+" "+bind.method+" "+bind.obj);
 		}
-
+		ModelEventManager.inuse--;
 	}
 
 }

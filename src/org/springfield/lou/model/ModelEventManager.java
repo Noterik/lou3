@@ -31,6 +31,7 @@ public class ModelEventManager {
 	//protected Stack<ModelBindEvent> eventqueue  = new Stack<ModelBindEvent>();
 	//private ModelEventThread normalthread;
     private static ExecutorService es=Executors.newFixedThreadPool(500);
+    public static int inuse=0;
 	
 	
     public ModelEventManager() {
@@ -464,6 +465,10 @@ public class ModelEventManager {
 		}
     }
     
+    public static int getInuse() {
+    	return inuse;
+    }
+    
     
     public void deliverNotify(String path,FsNode node) {	
  //   	System.out.println("PATH="+path+" N="+node.asXML());
@@ -477,14 +482,16 @@ public class ModelEventManager {
 			event.target = node;
 			event.eventtype = ModelBindEvent.NOTIFY;
 			int bindsize = binds.size();
-			if (threaded) {
+			//if (threaded) {
 				// done in cast (multithreaded) loop
 				for (int i=binds.size()-1;i>-1;i--) {
 					ModelBindObject bind  = binds.get(i);
 					ModelPoolNotify tr = new ModelPoolNotify(event,bind,bindsize,(i+1));
 					// add this to the threadpool 
+					inuse++;
 					es.execute(tr);
 				}
+			/*
 			} else {
 				// done in one loop
 				for (int i=binds.size()-1;i>-1;i--) {
@@ -505,6 +512,8 @@ public class ModelEventManager {
 			}
 
 			//System.out.println("notify delivertime="+path+" "+time+" trace="+dstring);
+			
+			 */
 
 		}
     }
