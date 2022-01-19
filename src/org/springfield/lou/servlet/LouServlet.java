@@ -737,7 +737,7 @@ public class LouServlet extends HttpServlet {
 		String exts[] = valids.split(",");
 		String cext = cfilename.substring(cfilename.lastIndexOf(".")+1);
 		for (int i=0;i<exts.length;i++) {
-			System.out.println("cext="+cext+" ext="+exts[i]);
+			//System.out.println("cext="+cext+" ext="+exts[i]);
 			if (cext.equals(exts[i])) {
 				return cext;
 			}

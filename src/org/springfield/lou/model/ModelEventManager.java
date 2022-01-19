@@ -178,7 +178,7 @@ public class ModelEventManager {
 			if (list!=null) {
 				for (int i=list.size()-1;i>=0;i--) {
 					ModelBindObject co = list.get(i);
-					if (co.screenid.equals(screenid) && co.method.equals(methodname) && co.methodcall.getDeclaringClass().getName().equals(method.getDeclaringClass().getName())) {
+					if (co!=null && co.screenid!=null && co.screenid.equals(screenid) && co.method.equals(methodname) && co.methodcall.getDeclaringClass().getName().equals(method.getDeclaringClass().getName())) {
 						list.remove(i); // dub kill
 					}
 				}
@@ -284,7 +284,7 @@ public class ModelEventManager {
     		List<ModelBindObject> l = (List)binds.get(key);
     		for (int i=l.size()-1;i>=0;i--) {
 				ModelBindObject bind  = l.get(i);
-				if (bind.obj==controller) {
+				if (bind!=null && bind.obj!=null && bind.obj==controller) {
 					l.remove(i);
 				}
     		}

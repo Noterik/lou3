@@ -44,7 +44,7 @@ public class ImageManager {
     	String bucket = "springfield-private-storage";
 		AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withCredentials(new EnvironmentVariableCredentialsProvider()).build();
         ObjectListing images = s3Client.listObjects(bucket,path); 
-        System.out.println("K="+path);
+        //System.out.println("K="+path);
         
         List<S3ObjectSummary> list = images.getObjectSummaries();
         List<AmazonImage> results = new ArrayList<AmazonImage>();
@@ -53,7 +53,7 @@ public class ImageManager {
             
 
             String key=obj.getKey();
-            System.out.println("K="+path+" "+key);
+            //System.out.println("K="+path+" "+key);
             if (key.indexOf(".jpg")!=-1) { // kind of a mistake but needed for now
             	AmazonImage ni = new AmazonImage(s3Client,bucket,key);
             	results.add(ni);            	

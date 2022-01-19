@@ -302,7 +302,7 @@ public class Model {
 	
 	public boolean setProperty(String path,String value) {
 		if (value==null) {
-			System.out.println("model trying to set empty value on "+path);
+			//System.out.println("model trying to set empty value on "+path);
 			return false;
 		}
 		if (path.startsWith("@")) {
@@ -479,7 +479,6 @@ public class Model {
 			//System.out.println("SHARED DELETE NODE NOT IMPLEMENTED YET");
 			return smodel.deleteNode(uri);
 		} else if (uri.startsWith("/domain/")) { 
-			System.out.println("NODE DELETE WANTED ON "+uri);
 			return Fs.deleteNode(uri);
 		}
 		return false;
