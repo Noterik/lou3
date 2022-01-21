@@ -235,7 +235,7 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
 				System.out.println("Exception in run() application");
 				e.printStackTrace();
 			}
-			System.out.println("TR INUSE="+ModelEventManager.getInuse());
+			ModelEventManager.getThreadState();
 		}
 		System.out.println("application run done, shutting down");
 	}

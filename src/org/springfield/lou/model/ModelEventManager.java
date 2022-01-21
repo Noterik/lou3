@@ -1,6 +1,7 @@
 package org.springfield.lou.model;
 
 import java.lang.reflect.Method;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import org.springfield.lou.controllers.Html5Controller;
 import org.springfield.lou.screen.BindEvent;
 import org.springfield.lou.screen.Screen;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ModelEventManager {
     private Map<String, ArrayList<ModelBindObject>> propertybinds = new HashMap<String, ArrayList<ModelBindObject>>();
@@ -31,7 +33,10 @@ public class ModelEventManager {
 	//protected Stack<ModelBindEvent> eventqueue  = new Stack<ModelBindEvent>();
 	//private ModelEventThread normalthread;
     private static ExecutorService es=Executors.newFixedThreadPool(500);
-    public static int inuse=0;
+ 	public static AtomicInteger up = new AtomicInteger();
+	public static AtomicInteger down = new AtomicInteger();
+	public static AtomicInteger error = new AtomicInteger();
+    
 	
 	
     public ModelEventManager() {
@@ -302,7 +307,7 @@ public class ModelEventManager {
     		for (int i=l.size()-1;i>=0;i--) {
 				ModelBindObject bind  = l.get(i);
 				if (bind==null) {
-					System.out.println("ModelEventManager bind=null");
+					//System.out.println("ModelEventManager bind=null");
 				} else if (bind.screenid==null) {
 					System.out.println("ModelEventManager screenid=null");
 				} else if (bind.screenid.equals(screenid)) {
@@ -465,8 +470,11 @@ public class ModelEventManager {
 		}
     }
     
-    public static int getInuse() {
-    	return inuse;
+    public  static synchronized void getThreadState() {  	
+    	int u = up.get();
+    	int d = down.get();
+    	int e = error.get();
+    	System.out.println("TR up="+u+" down="+d+" delta="+(u-d)+" error="+e); 	
     }
     
     
@@ -488,7 +496,6 @@ public class ModelEventManager {
 					ModelBindObject bind  = binds.get(i);
 					ModelPoolNotify tr = new ModelPoolNotify(event,bind,bindsize,(i+1));
 					// add this to the threadpool 
-					inuse++;
 					es.execute(tr);
 				}
 			/*
