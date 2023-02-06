@@ -143,6 +143,7 @@ var Eddie = function(options){
 								var oldvalue = trackervalues[tid+"/"+track];
 								var newvalue = ""+(left/width)*100;
 								newvalue += ","+((top/height)*100);
+                                newvalue += ","+tid;
 								if (oldvalue!=newvalue) {
 									console.log("xy="+newvalue+" T="+top+" H="+height);
 									trackervalues[tid+"/"+track] = newvalue;
