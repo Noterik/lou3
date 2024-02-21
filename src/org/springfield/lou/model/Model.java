@@ -250,6 +250,7 @@ public class Model {
 			path=xpathToFs(path);
 		}
 		if (path.startsWith("/screen/")) {
+			System.out.println("onPropertiesUpdate="+path);
 			eventmanager.onPropertiesUpdate(getScreenPath(path),methodname,callbackobject);
 		} else {
 			eventmanager.onPropertiesUpdate(path,methodname,callbackobject);
@@ -285,6 +286,7 @@ public class Model {
 	   	 	eventmanager.setProperties(path, properties); // signal the others new code
 	   	 	return true;
 		} else if (path.startsWith("/screen/")) {
+				System.out.println("model setProperties called "+properties.size());
 				smodel.setProperties(path.substring(5),properties);
 		   	 	eventmanager.setProperties(getScreenPath(path), properties); // signal the others new code
 		   	 	return true;
@@ -343,6 +345,51 @@ public class Model {
 		}
 		return false;
 	}
+	
+	public boolean setPropertyAnon(String path,String value) {
+		if (value==null) {
+			//System.out.println("model trying to set empty value on "+path);
+			return false;
+		}
+		if (path.startsWith("@")) {
+			// its a model mapping
+			int pos=path.indexOf("/"); // not sure if i can move tis in getModeMapping will try later
+			if (pos==-1) {
+				path = getModelMapping(path.substring(1));
+			} else {
+				String n = getModelMapping(path.substring(1,pos));
+				path = n+path.substring(pos);
+			}
+		//	System.out.println("SET PROPERTY @ PATH="+path);
+		}
+		
+		if (path.indexOf("[")!=-1) {
+			path=xpathToFs(path);
+		}
+		if (path.startsWith("/screen/"))  {
+			smodel.setPropertyAnon(path,value);
+	   	 	eventmanager.setProperty(getScreenPath(path), value); // signal the others new code
+	   	 	return true;
+		} else if (path.startsWith("/browser/"))  {
+				browsermodel.setProperty(getBrowserPath(path),value);
+		   	 	eventmanager.setProperty(getBrowserPath(path), value); // signal the others new code
+		   	 	return true;
+		} else if (path.startsWith("/shared/"))  {
+				sharedmodel.setProperty(path,value);
+		   	 	eventmanager.setProperty(path, value); // signal the others new code
+		   	 	return true;
+		} else if (path.startsWith("/app/")) {
+			amodel.setProperty(path,value);
+	   	 	eventmanager.setProperty(path, value); // signal the others new code
+	   	 	return true;
+		} else if (path.startsWith("/domain/")) {
+			dmodel.setProperty(path.substring(8),value);
+	   	 	eventmanager.setProperty(path, value); // signal the others new code
+	   	 	return true;
+		}
+		return false;
+	}
+	
 	
 	public String getProperty(String path) {
 		return getProperty(path,null);

@@ -225,7 +225,7 @@ public class LazyHomer implements MargeObserver {
 					
 					//System.out.println("DEVELOPER MODE = "+mp.getDeveloperMode());
 					
-					System.out.println("comparing ip "+ipnumber+" with "+myip+" added hack");					
+					//System.out.println("comparing ip "+ipnumber+" with "+myip+" added hack");					
 					if (ipnumber.equals(myip)) {
 						//System.out.println("ip was equal");
 						foundmynode = true;

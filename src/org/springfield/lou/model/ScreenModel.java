@@ -46,6 +46,17 @@ public class ScreenModel extends MemoryModel {
 		recoverykey = r;
 	}
 	
+	
+	
+	public boolean setPropertyAnon(String path,String value) {
+		if (recoverylist.contains(path.substring(8))) {
+			String spath = path.replace("/","_");
+			// ok we need to store this for now just works for Strings
+			Fs.setPropertyAnon(recoverykey,spath.substring(8), value);
+		}
+		return super.setProperty(path, value);
+	}
+	
 	public boolean setProperty(String path,String value) {
 		if (recoverylist.contains(path.substring(8))) {
 			String spath = path.replace("/","_");

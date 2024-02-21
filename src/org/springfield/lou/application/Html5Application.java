@@ -131,6 +131,11 @@ public class Html5Application implements Html5ApplicationInterface,Runnable {
     	return recoverylist;
     }
     
+    public ArrayList<String> getAnonRecoveryList() {
+    	return recoverylist;
+    }
+    
+    
     public void setSessionRecovery(boolean s) {
     	sessionrecovery = s;
     }

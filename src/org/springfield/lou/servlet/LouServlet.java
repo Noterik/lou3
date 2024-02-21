@@ -56,6 +56,7 @@ import org.springfield.lou.screen.Capabilities;
 import org.springfield.lou.screen.Screen;
 import org.springfield.lou.tools.XMLHelper;
 import org.springfield.mojo.http.ProxyHandler;
+import org.springfield.mojo.monitoring.MonitorManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -127,13 +128,15 @@ public class LouServlet extends HttpServlet {
 		response.addHeader("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS");
 		response.addHeader("Access-Control-Allow-Headers", "Content-Type,Range,If-None-Match,Accept-Ranges");
 		response.addHeader("Access-Control-Expose-Headers", "Content-Range");
+		
+		System.out.println("INCOMING="+request.getRequestURI());
+		
 		String mt = request.getContentType();
 		if (mt!=null && mt.indexOf("text/put")!=-1) { // need to check who made this and why (daniel)
 			doPut(request,response);
 			return;
 		}
 
-		//System.out.println("REQ="+request.getRequestURI()+" PARAMS="+request.getQueryString()+" MT="+request.getContentType());
 		String body = request.getRequestURI();
 		if(request.getParameter("method")!=null) {
 			if(request.getParameter("method").equals("post")){
@@ -357,6 +360,7 @@ public class LouServlet extends HttpServlet {
 
 		//System.out.println("PUT REQ="+request.getRequestURI());
 		
+		
 		String body = request.getRequestURI();
 		// if proxy request send it to Servicehandler 
 		if (body.indexOf("/lou/proxy/")!=-1) {
@@ -440,12 +444,14 @@ public class LouServlet extends HttpServlet {
 				String msg = screen.getMsg();
 				if (msg==null) { // bad bad bad
 					try {
+						System.out.println("hang bug?");
 						synchronized (screen) {
 							//screen.wait();
+							
 							screen.wait(2*1000); // turned into 'highspeed' for testing so 2 seconds instead of 60, also means eddie.js change
 						}
 					} catch (InterruptedException e) {
-						//	System.out.println("got interrupt.. getting data");
+						System.out.println("got interrupt.. getting data");
 					}
 					msg = screen.getMsg();
 					//System.out.println("MSG="+msg);
@@ -485,7 +491,7 @@ public class LouServlet extends HttpServlet {
 					caps.addCapability("ipnumber", request.getRemoteAddr());
 					caps.addCapability("servername", request.getServerName());
 					String ref = request.getHeader("Referer");
-					//System.out.println("REF="+ref);
+					//System.out.println("REF="+ref+" "+request.getRequestURI());
 					if (ref!=null) {
 						caps.addCapability("referer", ref);
 					} else {
@@ -597,20 +603,23 @@ public class LouServlet extends HttpServlet {
 				ps.setProperty("progress","0");
 				ps.setProperty("cfilename",cfilename);
 				ps.setProperty("url",publicurl);
+				System.out.println("UPLOAD START 0%");
 				eventscreen.getModel().setProperties("/screen/upload/"+targetid,ps);
-
+				System.out.println("UPLOAD START 1%");
 				try {
 					InputStream inst = request.getInputStream();
+					System.out.println("UPLOAD START 2%");
 					int read = 0;
 					int readtotal = 0;
 					int b;
 					while ((b = inst.read())!=44) {
 						// skip the base64 tagline, not sure how todo this better
+						System.out.println("skipping base");
 					}	
-					
+					System.out.println("UPLOAD START 3%");
 					Base64InputStream b64i = new Base64InputStream(inst);
 
-					//System.out.println("Uploading a new object to S3 from a stream "+bucketname+"/"+filename+"."+fileext);
+					System.out.println("Uploading a new object to S3 from a stream "+bucketname+"/"+filename+"."+fileext);
 
 					ObjectMetadata metadata = new ObjectMetadata();
 					metadata.setContentType(filetype+"/"+fileext);
@@ -625,12 +634,14 @@ public class LouServlet extends HttpServlet {
 
 				} catch (AmazonServiceException ase) {
 					ase.printStackTrace();
+					System.out.println("UPLOAD START ERROR");
 				}
+				System.out.println("UPLOAD START 99%");
 				ps.setProperty("action","done");
 				ps.setProperty("progress","100");
 				ps.setProperty("cfilename",cfilename);
 				ps.setProperty("url",publicurl);
-
+				System.out.println("UPLOAD START 100");
 				eventscreen.getModel().setProperties("/screen/upload/"+targetid,ps);
 				return bucketname+"/"+filename+"."+fileext;
 

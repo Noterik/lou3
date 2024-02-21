@@ -82,6 +82,7 @@ public interface Html5ApplicationInterface {
 	public void setSessionRecovery(boolean s);
 	public boolean getSessionRecovery();
 	public ArrayList<String> getRecoveryList(); 
+	public ArrayList<String> getAnonRecoveryList(); 
 	public void addToRecoveryList(String name);
 	public void setCallback(String name,String k,Object o);
 	public Html5Controller createController(String name);
