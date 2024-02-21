@@ -396,7 +396,6 @@ public class Model {
 	}
 	
 	public String getProperty(String path,String language) {
-		if (debug) System.out.println("getProperty path in = "+path);
 		if (path.startsWith("@")) {
 			// its a model mapping
 			int pos=path.indexOf("/"); // not sure if i can move tis in getModeMapping will try later
@@ -408,17 +407,16 @@ public class Model {
 			}
 			//System.out.println("GET PROPERTY @ PATH="+path);
 		}
-		if (debug) System.out.println("getProperty path middle = "+path);
 		
 		if (path.indexOf("[")!=-1) {
 			path=xpathToFs(path);
 		}
-		if (debug) System.out.println("getProperty path end = "+path);
 		if (path.startsWith("/screen/")) {
 			return smodel.getProperty(path);
 		} else if (path.startsWith("/browser/")) {
 				return browsermodel.getProperty(getBrowserPath(path));
 		} else  if (path.startsWith("/shared/")) {
+				System.out.println("shared name="+path+" v="+sharedmodel.getProperty(path));
 				return sharedmodel.getProperty(path);
 		} else if (path.startsWith("/app/")) {
 			return amodel.getProperty(path);
