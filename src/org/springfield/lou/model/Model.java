@@ -416,7 +416,6 @@ public class Model {
 		} else if (path.startsWith("/browser/")) {
 				return browsermodel.getProperty(getBrowserPath(path));
 		} else  if (path.startsWith("/shared/")) {
-				System.out.println("shared name="+path+" v="+sharedmodel.getProperty(path));
 				return sharedmodel.getProperty(path);
 		} else if (path.startsWith("/app/")) {
 			return amodel.getProperty(path);
