@@ -136,6 +136,7 @@ public class Screen {
 						String name =  iter.next();
 						String value = n2.getProperty(name.replace("/", "_"));
 						if (value!=null) {
+							System.out.println("REC A="+name+" V="+value);
 							model.setPropertyAnon("/screen/"+name, value); // put it back for now just String work !
 
 						}
@@ -166,6 +167,7 @@ public class Screen {
 						n2 = new FsNode(a.getAppname(),sid);
 						Fs.insertNode(n2, "/domain/"+a.getDomain()+"/session/"+appuser);
 					}
+					System.out.println("NODE2="+n2.asXML());
 					// ok lets look at the recovery list and see what to load back into the screen
 					ArrayList<String> list = app.getRecoveryList();
 
@@ -175,6 +177,7 @@ public class Screen {
 						String name =  iter.next();
 						String value = n2.getProperty(name.replace("/", "_"));
 						if (value!=null) {
+							System.out.println("REC B="+name+" V="+value);
 							model.setProperty("/screen/"+name, value); // put it back for now just String work !
 
 						}
