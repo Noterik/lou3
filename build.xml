@@ -76,7 +76,6 @@
 				<exclude name="WEB-INF/lib/org.restlet.jar" />
 				<exclude name="WEB-INF/lib/javax.servlet.jar" />
 				<exclude name="WEB-INF/lib/aws-java-sdk-1.11.66.jar" />
-				<exclude name="WEB-INF/lib/commons-codec-*" />
 				<exclude name="WEB-INF/lib/jsch-0.1.54.jar" />
 				<exclude name="WEB-INF/lib/websocket-api*" />
 				

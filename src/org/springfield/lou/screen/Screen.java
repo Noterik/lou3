@@ -98,7 +98,6 @@ public class Screen {
 		boolean anonapp = false;
 
 		String ref = caps.getCapability("referer");
-		System.out.println("REF="+ref);
 		if (ref.contains("//beta.qandr.eu") || ref.contains("//qandr.eu") || ref.contains("//staging.qandr.eu")) {
 			anonapp = true;
 		}

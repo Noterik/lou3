@@ -129,8 +129,6 @@ public class LouServlet extends HttpServlet {
 		response.addHeader("Access-Control-Allow-Headers", "Content-Type,Range,If-None-Match,Accept-Ranges");
 		response.addHeader("Access-Control-Expose-Headers", "Content-Range");
 		
-		System.out.println("INCOMING="+request.getRequestURI());
-		
 		String mt = request.getContentType();
 		if (mt!=null && mt.indexOf("text/put")!=-1) { // need to check who made this and why (daniel)
 			doPut(request,response);
@@ -444,14 +442,13 @@ public class LouServlet extends HttpServlet {
 				String msg = screen.getMsg();
 				if (msg==null) { // bad bad bad
 					try {
-						System.out.println("hang bug?");
 						synchronized (screen) {
 							//screen.wait();
 							
 							screen.wait(2*1000); // turned into 'highspeed' for testing so 2 seconds instead of 60, also means eddie.js change
 						}
 					} catch (InterruptedException e) {
-						System.out.println("got interrupt.. getting data");
+						//System.out.println("got interrupt.. getting data");
 					}
 					msg = screen.getMsg();
 					//System.out.println("MSG="+msg);
