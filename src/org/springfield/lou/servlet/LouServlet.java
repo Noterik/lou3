@@ -600,20 +600,15 @@ public class LouServlet extends HttpServlet {
 				ps.setProperty("progress","0");
 				ps.setProperty("cfilename",cfilename);
 				ps.setProperty("url",publicurl);
-				System.out.println("UPLOAD START 0%");
 				eventscreen.getModel().setProperties("/screen/upload/"+targetid,ps);
-				System.out.println("UPLOAD START 1%");
 				try {
 					InputStream inst = request.getInputStream();
-					System.out.println("UPLOAD START 2%");
 					int read = 0;
 					int readtotal = 0;
 					int b;
 					while ((b = inst.read())!=44) {
 						// skip the base64 tagline, not sure how todo this better
-						System.out.println("skipping base");
 					}	
-					System.out.println("UPLOAD START 3%");
 					Base64InputStream b64i = new Base64InputStream(inst);
 
 					System.out.println("Uploading a new object to S3 from a stream "+bucketname+"/"+filename+"."+fileext);
@@ -631,14 +626,11 @@ public class LouServlet extends HttpServlet {
 
 				} catch (AmazonServiceException ase) {
 					ase.printStackTrace();
-					System.out.println("UPLOAD START ERROR");
 				}
-				System.out.println("UPLOAD START 99%");
 				ps.setProperty("action","done");
 				ps.setProperty("progress","100");
 				ps.setProperty("cfilename",cfilename);
 				ps.setProperty("url",publicurl);
-				System.out.println("UPLOAD START 100");
 				eventscreen.getModel().setProperties("/screen/upload/"+targetid,ps);
 				return bucketname+"/"+filename+"."+fileext;
 

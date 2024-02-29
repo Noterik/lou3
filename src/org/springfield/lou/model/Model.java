@@ -286,7 +286,6 @@ public class Model {
 	   	 	eventmanager.setProperties(path, properties); // signal the others new code
 	   	 	return true;
 		} else if (path.startsWith("/screen/")) {
-				System.out.println("model setProperties called "+properties.size());
 				smodel.setProperties(path.substring(5),properties);
 		   	 	eventmanager.setProperties(getScreenPath(path), properties); // signal the others new code
 		   	 	return true;

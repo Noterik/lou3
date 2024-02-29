@@ -182,7 +182,6 @@ public class LouWebSocketConnection implements MessageHandler.Partial<String> {
 	}
 	
 	public void resetPerformanceCounters() {
-		System.out.println("RESET COUNTERS "+this);
 		sendtime=0;
 		sendcount=0;
 		senddata=0;
