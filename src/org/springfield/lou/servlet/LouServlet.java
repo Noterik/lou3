@@ -297,7 +297,7 @@ public class LouServlet extends HttpServlet {
 			body+="<p>Parsing the requests...</p>\n";
 			body+="<p>Please reload this page...</p>\n";
 			body+="<p>Connecting the database...</p>\n";
-			body+="<p>Please reload this page...</p>\n";
+			body+="<p>Check your internet connection...</p>\n";
 			body+="<p>Getting up the slides...</p>\n";
 			body+="</div>\n";
 			body+="</div>\n";
