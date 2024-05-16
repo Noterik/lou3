@@ -295,9 +295,9 @@ public class LouServlet extends HttpServlet {
 			body+="<div class=\"init-loader-text\">\n";
 			body+="<p>Loading...</p>\n";
 			body+="<p>Parsing the requests...</p>\n";
-			body+="<p>Warming up the modules...</p>\n";
+			body+="<p>Please reload this page...</p>\n";
 			body+="<p>Connecting the database...</p>\n";
-			body+="<p>Rendering the data...</p>\n";
+			body+="<p>Please reload this page...</p>\n";
 			body+="<p>Getting up the slides...</p>\n";
 			body+="</div>\n";
 			body+="</div>\n";

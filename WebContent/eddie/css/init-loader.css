@@ -131,29 +131,29 @@
 }
 
 .init-loader-text p:nth-child(1) {
-	animation: left-one 60s ease infinite;
-	-moz-animation: left-one 60s ease infinite;
-	-webkit-animation: left-one 60s ease infinite;
+	animation: left-one 6s ease infinite;
+	-moz-animation: left-one 6s ease infinite;
+	-webkit-animation: left-one 6s ease infinite;
 }
 .init-loader-text p:nth-child(2) {
-	animation: left-two 60s ease infinite;
-	-moz-animation: left-two 60s ease infinite;
-	-webkit-animation: left-two 60s ease infinite;
+	animation: left-two 6s ease infinite;
+	-moz-animation: left-two 6s ease infinite;
+	-webkit-animation: left-two 6s ease infinite;
 }
 .init-loader-text p:nth-child(3) {
-	animation: left-three 60s ease infinite;
-	-moz-animation: left-three 60s ease infinite;
-	-webkit-animation: left-three 60s ease infinite;
+	animation: left-three 15s ease infinite;
+	-moz-animation: left-three 15s ease infinite;
+	-webkit-animation: left-three 15s ease infinite;
 }
 .init-loader-text p:nth-child(4) {
-	animation: left-four 60s ease infinite;
-	-moz-animation: left-four 60s ease infinite;
-	-webkit-animation: left-four 60s ease infinite;
+	animation: left-four 15s ease infinite;
+	-moz-animation: left-four 15s ease infinite;
+	-webkit-animation: left-four 15s ease infinite;
 }
 .init-loader-text p:nth-child(5) {
-	animation: left-five 60s ease infinite;
-	-moz-animation: left-five 60s ease infinite;
-	-webkit-animation: left-five 60s ease infinite;
+	animation: left-five 30s ease infinite;
+	-moz-animation: left-five 30s ease infinite;
+	-webkit-animation: left-five 30s ease infinite;
 }
 .init-loader-text p:nth-child(6) {
 	animation: left-six 60s ease infinite;
