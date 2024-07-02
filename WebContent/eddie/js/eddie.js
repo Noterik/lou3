@@ -1207,7 +1207,7 @@ var Eddie = function(options){
 			var yp = (event.clientY/window.innerHeight)*100;
 			map["screenXP"] = xp;
 			map["screenYP"] = yp;
-
+            map["which"] = event.which;
 
 			if (padding.length>1) {
 				for (var i = 1; i < padding.length; i++) {
