@@ -562,6 +562,11 @@ var Eddie = function(options){
 				break;
 			case "fullscreen":
 				window.fullscreenwanted = true;
+                var elem = document.documentElement;
+                var isFullScreen = document.fullscreenElement === elem;
+                if(!isFullscreen() && document.fullscreenEnabled) {
+                        elem.requestFullscreen();
+                }
 				break;
 			case "image":
 				var binary = atob(content);
