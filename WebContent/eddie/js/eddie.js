@@ -1233,8 +1233,8 @@ var Eddie = function(options){
 								if (file===undefined) {
 									file=window.dropfile;
 								}							
-
-								var fileparams = "?targetid="+name+"&screenid="+settings.screenId+"&cfilename="+file.name+"&cfilesize="+file.size;								
+								
+								var fileparams = "?targetid="+name+"&screenid="+settings.screenId+"&cfilename="+(file.name).replace("&","_and_")+"&cfilesize="+file.size;								
 								reader = new FileReader();
 								reader.readAsDataURL(file);
 								reader.onload = function(event) {  
@@ -1249,12 +1249,12 @@ var Eddie = function(options){
 										'async': true
 									});
 								};
-								map['filename'] = file.name;
+								map['filename'] = (file.name).replace("&","_and_");
 								map[name] = "filehandle";
 							} else if (p.prop("type") === "hidden" && p.prop("name") === "fileupload") {
 								var inp = $("#"+name);
 								var file = {};
-								file.name = inp.data("filename");
+								file.name = inp.data("filename").replace("&","_and_");
 								file.data = inp.val();
 								var fileparams = "?targetid="+name+"&screenid="+settings.screenId+"&cfilename="+file.name+"&cfilesize="+file.data.length;							
 
