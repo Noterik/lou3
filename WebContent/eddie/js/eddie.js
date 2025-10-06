@@ -21,6 +21,7 @@ var Eddie = function(options){
 	var autohidecursortimer = 0;
 	var trackdelay = 2;
 	var trackdelaycounter = 0;
+	var doingupload = false;
 
 	var settings = {
 			lou_ip: "",
@@ -64,7 +65,9 @@ var Eddie = function(options){
 				if (websocket.readyState===3 && delaycounter>30) {
 					if (hadwsactive) {
 						clearInterval(interval);
-						window.location.href=window.location.href;
+						if (!externalprogram) {
+							window.location.href=window.location.href;
+						}
 					}
 				}
 				if (performancetestcounter!==-1) {
@@ -265,7 +268,14 @@ var Eddie = function(options){
 	};
 
 	self.doRequest = function(args){
-		$.ajax(args);
+		$.ajax(args).done(function(data, textStatus, jqXHR) {
+    			console.log('doingupload='+doingupload+' externalprogram='+externalprogram);
+			if (doingupload && externalprogram) {
+				setTimeout(() => {
+					window.location.href=window.location.href;
+				}, "2000");
+			}
+		});
 	};
 
 	self.sendEvent = function(targetid,eventtype,data){
@@ -336,7 +346,7 @@ var Eddie = function(options){
 				'dataType': 'text',
 				'async': !sync
 			});
-		} else {
+		}  else {
 			//console.log("send ws data");
 			websocket.send(postData);
 		}
@@ -589,6 +599,7 @@ var Eddie = function(options){
 				setBind(targetid,content);
 				break;
 			case "externalprogram":
+				console.log("set externalprogram=true");
 				externalprogram = true;
 				break;
 			case "internalprogram":
@@ -1258,6 +1269,7 @@ var Eddie = function(options){
 								file.data = inp.val();
 								var fileparams = "?targetid="+name+"&screenid="+settings.screenId+"&cfilename="+file.name+"&cfilesize="+file.data.length;							
 
+								doingupload = true;
 								self.doRequest({
 									'type': 'POST',
 									'url': "//" + settings.lou_ip + ":" + settings.lou_port + "/lou/LouServlet" + settings.fullapp+fileparams,
