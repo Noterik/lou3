@@ -1,11 +1,12 @@
 package org.springfield.lou.websocket;
 
+import java.io.IOException;
 import java.lang.StringBuffer;
 import java.util.Date;
 import java.util.HashMap;
 
-import javax.websocket.MessageHandler;
-import javax.websocket.Session;
+import jakarta.websocket.MessageHandler;
+import jakarta.websocket.Session;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;

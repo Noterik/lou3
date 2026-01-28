@@ -21,12 +21,12 @@
 
 package org.springfield.lou.websocket;
 
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnOpen;
-import javax.websocket.RemoteEndpoint;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
+import jakarta.websocket.OnClose;
+import jakarta.websocket.OnError;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.RemoteEndpoint;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.ServerEndpoint;
 
 import org.springfield.lou.application.ApplicationManager;
 import org.springfield.lou.application.Html5ApplicationInterface;
@@ -38,7 +38,6 @@ import org.springfield.lou.screen.Screen;
 @ServerEndpoint("/ws")
 public class LouWebSocket {
 	
-	
 	public LouWebSocket(){
 		
 	}
@@ -46,7 +45,6 @@ public class LouWebSocket {
 	@OnOpen
 	public void open(Session session){
 		RemoteEndpoint.Basic remoteEndpointBasic = session.getBasicRemote();
-
 
 		// the websocket session needs to be linked to a screen object, for this we need to know
 		//the session id.
@@ -64,14 +62,11 @@ public class LouWebSocket {
 
 	@OnClose
 	public void close(Session session){
-		//System.out.println("Websocket closed!");
+		System.out.println("Websocket closed!");
 	}
 	
 	@OnError
 	public void onError(Session session, Throwable thr) {
-		//System.out.println("Websocket error (closed?)"+thr.getMessage());
+		System.out.println("Websocket error (closed?)"+thr.getMessage());
 	}
-	
-	
-
 }
